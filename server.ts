@@ -229,6 +229,70 @@ function getFallbackData(action: string, args: any) {
     case "generateVisibilityProjectionAnalysis":
       return `Under a ${args.scenario || 'growth'} scenario, ${name} is projected to increase its visibility score from ${args.currentScore || 78} to ${Math.min(100, (args.currentScore || 78) + 14)} over the next 90 days.`;
 
+    case "analyzeSocialMentions":
+      return {
+        summary: `Social conversations around ${name} are predominantly positive, emphasizing customer service responsiveness and product reliability on Twitter and LinkedIn.`,
+        sentimentBreakdown: { positive: 72, neutral: 18, negative: 10, totalMentions: 384, volumeTrend: 15.2, netSentimentScore: 62 },
+        platformBreakdown: [
+          { platform: 'Twitter', mentions: 142, positivePct: 76, neutralPct: 14, negativePct: 10 },
+          { platform: 'Facebook', mentions: 98, positivePct: 68, neutralPct: 20, negativePct: 12 },
+          { platform: 'Instagram', mentions: 74, positivePct: 82, neutralPct: 12, negativePct: 6 },
+          { platform: 'LinkedIn', mentions: 45, positivePct: 80, neutralPct: 15, negativePct: 5 },
+          { platform: 'Reddit', mentions: 25, positivePct: 52, neutralPct: 28, negativePct: 20 }
+        ],
+        trendingTopics: [
+          { topic: `${name} Quality`, count: 92, sentiment: 'positive' },
+          { topic: 'Customer Support', count: 74, sentiment: 'positive' },
+          { topic: 'Pricing Options', count: 38, sentiment: 'neutral' },
+          { topic: 'App Interface', count: 21, sentiment: 'positive' }
+        ],
+        keyInsights: {
+          drivers: ["Frequent praise for support team responsiveness", "Strong visual engagement on Instagram"],
+          concerns: ["Occasional pricing clarity queries on community forums"],
+          recommendations: ["Amplify customer testimonials on Twitter/X", "Deploy clear pricing FAQ responses"]
+        },
+        mentions: [
+          {
+            id: 'm-f1',
+            platform: 'Twitter',
+            author: 'Jessica Lin',
+            authorHandle: '@jess_lin',
+            authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+            followerCount: 11200,
+            influenceScore: 82,
+            content: `Switched our workflow over to ${name} this month. Phenomenal experience and super smooth onboard!`,
+            timestamp: new Date().toISOString(),
+            sentiment: 'positive',
+            sentimentScore: 0.94,
+            matchedKeyword: name,
+            engagement: { likes: 88, shares: 21, comments: 12 },
+            reach: 14500,
+            verified: true
+          },
+          {
+            id: 'm-f2',
+            platform: 'LinkedIn',
+            author: 'Robert Sterling',
+            authorHandle: 'r-sterling-tech',
+            influenceScore: 89,
+            content: `Great market analysis on ${name}'s rapid visibility expansion in regional sectors. Highly recommended team.`,
+            timestamp: new Date(Date.now() - 3600000).toISOString(),
+            sentiment: 'positive',
+            sentimentScore: 0.88,
+            matchedKeyword: name,
+            engagement: { likes: 184, shares: 32, comments: 14 },
+            reach: 22000,
+            verified: true
+          }
+        ]
+      };
+
+    case "generateSocialReply":
+      return {
+        recommendedReply: `Hi ${args.author || 'there'}, thank you so much for the feedback regarding ${name}! We truly appreciate your support and are always here if you need anything.`,
+        tone: args.tone || 'professional'
+      };
+
     default:
       return { status: "success", message: `Completed ${action}` };
   }
@@ -276,6 +340,10 @@ async function handleAIAction(action: string, args: any) {
         return await core.refreshStrategicInsights(args.businessName, args.summary);
       case "generateVisibilityProjectionAnalysis":
         return await core.generateVisibilityProjectionAnalysis(args.businessName, args.currentScore, args.scenario, args.competitorNames, args.strengths, args.weaknesses);
+      case "analyzeSocialMentions":
+        return await core.analyzeSocialMentions(args);
+      case "generateSocialReply":
+        return await core.generateSocialReply(args);
       default:
         throw new Error(`Unknown action: ${action}`);
     }

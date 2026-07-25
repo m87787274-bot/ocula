@@ -87,3 +87,12 @@ export async function refreshStrategicInsights(businessName: string, summary: st
 export async function generateVisibilityProjectionAnalysis(businessName: string, currentScore: number, scenario: string, competitorNames: string[], strengths: string[], weaknesses: string[]) {
   return callAI("generateVisibilityProjectionAnalysis", { businessName, currentScore, scenario, competitorNames, strengths, weaknesses });
 }
+
+export async function analyzeSocialMentions(args: { businessName: string; industry?: string; keywords?: string[]; timeframe?: string; platform?: string }) {
+  return callAI("analyzeSocialMentions", args);
+}
+
+export async function generateSocialReply(args: { businessName: string; mentionContent: string; author: string; platform: string; sentiment: string; tone?: string }) {
+  return callAI("generateSocialReply", args);
+}
+

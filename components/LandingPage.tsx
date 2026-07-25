@@ -14,9 +14,10 @@ interface LandingPageProps {
   onGoToDashboard: () => void;
   onViewLegal?: () => void;
   onGiveFeedback?: () => void;
+  onGoToFlokker?: () => void;
 }
 
-const LandingPage: React.FC<LandingPageProps> = ({ user, onStartAudit, onLogin, onViewPricing, onGoToDashboard, onViewLegal, onGiveFeedback }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ user, onStartAudit, onLogin, onViewPricing, onGoToDashboard, onViewLegal, onGiveFeedback, onGoToFlokker }) => {
   const [businessName, setBusinessName] = useState('');
   const [industry, setIndustry] = useState('');
   const [companySize, setCompanySize] = useState('');
@@ -44,8 +45,17 @@ const LandingPage: React.FC<LandingPageProps> = ({ user, onStartAudit, onLogin, 
             <OculaLogo className="w-6 h-6 text-slate-900 dark:text-white" />
             <div className="flex items-baseline gap-1.5">
               <span className="text-xl font-display font-bold tracking-tighter text-slate-900 dark:text-white">ocula</span>
-              <span className="text-[9px] font-black bg-indigo-600/10 text-indigo-600 dark:bg-indigo-400/10 dark:text-indigo-400 border border-indigo-500/20 px-1.5 py-0.5 rounded uppercase tracking-widest">AI</span>
+              <span className="text-[9px] font-black bg-indigo-600/10 text-indigo-600 dark:bg-indigo-400/10 dark:text-indigo-400 border border-indigo-500/20 px-1.5 py-0.5 rounded uppercase tracking-widest">BI</span>
             </div>
+            {onGoToFlokker && (
+              <button 
+                onClick={onGoToFlokker}
+                className="hidden sm:inline-flex items-center gap-1 ml-2 text-[10px] font-mono font-bold text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors bg-slate-100 dark:bg-slate-900 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-800"
+              >
+                <span>BY FLOKKER</span>
+                <ArrowRight className="w-2.5 h-2.5" />
+              </button>
+            )}
           </div>
           <div className="flex items-center gap-4">
             {user ? (

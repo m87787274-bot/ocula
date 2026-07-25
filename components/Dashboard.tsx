@@ -38,6 +38,7 @@ import {
 } from 'recharts';
 import { generateAIFix, generateAudioBriefing, generateSocialPost, generateComparisonVerdict, generateSWOTAnalysis, generateMissionTactics, refreshStrategicInsights } from '../services/aiService';
 import { storageService } from '../services/storageService';
+import SocialMediaMonitoring from './SocialMediaMonitoring';
 import { Swords, Shield, Sparkles, AlertCircle, GripVertical, Eye, EyeOff, LayoutDashboard, Maximize2, Minimize2, Calendar, Target, Activity, PieChart, X, Radar, BarChart2, Share2, Zap, CheckCircle2, Loader2, FileText, RefreshCw, Search, MapPin, TrendingUp, TrendingDown, Minus, Globe, Printer } from 'lucide-react';
 import { motion, Reorder, AnimatePresence, animate } from 'framer-motion';
 import { Responsive, WidthProvider } from 'react-grid-layout/legacy';
@@ -515,6 +516,7 @@ const Dashboard: React.FC<DashboardProps> = ({ report, onReset, onRescan, initia
   const [hoveredRadarMetric, setHoveredRadarMetric] = useState<string | null>(null);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [socialSubTab, setSocialSubTab] = useState<'monitoring' | 'channels'>('monitoring');
 
   const [isComparingExporting, setIsComparingExporting] = useState(false);
 
@@ -3432,14 +3434,53 @@ const Dashboard: React.FC<DashboardProps> = ({ report, onReset, onRescan, initia
       )}
 
       {activeTab === 'social' && (
-        <div className="space-y-4 animate-in">
-          <div className="flex flex-col md:flex-row justify-between items-end gap-4 mb-4">
-             <div className="space-y-1">
-                <h2 className="text-2xl font-display font-medium text-slate-900 dark:text-white tracking-tighter uppercase">Social Command</h2>
-                <p className="text-slate-500 dark:text-slate-400 font-bold text-sm">Synchronize your voice across all active digital channels.</p>
+        <div className="space-y-6 animate-in">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 surface p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+             <div>
+                <h2 className="text-2xl font-display font-medium text-slate-900 dark:text-white tracking-tighter uppercase">Social Command Hub</h2>
+                <p className="text-slate-500 dark:text-slate-400 font-bold text-xs mt-0.5">Track brand mentions across Twitter, Facebook, Instagram & Reddit, and manage channel posts.</p>
              </div>
-             <button onClick={() => setConnectedPlatforms(new Set())} className="btn-ghost text-rose-500 hover:text-rose-700 btn-xs">Clear All Synced Signals</button>
+
+             <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                <button
+                  onClick={() => setSocialSubTab('monitoring')}
+                  className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${
+                    socialSubTab === 'monitoring'
+                      ? 'bg-indigo-600 text-white shadow-sm'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <Globe className="w-3.5 h-3.5" />
+                  <span>Social Listening & Mentions</span>
+                </button>
+                <button
+                  onClick={() => setSocialSubTab('channels')}
+                  className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${
+                    socialSubTab === 'channels'
+                      ? 'bg-indigo-600 text-white shadow-sm'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span>Channels & Post Dispatcher</span>
+                </button>
+             </div>
           </div>
+
+          {socialSubTab === 'monitoring' ? (
+            <SocialMediaMonitoring
+              businessName={report.businessName}
+              industry={report.profileBadge?.industry || 'General Business'}
+              isDarkMode={isDarkMode}
+              onDeployMission={(topic, details) => {
+                setActiveTab('missions');
+              }}
+            />
+          ) : (
+            <div className="space-y-4">
+              <div className="flex justify-end">
+                <button onClick={() => setConnectedPlatforms(new Set())} className="btn-ghost text-rose-500 hover:text-rose-700 btn-xs">Clear All Synced Signals</button>
+              </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="bg-slate-900 dark:bg-slate-950 p-4 rounded-xl shadow-xl flex flex-col h-[300px] relative overflow-hidden group border border-white/5">
@@ -3656,6 +3697,8 @@ const Dashboard: React.FC<DashboardProps> = ({ report, onReset, onRescan, initia
                </div>
              )}
           </div>
+        </div>
+          )}
         </div>
       )}
 

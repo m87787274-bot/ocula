@@ -141,3 +141,74 @@ export async function generateVisibilityProjectionAnalysis(businessName: string,
     const res = await chat([{ role: 'user', content: `Projection for ${businessName}` }]);
     return res.content;
 }
+
+export async function analyzeSocialMentions(args: { businessName: string; industry?: string; keywords?: string[]; timeframe?: string; platform?: string }) {
+    const prompt = `Perform social media mention and sentiment analysis for "${args.businessName}" in industry "${args.industry || 'General'}". 
+Tracked keywords: ${(args.keywords || [args.businessName]).join(', ')}. Timeframe: ${args.timeframe || '7d'}. Platform: ${args.platform || 'all'}.
+Return a valid JSON matching this schema:
+{
+  "summary": "High level narrative summarizing current social sentiment and public reception",
+  "sentimentBreakdown": { "positive": 70, "neutral": 20, "negative": 10, "totalMentions": 350, "volumeTrend": 15.5, "netSentimentScore": 60 },
+  "platformBreakdown": [
+    { "platform": "Twitter", "mentions": 140, "positivePct": 75, "neutralPct": 15, "negativePct": 10 },
+    { "platform": "Facebook", "mentions": 90, "positivePct": 65, "neutralPct": 22, "negativePct": 13 },
+    { "platform": "Instagram", "mentions": 70, "positivePct": 85, "neutralPct": 10, "negativePct": 5 },
+    { "platform": "LinkedIn", "mentions": 50, "positivePct": 80, "neutralPct": 15, "negativePct": 5 }
+  ],
+  "trendingTopics": [
+    { "topic": "Customer Support", "count": 85, "sentiment": "positive" },
+    { "topic": "Product Quality", "count": 62, "sentiment": "positive" },
+    { "topic": "Delivery Speed", "count": 28, "sentiment": "neutral" }
+  ],
+  "keyInsights": {
+    "drivers": ["Praise for friendly support team", "High visual engagement on Instagram"],
+    "concerns": ["Minor queries about onboarding time"],
+    "recommendations": ["Highlight top customer quotes on Twitter", "Publish setup guide FAQ"]
+  },
+  "mentions": [
+    {
+      "id": "m-1",
+      "platform": "Twitter",
+      "author": "Alex Rivera",
+      "authorHandle": "@arivera_tech",
+      "authorAvatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80",
+      "followerCount": 12500,
+      "influenceScore": 82,
+      "content": "Really impressed with how ${args.businessName} handles customer requests. Smooth interface and fast response times!",
+      "timestamp": "${new Date().toISOString()}",
+      "sentiment": "positive",
+      "sentimentScore": 0.92,
+      "matchedKeyword": "${args.businessName}",
+      "engagement": { "likes": 112, "shares": 24, "comments": 15 },
+      "reach": 15400,
+      "verified": true
+    },
+    {
+      "id": "m-2",
+      "platform": "LinkedIn",
+      "author": "Sophia Zhang",
+      "authorHandle": "sophia-zhang-mktg",
+      "influenceScore": 88,
+      "content": "${args.businessName} is setting a new standard for customer experience in regional markets.",
+      "timestamp": "${new Date(Date.now() - 3600000).toISOString()}",
+      "sentiment": "positive",
+      "sentimentScore": 0.89,
+      "matchedKeyword": "${args.businessName}",
+      "engagement": { "likes": 240, "shares": 38, "comments": 22 },
+      "reach": 28000,
+      "verified": true
+    }
+  ]
+}`;
+    return await generateJSON(prompt);
+}
+
+export async function generateSocialReply(args: { businessName: string; mentionContent: string; author: string; platform: string; sentiment: string; tone?: string }) {
+    const prompt = `You are the social media manager for "${args.businessName}". 
+Draft a ${args.tone || 'professional'} public response to the following ${args.platform} post by ${args.author} (${args.sentiment} sentiment):
+"${args.mentionContent}"
+
+Return JSON: { "recommendedReply": "string", "tone": "${args.tone || 'professional'}" }`;
+    return await generateJSON(prompt);
+}
+

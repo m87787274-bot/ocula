@@ -121,10 +121,10 @@ const GlobalMissionControl: React.FC<GlobalMissionControlProps> = ({ onBack, isD
       if (s.businessName && !map.has(s.businessName.toLowerCase())) {
         map.set(s.businessName.toLowerCase(), {
           name: s.businessName,
-          location: s.report?.businessDetails?.location,
-          website: s.report?.businessDetails?.website,
-          industry: s.report?.businessDetails?.industry,
-          companySize: s.report?.businessDetails?.companySize
+          location: (s.report as any)?.businessDetails?.location || s.report?.profileBadge?.location,
+          website: (s.report as any)?.businessDetails?.website || s.report?.website,
+          industry: (s.report as any)?.businessDetails?.industry || s.report?.profileBadge?.industry,
+          companySize: (s.report as any)?.businessDetails?.companySize
         });
       }
     });

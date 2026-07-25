@@ -216,7 +216,7 @@ const Scanner: React.FC<ScannerProps> = ({
                 Active Scanning Network
               </span>
 
-              {status !== 'error' && (
+              {(status as string) !== 'error' && (
                 <span className="px-4 py-2 bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 rounded-full text-[10px] font-mono font-black uppercase tracking-wider border border-indigo-200/60 dark:border-indigo-500/30 backdrop-blur-md inline-flex items-center gap-2 shadow-2xs">
                   <Clock className="w-3.5 h-3.5 text-indigo-500 animate-pulse" />
                   Est. Time: <span className="font-extrabold text-indigo-700 dark:text-indigo-300">{formatTimeRemaining(secondsRemaining)}</span>
@@ -271,7 +271,7 @@ const Scanner: React.FC<ScannerProps> = ({
                     {Math.floor(displayedProgress)}%
                   </span>
                   <span className="text-[7px] font-mono font-bold uppercase tracking-widest text-slate-400 mt-0.5">analyzing</span>
-                  {status !== 'error' && (
+                  {(status as string) !== 'error' && (
                     <span className="text-[8px] font-mono font-extrabold text-indigo-500 dark:text-indigo-400 mt-1 tracking-tight flex items-center gap-1">
                       <Timer className="w-2.5 h-2.5 text-indigo-500" />
                       {secondsRemaining !== null && secondsRemaining > 0 ? `~${secondsRemaining}s left` : secondsRemaining === 0 ? 'Done' : 'Estimating...'}

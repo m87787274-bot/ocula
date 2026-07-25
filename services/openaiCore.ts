@@ -294,3 +294,59 @@ export async function generateAudioBriefing(summary: string): Promise<string> {
     return buffer.toString("base64");
   });
 }
+
+export async function analyzeSocialMentions(args: { businessName: string; industry?: string; keywords?: string[]; timeframe?: string; platform?: string }) {
+  const prompt = `Perform social media mention and sentiment analysis for "${args.businessName}" in industry "${args.industry || 'General'}". 
+Tracked keywords: ${(args.keywords || [args.businessName]).join(', ')}. Timeframe: ${args.timeframe || '7d'}. Platform: ${args.platform || 'all'}.
+Return a valid JSON object matching this schema:
+{
+  "summary": "High level narrative summarizing current social sentiment and public reception",
+  "sentimentBreakdown": { "positive": 72, "neutral": 18, "negative": 10, "totalMentions": 380, "volumeTrend": 16.2, "netSentimentScore": 62 },
+  "platformBreakdown": [
+    { "platform": "Twitter", "mentions": 150, "positivePct": 76, "neutralPct": 14, "negativePct": 10 },
+    { "platform": "Facebook", "mentions": 95, "positivePct": 68, "neutralPct": 20, "negativePct": 12 },
+    { "platform": "Instagram", "mentions": 75, "positivePct": 84, "neutralPct": 11, "negativePct": 5 },
+    { "platform": "LinkedIn", "mentions": 60, "positivePct": 80, "neutralPct": 15, "negativePct": 5 }
+  ],
+  "trendingTopics": [
+    { "topic": "Customer Service", "count": 88, "sentiment": "positive" },
+    { "topic": "Product Experience", "count": 64, "sentiment": "positive" },
+    { "topic": "Onboarding", "count": 22, "sentiment": "neutral" }
+  ],
+  "keyInsights": {
+    "drivers": ["Praise for responsive support team", "Strong visual engagement on Instagram"],
+    "concerns": ["Queries regarding onboarding guide clarity"],
+    "recommendations": ["Highlight top user testimonials on Twitter", "Publish setup guide FAQ"]
+  },
+  "mentions": [
+    {
+      "id": "m-o1",
+      "platform": "Twitter",
+      "author": "David Miller",
+      "authorHandle": "@dmiller_tech",
+      "authorAvatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80",
+      "followerCount": 18900,
+      "influenceScore": 86,
+      "content": "Really impressed with ${args.businessName}'s customer engagement team. Instant turnaround!",
+      "timestamp": "${new Date().toISOString()}",
+      "sentiment": "positive",
+      "sentimentScore": 0.94,
+      "matchedKeyword": "${args.businessName}",
+      "engagement": { "likes": 145, "shares": 32, "comments": 18 },
+      "reach": 21000,
+      "verified": true
+    }
+  ]
+}`;
+  return await generateJSON(prompt);
+}
+
+export async function generateSocialReply(args: { businessName: string; mentionContent: string; author: string; platform: string; sentiment: string; tone?: string }) {
+  const prompt = `You are the social media manager for "${args.businessName}". 
+Draft a ${args.tone || 'professional'} public response to the following ${args.platform} post by ${args.author} (${args.sentiment} sentiment):
+"${args.mentionContent}"
+
+Return JSON: { "recommendedReply": "string", "tone": "${args.tone || 'professional'}" }`;
+  return await generateJSON(prompt);
+}
+

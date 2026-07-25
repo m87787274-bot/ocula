@@ -98,7 +98,7 @@ const SplashScreen: React.FC = () => {
         <p className="text-[8px] font-mono text-slate-300 dark:text-slate-700 uppercase tracking-widest">System v3.1.0</p>
       </div>
       <div className="absolute bottom-12 right-12">
-        <p className="text-[8px] font-mono text-slate-300 dark:text-slate-700 uppercase tracking-widest">© 2026 Ocula AI</p>
+        <p className="text-[8px] font-mono text-slate-300 dark:text-slate-700 uppercase tracking-widest">© 2026 Ocula BI</p>
       </div>
     </div>
   );

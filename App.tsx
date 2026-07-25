@@ -71,6 +71,7 @@ const GlobalMissionControl = lazy(
 );
 const PricingPage = lazy(() => import("./components/PricingPage"));
 const LandingPage = lazy(() => import("./components/LandingPage"));
+const FlokkerPreLanding = lazy(() => import("./components/FlokkerPreLanding"));
 const CompareEntities = lazy(() => import("./components/CompareEntities"));
 const HelpSection = lazy(() => import("./components/HelpSection"));
 const OnboardingTour = lazy(() => import("./components/OnboardingTour"));
@@ -243,6 +244,7 @@ const AppContent: React.FC = () => {
   const [hasNoScans, setHasNoScans] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [view, setView] = useState<
+    | "flokker"
     | "landing"
     | "home"
     | "dashboard"
@@ -254,7 +256,7 @@ const AppContent: React.FC = () => {
     | "settings"
     | "users"
     | "legal"
-  >("landing");
+  >("flokker");
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [rescanTarget, setRescanTarget] = useState<{ report: VisibilityReport; scanId?: string } | null>(null);
   const [selectedRescanTemplate, setSelectedRescanTemplate] = useState<ScryTemplate>("standard");
@@ -1126,7 +1128,7 @@ const AppContent: React.FC = () => {
         )}
 
         {/* Top Navigation for Landing/Guest */}
-        {(!user && view !== "landing") && (
+        {(!user && view !== "landing" && view !== "flokker") && (
           <nav
             className="fixed top-0 left-0 right-0 z-[100] transition-all duration-500 glass dark:dark-glass py-4 shadow-sm border-b border-slate-200/50 dark:border-slate-800/50"
           >
@@ -1297,7 +1299,7 @@ const AppContent: React.FC = () => {
         </nav>
 
         <main
-          className={`relative z-10 min-h-screen flex-1 overflow-x-hidden transition-all duration-300 pb-24 md:pb-0 ${user && view !== "landing" ? (isSidebarCollapsed ? "md:ml-16 xl:ml-20 pt-14 md:pt-0" : "md:ml-[240px] xl:ml-[280px] pt-14 md:pt-0") : ""}`}
+          className={`relative z-10 min-h-screen flex-1 overflow-x-hidden transition-all duration-300 pb-24 md:pb-0 ${user && view !== "landing" && view !== "flokker" ? (isSidebarCollapsed ? "md:ml-16 xl:ml-20 pt-14 md:pt-0" : "md:ml-[240px] xl:ml-[280px] pt-14 md:pt-0") : ""}`}
         >
           <div className="max-w-[1920px] mx-auto w-full px-4 sm:px-6 lg:px-8 xl:px-12">
             <AnimatePresence mode="wait">
@@ -1323,7 +1325,7 @@ const AppContent: React.FC = () => {
               </Suspense>
             </AnimatePresence>
 
-            {user && view !== "landing" && (
+            {user && view !== "landing" && view !== "flokker" && (
               <div className="flex items-center gap-2 px-4 sm:px-6 py-4 text-sm text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800/50 bg-white/80 dark:bg-[#0A0A0A]/80 backdrop-blur-md sticky top-14 md:top-0 z-40">
                 <button
                   onClick={() => {
@@ -1454,7 +1456,39 @@ const AppContent: React.FC = () => {
               </div>
             )}
 
-            {view === "landing" ? (
+            {view === "flokker" ? (
+              <FlokkerPreLanding
+                user={user}
+                onLaunchOculaBI={(businessName, industry) => {
+                  if (businessName) {
+                    setView("home");
+                    const initialEntity = {
+                      id: "1",
+                      businessName,
+                      industry: industry || "",
+                      companySize: "",
+                      location: "",
+                      website: "",
+                    };
+                    setEntities([initialEntity]);
+                    setTimeout(() => {
+                      startScan(undefined, {
+                        overrideEntities: [initialEntity],
+                      });
+                    }, 100);
+                  } else {
+                    setView("landing");
+                  }
+                }}
+                onLogin={() => setIsAuthModalOpen(true)}
+                onGoToDashboard={() => setView("dashboard")}
+                onViewPricing={() => setView("pricing")}
+                onViewLegal={() => setView("legal")}
+                onGiveFeedback={() => setIsFeedbackOpen(true)}
+                isDarkMode={isDarkMode}
+                onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+              />
+            ) : view === "landing" ? (
               <LandingPage
                 user={user}
                 onStartAudit={(businessName, industry, companySize) => {
@@ -1481,6 +1515,7 @@ const AppContent: React.FC = () => {
                 onGoToDashboard={() => setView("dashboard")}
                 onViewLegal={() => setView("legal")}
                 onGiveFeedback={() => setIsFeedbackOpen(true)}
+                onGoToFlokker={() => setView("flokker")}
               />
             ) : view === "pricing" ? (
               <PricingPage
