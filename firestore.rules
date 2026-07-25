@@ -1,0 +1,153 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Phase 3: Primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        request.auth.token.email == 'adekunleowadara@gmail.com'
+      );
+    }
+
+    function isVerified() {
+      return isSignedIn();
+    }
+
+    function isTimestamp(t) {
+      return t is timestamp || t is string;
+    }
+
+    // 1. Users Collection
+    match /users {
+      allow list: if isAdmin();
+    }
+
+    match /users/{userId} {
+      function isValidUser(data) {
+        let isIdValid = data.get('id', userId) == userId;
+        let isEmailValid = data.get('email', '') is string && data.get('email', '').size() <= 256;
+        let isNameValid = data.get('name', '') is string && data.get('name', '').size() <= 128;
+        let isRoleValid = data.get('role', 'user') in ['admin', 'analyst', 'viewer', 'user'];
+        let isAccountValid = data.get('account', {}) is map;
+        let isTimestampValid = isTimestamp(data.get('updatedAt', request.time)) 
+                              && (data.get('updatedAt', request.time) == request.time);
+        
+        return isIdValid && isEmailValid && isNameValid && isRoleValid && isAccountValid && isTimestampValid;
+      }
+
+      function isOwnerUpdate() {
+        return isOwner(userId) && isVerified();
+      }
+
+      allow get: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && isVerified() && isValidUser(incoming());
+      allow update: if (isOwnerUpdate() || isAdmin()) && (
+        // Action: Update Profile
+        (incoming().diff(existing()).affectedKeys().hasOnly(['businessDetails', 'name', 'avatar', 'updatedAt', 'onboardingCompleted', 'onboardingSteps', 'dashboardLayout'])) ||
+        // Action: Internal Unit/Tier Sync
+        (incoming().diff(existing()).affectedKeys().hasOnly(['account', 'updatedAt', 'role'])) ||
+        // Action: Full Update
+        isValidUser(incoming())
+      );
+      allow delete: if isAdmin();
+
+      // Sub-collections: Scans
+      match /scans/{scanId} {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
+
+      // Sub-collections: Notifications
+      match /notifications/{notifId} {
+        function isValidNotification(data) {
+          return data.id == notifId
+            && data.userId == userId
+            && data.title is string && data.title.size() <= 256
+            && data.message is string && data.message.size() <= 2048
+            && data.type in ['info', 'success', 'warning', 'error', 'anomaly']
+            && data.read is bool
+            && isTimestamp(data.get('createdAt', request.time))
+            && (data.get('createdAt', request.time) == request.time);
+        }
+
+        allow list, get: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) && isVerified() && isValidNotification(incoming()) && isValidId(notifId);
+        allow update: if isOwner(userId) && incoming().diff(existing()).affectedKeys().hasOnly(['read']);
+        allow delete: if isOwner(userId) || isAdmin();
+      }
+
+      // Sub-collections: Campaigns
+      match /campaigns/{campaignId} {
+        function isValidCampaign(data) {
+          return data.id == campaignId
+            && data.userId == userId
+            && data.name is string && data.name.size() <= 256
+            && data.status in ['active', 'planned', 'completed']
+            && data.progress is number && data.progress >= 0 && data.progress <= 100
+            && data.objective is string && data.objective.size() <= 2048
+            && isTimestamp(data.get('createdAt', request.time))
+             && (data.get('createdAt', request.time) == request.time);
+        }
+
+        allow list, get: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) && isVerified() && isValidCampaign(incoming()) && isValidId(campaignId);
+        allow update: if isOwner(userId) && (
+          (incoming().diff(existing()).affectedKeys().hasOnly(['status', 'progress', 'updatedAt']))
+          || isValidCampaign(incoming())
+        );
+        allow delete: if isOwner(userId) || isAdmin();
+      }
+
+      // Sub-collections: Tickets
+      match /tickets/{ticketId} {
+        function isValidTicket(data) {
+          return data.id == ticketId
+            && data.userId == userId
+            && data.subject is string && data.subject.size() <= 256
+            && data.message is string && data.message.size() <= 4096
+            && data.status in ['open', 'in-progress', 'resolved']
+            && isTimestamp(data.get('createdAt', request.time))
+             && (data.get('createdAt', request.time) == request.time);
+        }
+
+        allow list, get: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) && isVerified() && isValidTicket(incoming()) && isValidId(ticketId);
+        allow update: if isAdmin() && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']);
+      }
+    }
+
+    // Admins Collection
+    match /admins/{adminId} {
+      allow get: if isSignedIn();
+    }
+
+    // Connectivity Monitoring
+    match /system/health_check {
+      allow get: if true;
+    }
+  }
+}

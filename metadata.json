@@ -1,0 +1,10 @@
+{
+  "name": "Remix: Ocula - See Your Business Clearly, Everywhere",
+  "description": "The professional visibility intelligence tool for businesses to gain deep insights and dominate their market.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
