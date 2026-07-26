@@ -354,18 +354,27 @@ async function handleAIAction(action: string, args: any) {
   const primaryCore = isGeminiPreferred ? geminiCore : openaiCore;
   const secondaryCore = isGeminiPreferred ? openaiCore : geminiCore;
 
+  const runWithTimeout = (core: any, timeoutMs: number, label: string) => {
+    return Promise.race([
+      runAction(core),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error(`${label} timed out after ${timeoutMs}ms`)), timeoutMs)
+      )
+    ]);
+  };
+
   try {
-    const result = await runAction(primaryCore);
+    const result = await runWithTimeout(primaryCore, 12000, "Primary AI Provider");
     cache.set(cacheKey, { result, timestamp: Date.now() });
     return result;
   } catch (primaryError: any) {
     console.warn(`[AI Handler] Primary AI provider failed (${primaryError?.message || primaryError}), attempting secondary provider...`);
     try {
-      const secondaryResult = await runAction(secondaryCore);
+      const secondaryResult = await runWithTimeout(secondaryCore, 8000, "Secondary AI Provider");
       cache.set(cacheKey, { result: secondaryResult, timestamp: Date.now() });
       return secondaryResult;
     } catch (secondaryError: any) {
-      console.warn(`[AI Handler] Both live AI providers failed or returned error (${secondaryError?.message || secondaryError}). Utilizing Ocula Fallback Intelligence for ${action}...`);
+      console.warn(`[AI Handler] Both live AI providers failed or timed out (${secondaryError?.message || secondaryError}). Utilizing Ocula Fallback Intelligence for ${action}...`);
       const fallbackResult = getFallbackData(action, args);
       cache.set(cacheKey, { result: fallbackResult, timestamp: Date.now() });
       return fallbackResult;
