@@ -1,1251 +1,1743 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Globe, 
-  Search, 
-  Share2, 
-  Code, 
-  Zap, 
-  Sparkles, 
-  TrendingUp, 
-  ShieldCheck, 
-  BarChart3, 
-  Rocket, 
-  ArrowRight, 
-  CheckCircle2, 
-  ChevronRight, 
-  Users, 
-  MessageSquare, 
-  Layers, 
-  Award, 
-  Star, 
-  PhoneCall, 
-  Mail,
-  ExternalLink, 
-  Eye, 
-  Target, 
-  Check,
-  Activity,
-  Flame,
-  ArrowUpRight,
-  Calculator,
-  Calendar,
-  X,
-  Send,
-  LayoutDashboard
+  Sparkles, Globe, TrendingUp, Layers, Award, Shield, ArrowRight, Check, 
+  CheckCircle2, ChevronDown, ChevronUp, Mail, Calendar, MapPin, Activity, 
+  BarChart3, Users, Smartphone, Search, Share2, Code, Target, Cpu, 
+  Brain, Briefcase, Clock, Star, Sliders, X, Lock, ExternalLink, HelpCircle
 } from 'lucide-react';
-import OculaLogo from './OculaLogo';
-import FlokkerLogo from './FlokkerLogo';
+import { OculaLogo } from './OculaLogo';
+import { FlokkerLogo } from './FlokkerLogo';
 
 interface FlokkerPreLandingProps {
-  user: any;
-  onLaunchOculaBI: (businessName?: string, industry?: string, companySize?: string) => void;
-  onLogin: () => void;
+  user?: any;
+  onLaunchOculaBI: (businessName?: string, industry?: string) => void;
+  onLaunchUserDashboard?: () => void;
+  onLaunchAdminDashboard?: () => void;
+  onToggleDarkMode?: () => void;
+  onLogin?: () => void;
   onGoToDashboard?: () => void;
   onViewPricing?: () => void;
   onViewLegal?: () => void;
   onGiveFeedback?: () => void;
   isDarkMode?: boolean;
-  onToggleDarkMode?: () => void;
 }
+
+// Global visual assets
+const AFRICA_MAP_DOTS = [
+  { x: 135, y: 100 }, { x: 145, y: 98 }, { x: 155, y: 96 }, { x: 165, y: 95 }, { x: 175, y: 93 }, { x: 185, y: 95 }, { x: 195, y: 98 }, { x: 205, y: 102 }, { x: 215, y: 106 }, { x: 225, y: 110 },
+  { x: 115, y: 110 }, { x: 125, y: 108 }, { x: 135, y: 110 }, { x: 145, y: 112 }, { x: 155, y: 114 }, { x: 165, y: 112 }, { x: 175, y: 110 }, { x: 185, y: 108 }, { x: 195, y: 110 }, { x: 205, y: 114 },
+  { x: 105, y: 120 }, { x: 115, y: 122 }, { x: 125, y: 124 }, { x: 135, y: 124 }, { x: 145, y: 126 }, { x: 155, y: 128 }, { x: 165, y: 126 }, { x: 175, y: 124 }, { x: 185, y: 122 }, { x: 195, y: 124 },
+  { x: 80, y: 135 }, { x: 90, y: 134 }, { x: 100, y: 135 }, { x: 110, y: 136 }, { x: 120, y: 138 }, { x: 130, y: 140 }, { x: 140, y: 138 }, { x: 150, y: 136 }, { x: 160, y: 138 }, { x: 170, y: 140 },
+  { x: 75, y: 145 }, { x: 85, y: 146 }, { x: 95, y: 148 }, { x: 105, y: 150 }, { x: 115, y: 152 }, { x: 125, y: 154 }, { x: 135, y: 152 }, { x: 145, y: 150 }, { x: 155, y: 152 }, { x: 165, y: 154 },
+  { x: 90, y: 160 }, { x: 100, y: 162 }, { x: 110, y: 164 }, { x: 120, y: 166 }, { x: 130, y: 164 }, { x: 140, y: 162 }, { x: 150, y: 164 }, { x: 165, y: 166 }, { x: 175, y: 168 }, { x: 185, y: 170 },
+  { x: 135, y: 174 }, { x: 145, y: 176 }, { x: 155, y: 178 }, { x: 165, y: 180 }, { x: 175, y: 182 }, { x: 185, y: 184 }, { x: 195, y: 186 }, { x: 205, y: 188 }, { x: 215, y: 190 }, { x: 225, y: 192 },
+  { x: 140, y: 186 }, { x: 150, y: 188 }, { x: 160, y: 190 }, { x: 170, y: 192 }, { x: 185, y: 194 }, { x: 195, y: 196 }, { x: 205, y: 198 }, { x: 215, y: 200 }, { x: 225, y: 202 }, { x: 235, y: 204 },
+  { x: 145, y: 198 }, { x: 155, y: 200 }, { x: 165, y: 202 }, { x: 175, y: 204 }, { x: 185, y: 206 }, { x: 195, y: 208 }, { x: 205, y: 210 }, { x: 215, y: 212 }, { x: 225, y: 214 }, { x: 235, y: 216 },
+  { x: 150, y: 210 }, { x: 160, y: 212 }, { x: 170, y: 214 }, { x: 180, y: 216 }, { x: 190, y: 218 }, { x: 200, y: 220 }, { x: 210, y: 222 }, { x: 220, y: 224 },
+  { x: 155, y: 222 }, { x: 165, y: 224 }, { x: 175, y: 226 }, { x: 180, y: 228 }, { x: 190, y: 230 }, { x: 200, y: 232 }, { x: 210, y: 234 },
+  { x: 160, y: 234 }, { x: 170, y: 236 }, { x: 180, y: 238 }, { x: 190, y: 240 }, { x: 200, y: 242 },
+  { x: 165, y: 246 }, { x: 175, y: 248 }, { x: 180, y: 250 }, { x: 190, y: 252 }, { x: 195, y: 254 },
+  { x: 170, y: 258 }, { x: 175, y: 260 }, { x: 180, y: 262 }, { x: 185, y: 264 },
+  { x: 175, y: 270 }, { x: 180, y: 272 },
+  { x: 178, y: 280 }
+];
+
+const HUB_HUBS = [
+  { name: 'Lagos', x: 120, y: 166, color: '#6C63FF' },
+  { name: 'Nairobi', x: 215, y: 190, color: '#8B5CF6' },
+  { name: 'Cape Town', x: 178, y: 280, color: '#FDBA2D' },
+  { name: 'Cairo', x: 195, y: 110, color: '#4F8BFF' }
+];
+
+const GLOW_PARTICLES = Array.from({ length: 25 }).map((_, i) => ({
+  id: i,
+  x: Math.random() * 100,
+  y: Math.random() * 100,
+  size: Math.random() * 2 + 0.8,
+  duration: Math.random() * 14 + 6,
+  delay: Math.random() * -10,
+}));
 
 export const FlokkerPreLanding: React.FC<FlokkerPreLandingProps> = ({
   user,
   onLaunchOculaBI,
-  onLogin,
-  onGoToDashboard,
-  onViewPricing,
-  onViewLegal,
-  onGiveFeedback,
-  isDarkMode = true,
+  onLaunchUserDashboard,
+  onLaunchAdminDashboard
 }) => {
-  const [heroBusinessName, setHeroBusinessName] = useState('');
-  const [activeTab, setActiveTab] = useState<'all' | 'ocula' | 'seo' | 'social' | 'web' | 'activation'>('all');
-  
-  // Interactive Contact & Booking State
-  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
-  const [selectedServiceForModal, setSelectedServiceForModal] = useState<string>('General Inquiry');
-  const [modalEmail, setModalEmail] = useState('');
-  const [modalMessage, setModalMessage] = useState('');
-  const [isEmailSent, setIsEmailSent] = useState(false);
-
-  // Proposal Calculator State
-  const [selectedServices, setSelectedServices] = useState<string[]>(['ocula', 'seo', 'web']);
-  const [companyTier, setCompanyTier] = useState<string>('growth');
-  const [timeline, setTimeline] = useState<string>('quarterly');
-
-  // Interactive State
+  // Navigation & Interactive states
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
-  const [activeProcessStep, setActiveProcessStep] = useState<number>(0);
+  const [dashboardTab, setDashboardTab] = useState<'visibility' | 'keywords' | 'competitors'>('visibility');
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [emailSubject, setEmailSubject] = useState('');
+  const [emailBody, setEmailBody] = useState('');
+  const [emailSender, setEmailSender] = useState('');
+  const [emailSuccess, setEmailSuccess] = useState(false);
+
+  // Pricing Builder State
+  const [selectedServices, setSelectedServices] = useState<string[]>(['ocula']);
+  const [businessSize, setBusinessSize] = useState<'startup' | 'growth' | 'enterprise'>('growth');
+  const [targetRegion, setTargetRegion] = useState<'national' | 'continental' | 'global'>('continental');
+  const [campaignTimeline, setCampaignTimeline] = useState<'3months' | '6months' | '12months'>('6months');
+
+  // Interactive Price calculation logic
+  const calculatedInvestment = useMemo(() => {
+    let base = 350;
+    
+    // Services base cost
+    if (selectedServices.includes('ocula')) base += 150;
+    if (selectedServices.includes('seo')) base += 450;
+    if (selectedServices.includes('social')) base += 350;
+    if (selectedServices.includes('web')) base += 600;
+    if (selectedServices.includes('local')) base += 250;
+
+    // Multipliers
+    const sizeMultiplier = businessSize === 'startup' ? 0.85 : businessSize === 'growth' ? 1.2 : 2.5;
+    const regionMultiplier = targetRegion === 'national' ? 1.0 : targetRegion === 'continental' ? 1.4 : 2.0;
+    const timelineDiscount = campaignTimeline === '3months' ? 1.0 : campaignTimeline === '6months' ? 0.9 : 0.8;
+
+    return Math.round(base * sizeMultiplier * regionMultiplier * timelineDiscount);
+  }, [selectedServices, businessSize, targetRegion, campaignTimeline]);
 
   const handleOpenCalendly = () => {
-    window.open('https://calendly.com/teamflokker/new-meeting', '_blank');
+    window.open('https://calendly.com/flokker/strategy', '_blank');
   };
 
-  const handleOpenEmailModal = (serviceName: string = 'General Inquiry') => {
-    setSelectedServiceForModal(serviceName);
-    setIsContactModalOpen(true);
-    setIsEmailSent(false);
-  };
-
-  const handleSendEmailSubmit = (e: React.FormEvent) => {
+  const handleSendEmail = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!modalEmail) return;
-    setIsEmailSent(true);
+    if (!emailSender) return;
+    setEmailSuccess(true);
     setTimeout(() => {
-      // Also open mailto as fallback
-      window.location.href = `mailto:hello@flokker.com?subject=Flokker Inquiry: ${encodeURIComponent(selectedServiceForModal)}&body=${encodeURIComponent(`Client Email: ${modalEmail}\n\nMessage:\n${modalMessage}`)}`;
-    }, 800);
+      setEmailSuccess(false);
+      setEmailModalOpen(false);
+      setEmailSender('');
+      setEmailBody('');
+    }, 2000);
   };
 
-  const handleServiceToggle = (id: string) => {
-    if (selectedServices.includes(id)) {
+  const toggleServiceBuilder = (serviceId: string) => {
+    if (selectedServices.includes(serviceId)) {
       if (selectedServices.length > 1) {
-        setSelectedServices(selectedServices.filter(s => s !== id));
+        setSelectedServices(selectedServices.filter(s => s !== serviceId));
       }
     } else {
-      setSelectedServices([...selectedServices, id]);
+      setSelectedServices([...selectedServices, serviceId]);
     }
   };
 
-  const estimatedPriceRange = () => {
-    let base = 2500;
-    if (selectedServices.includes('ocula')) base += 1500;
-    if (selectedServices.includes('seo')) base += 2000;
-    if (selectedServices.includes('social')) base += 1800;
-    if (selectedServices.includes('web')) base += 3500;
-    if (selectedServices.includes('activation')) base += 2800;
-
-    if (companyTier === 'enterprise') base *= 1.8;
-    if (companyTier === 'startup') base *= 0.85;
-
-    return Math.round(base);
-  };
-
   return (
-    <div className="dark bg-slate-950 text-slate-100 min-h-screen font-sans selection:bg-indigo-500/30 overflow-x-hidden">
+    <div className="dark bg-[#070B1A] text-[#F8FAFC] min-h-screen font-sans selection:bg-[#6C63FF]/30 overflow-x-hidden relative">
       
-      {/* TOP ANNOUNCEMENT BAR */}
-      <div className="bg-gradient-to-r from-indigo-900 via-purple-900 to-indigo-950 text-xs font-medium py-2.5 px-4 border-b border-indigo-500/20 text-center flex items-center justify-center gap-3">
-        <span className="px-2.5 py-0.5 bg-indigo-500/20 text-indigo-300 rounded-full font-mono text-[10px] font-bold uppercase tracking-wider border border-indigo-400/30 flex items-center gap-1">
-          <Sparkles className="w-3 h-3 text-amber-300" /> FLOKKER
+      {/* BACKGROUND DECORATIVE GRID & ORBITS */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+        {/* Subtle geometric layout grid */}
+        <div 
+          className="absolute inset-0 opacity-[0.025]"
+          style={{
+            backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px), 
+                              linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px)`,
+            backgroundSize: '54px 54px',
+          }}
+        />
+
+        {/* Ambient Neon Lighting & Particle field */}
+        <motion.div 
+          className="absolute top-[-10%] left-[-10%] w-[55%] h-[55%] bg-[#6C63FF]/12 rounded-full blur-[180px]"
+          animate={{ scale: [1, 1.08, 1], opacity: [0.8, 0.95, 0.8] }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div 
+          className="absolute top-[25%] right-[-10%] w-[65%] h-[65%] bg-[#8B5CF6]/10 rounded-full blur-[200px]"
+          animate={{ scale: [1.1, 1, 1.1], opacity: [0.7, 0.9, 0.7] }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div 
+          className="absolute bottom-[30%] left-[15%] w-[45%] h-[45%] bg-[#4F8BFF]/6 rounded-full blur-[160px]"
+        />
+
+        {/* Floating Ambient Points */}
+        {GLOW_PARTICLES.map((p) => (
+          <motion.div
+            key={p.id}
+            className="absolute rounded-full bg-indigo-400/20"
+            style={{
+              left: `${p.x}%`,
+              top: `${p.y}%`,
+              width: p.size,
+              height: p.size,
+            }}
+            animate={{ y: [0, -100], opacity: [0, 0.75, 0] }}
+            transition={{ duration: p.duration, repeat: Infinity, delay: p.delay, ease: "linear" }}
+          />
+        ))}
+
+        {/* Ultra-soft elegant noise texture overlay */}
+        <svg className="absolute inset-0 w-full h-full opacity-[0.015] mix-blend-overlay">
+          <filter id="gentleNoise">
+            <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="4" stitchTiles="stitch" />
+          </filter>
+          <rect width="100%" height="100%" filter="url(#gentleNoise)" />
+        </svg>
+      </div>
+
+      {/* TOP NOTIFICATION SYSTEM BAR */}
+      <div className="relative z-50 bg-[#070B1A]/80 border-b border-white/5 text-[11px] font-mono py-2.5 px-4 text-center flex items-center justify-center gap-3">
+        <span className="px-2 py-0.5 bg-[#6C63FF]/15 text-[#6C63FF] rounded-full font-bold uppercase tracking-wider border border-[#6C63FF]/20 flex items-center gap-1">
+          <Sparkles className="w-3 h-3 text-[#FDBA2D] animate-spin" /> PLATFORM IN BRIEF
         </span>
-        <span className="text-slate-200 hidden sm:inline">
-          Ready to scale your business? Book a strategy call or get a tailored growth scope today.
+        <span className="text-[#94A3B8] hidden md:inline">
+          Ocula BI has finished indexing regional commerce sectors. Next-generation growth pipelines active.
         </span>
-        <div className="flex items-center gap-2">
-          <button 
-            onClick={handleOpenCalendly} 
-            className="font-bold text-amber-300 hover:text-white transition-colors flex items-center gap-1 text-xs"
-          >
-            <Calendar className="w-3 h-3" /> Book Call
+        <div className="flex items-center gap-2.5 font-bold">
+          <button onClick={handleOpenCalendly} className="text-[#FDBA2D] hover:text-white transition-colors flex items-center gap-1">
+            <Calendar className="w-3.5 h-3.5" /> Book Call
           </button>
-          <span className="text-slate-600">•</span>
-          <button 
-            onClick={() => handleOpenEmailModal('General Inquiry')} 
-            className="font-bold text-indigo-300 hover:text-white transition-colors flex items-center gap-1 text-xs"
-          >
-            <Mail className="w-3 h-3" /> Send Email
+          <span className="text-slate-800">•</span>
+          <button onClick={() => { setEmailSubject('Consulting Request'); setEmailModalOpen(true); }} className="text-[#6C63FF] hover:text-white transition-colors flex items-center gap-1">
+            <Mail className="w-3.5 h-3.5" /> Contact Sales
           </button>
         </div>
       </div>
 
-      {/* HEADER NAVIGATION */}
-      <header className="sticky top-0 z-50 bg-slate-950/85 backdrop-blur-xl border-b border-slate-800/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 h-20 flex items-center justify-between">
-          
-          {/* LOGO */}
-          <div className="flex items-center gap-3">
-            <FlokkerLogo size="md" />
+      {/* NAVIGATION HERO */}
+      <header className="sticky top-0 z-40 bg-[#070B1A]/70 backdrop-blur-xl border-b border-white/5">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 h-20 flex items-center justify-between">
+          {/* Logo Brand */}
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <FlokkerLogo className="h-9 w-auto text-[#6C63FF]" />
           </div>
 
-          {/* DESKTOP NAV LINKS */}
-          <nav className="hidden lg:flex items-center gap-6 xl:gap-8 text-xs font-bold uppercase tracking-widest text-slate-300">
-            <a href="#services" className="hover:text-indigo-400 transition-colors">Services</a>
-            <a href="#ocula-bi" className="hover:text-indigo-400 transition-colors flex items-center gap-1 text-indigo-300">
-              <OculaLogo className="w-3.5 h-3.5 text-indigo-400" /> OCULA BI
+          {/* Links Center */}
+          <nav className="hidden lg:flex items-center gap-8 text-[11px] font-bold uppercase tracking-widest text-[#94A3B8]">
+            <a href="#services" className="hover:text-white transition-colors relative py-1.5 group">
+              Services
+              <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#6C63FF] transition-all group-hover:w-full" />
             </a>
-            <a href="#process" className="hover:text-indigo-400 transition-colors">Process</a>
-            <a href="#results" className="hover:text-indigo-400 transition-colors">Results</a>
-            <a href="#calculator" className="hover:text-indigo-400 transition-colors">Estimator</a>
-            <a href="#faq" className="hover:text-indigo-400 transition-colors">FAQ</a>
+            <a href="#platform" className="hover:text-white transition-colors relative py-1.5 group">
+              Solutions
+              <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#6C63FF] transition-all group-hover:w-full" />
+            </a>
+            <button onClick={() => onLaunchOculaBI()} className="hover:text-white transition-colors flex items-center gap-1.5 text-[#6C63FF] py-1.5 group font-extrabold">
+              <OculaLogo className="w-4 h-4 text-[#6C63FF] group-hover:rotate-12 duration-300" />
+              <span>Ocula BI</span>
+            </button>
+            <a href="#results" className="hover:text-white transition-colors relative py-1.5 group">
+              Case Studies
+              <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#6C63FF] transition-all group-hover:w-full" />
+            </a>
+            <a href="#pricing" className="hover:text-white transition-colors relative py-1.5 group">
+              Pricing
+              <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#6C63FF] transition-all group-hover:w-full" />
+            </a>
+            <a href="#faq" className="hover:text-white transition-colors relative py-1.5 group">
+              About
+              <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#6C63FF] transition-all group-hover:w-full" />
+            </a>
           </nav>
 
-          {/* ACTION BUTTONS */}
-          <div className="flex items-center gap-3">
-            <button 
-              onClick={() => handleOpenEmailModal('Header Contact')} 
-              className="hidden sm:inline-flex px-4 py-2.5 rounded-xl border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white font-bold text-xs uppercase tracking-wider transition-all items-center gap-1.5"
-            >
-              <Mail className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Send Email</span>
+          {/* Right Controls */}
+          <div className="flex items-center gap-4">
+            <button onClick={() => onLaunchOculaBI()} className="text-xs font-bold uppercase tracking-widest text-[#94A3B8] hover:text-white transition-colors px-4 py-2">
+              Log In
             </button>
-
             <button 
               onClick={handleOpenCalendly} 
-              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2"
+              className="px-5 py-2.5 rounded-full bg-[#6C63FF] hover:bg-[#5a52e0] text-white font-bold text-xs uppercase tracking-widest transition-all shadow-lg shadow-[#6C63FF]/15 hover:shadow-[#6C63FF]/30 hover:scale-[1.02]"
             >
-              <PhoneCall className="w-3.5 h-3.5" />
-              <span>Book a Call</span>
+              Book Strategy Call
             </button>
           </div>
         </div>
       </header>
 
-      {/* HERO SECTION */}
-      <section className="relative pt-12 pb-20 px-4 sm:px-8 overflow-hidden">
-        {/* BACKGROUND GLOWS */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[450px] bg-indigo-600/15 rounded-full blur-[140px] pointer-events-none" />
-        <div className="absolute top-1/3 right-10 w-[350px] h-[350px] bg-purple-600/15 rounded-full blur-[120px] pointer-events-none" />
-
-        <div className="max-w-7xl mx-auto relative z-10">
+      {/* SECTION 1: HERO CONTAINER */}
+      <section className="relative pt-16 pb-24 px-6 sm:px-8 overflow-hidden z-10">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
           
-          {/* BADGE */}
-          <div className="flex justify-center mb-6">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900/90 border border-indigo-500/30 shadow-xl backdrop-blur-md">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-xs font-mono font-bold uppercase tracking-widest text-indigo-300">
-                FLOKKER • FULL-SPECTRUM DIGITAL SERVICES
+          {/* Left Content */}
+          <div className="lg:col-span-6 space-y-8 text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/60 border border-[#6C63FF]/20 backdrop-blur-md">
+              <span className="w-2 h-2 rounded-full bg-[#6C63FF] animate-ping" />
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#94A3B8]">
+                ● Africa's AI Digital Growth Platform
               </span>
             </div>
-          </div>
 
-          {/* MAIN HEADLINE */}
-          <div className="text-center max-w-4xl mx-auto space-y-6">
-            <h1 className="text-4xl sm:text-7xl font-display font-extrabold tracking-tight !text-white leading-[1.08] drop-shadow-sm">
-              We Build, Scale & Accelerate <br className="hidden sm:inline" />
-              <span className="bg-gradient-to-r from-indigo-400 via-purple-300 to-amber-300 bg-clip-text text-transparent">
+            <h1 className="text-5xl sm:text-6xl xl:text-7xl font-extrabold tracking-tight text-white leading-[1.08]">
+              We Build, <br />
+              Scale & Accelerate <br />
+              <span className="bg-gradient-to-r from-[#6C63FF] via-[#8B5CF6] to-[#FDBA2D] bg-clip-text text-transparent">
                 Digital Brands.
               </span>
             </h1>
 
-            <p className="text-lg sm:text-xl text-slate-400 font-light max-w-2xl mx-auto leading-relaxed">
-              Flokker delivers high-impact digital services — from our signature <strong>OCULA BI</strong> intelligence platform to full SEO/SEM, Social Media Management, Custom Web Development, and Local Market Activation.
+            <p className="text-base sm:text-lg text-[#94A3B8] font-light leading-relaxed max-w-xl">
+              Flokker combines AI visibility intelligence, search marketing, digital strategy, websites, and execution into one complete growth platform.
             </p>
 
-            {/* DIRECT HERO CTAs */}
-            <div className="pt-6 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-xl mx-auto">
+            <div className="flex flex-col sm:flex-row items-center gap-4 pt-2">
               <button
                 onClick={handleOpenCalendly}
-                className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-sm uppercase tracking-wider transition-all shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-2.5 group"
+                className="w-full sm:w-auto px-8 py-4 rounded-full bg-[#6C63FF] hover:bg-[#5a52e0] text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-[#6C63FF]/20 flex items-center justify-center gap-2 group hover:shadow-xl hover:shadow-[#6C63FF]/30"
               >
-                <PhoneCall className="w-4 h-4 text-amber-300" />
-                <span>Book a Strategy Call</span>
+                <span>Book Strategy Call</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
-
+              
               <button
-                onClick={() => handleOpenEmailModal('Hero Section')}
-                className="w-full sm:w-auto px-8 py-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-white font-bold text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2.5"
+                onClick={() => onLaunchOculaBI()}
+                className="w-full sm:w-auto px-8 py-4 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-[#F8FAFC] font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2"
               >
-                <Mail className="w-4 h-4 text-indigo-400" />
-                <span>Send Us an Email</span>
+                <OculaLogo className="w-4 h-4 text-[#8B5CF6]" />
+                <span>Explore Ocula BI</span>
               </button>
             </div>
 
-            <p className="text-xs text-slate-500 font-mono pt-2">
-              ✓ Direct Access to Senior Growth Strategists • Response within 24 hours
-            </p>
+            {/* Small Trust Line */}
+            <div className="pt-4 border-t border-white/5 flex flex-wrap sm:items-center gap-y-2 gap-x-6 text-[11px] font-mono text-[#94A3B8]">
+              <span className="flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5 text-emerald-400" /> Response within 24 hours
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5 text-[#8B5CF6]" /> Senior Growth Strategists
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5 text-[#FDBA2D]" /> Trusted across Africa
+              </span>
+            </div>
           </div>
 
-          {/* LIVELY METRICS HIGHLIGHT */}
-          <div className="mt-16 grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-6xl mx-auto">
-            <div className="bg-slate-900/70 border border-slate-800/80 hover:border-indigo-500/40 rounded-2xl p-6 text-center backdrop-blur-xl shadow-xl transition-all hover:-translate-y-0.5 group">
-              <div className="w-8 h-1 mx-auto bg-indigo-500 rounded-full mb-3 opacity-60 group-hover:opacity-100 transition-opacity" />
-              <p className="text-3xl sm:text-4xl font-display font-extrabold text-white tracking-tight">$120M+</p>
-              <p className="text-[11px] font-mono font-bold text-slate-400 uppercase tracking-widest mt-1.5">Client Revenue Driven</p>
-            </div>
-            <div className="bg-slate-900/70 border border-slate-800/80 hover:border-indigo-500/40 rounded-2xl p-6 text-center backdrop-blur-xl shadow-xl transition-all hover:-translate-y-0.5 group">
-              <div className="w-8 h-1 mx-auto bg-purple-500 rounded-full mb-3 opacity-60 group-hover:opacity-100 transition-opacity" />
-              <p className="text-3xl sm:text-4xl font-display font-extrabold text-indigo-400 tracking-tight">350+</p>
-              <p className="text-[11px] font-mono font-bold text-slate-400 uppercase tracking-widest mt-1.5">Successful Projects</p>
-            </div>
-            <div className="bg-slate-900/70 border border-slate-800/80 hover:border-indigo-500/40 rounded-2xl p-6 text-center backdrop-blur-xl shadow-xl transition-all hover:-translate-y-0.5 group">
-              <div className="w-8 h-1 mx-auto bg-emerald-500 rounded-full mb-3 opacity-60 group-hover:opacity-100 transition-opacity" />
-              <p className="text-3xl sm:text-4xl font-display font-extrabold text-purple-400 tracking-tight">99.4%</p>
-              <p className="text-[11px] font-mono font-bold text-slate-400 uppercase tracking-widest mt-1.5">Client Satisfaction</p>
-            </div>
-            <div className="bg-slate-900/70 border border-slate-800/80 hover:border-indigo-500/40 rounded-2xl p-6 text-center backdrop-blur-xl shadow-xl transition-all hover:-translate-y-0.5 group">
-              <div className="w-8 h-1 mx-auto bg-amber-500 rounded-full mb-3 opacity-60 group-hover:opacity-100 transition-opacity" />
-              <p className="text-3xl sm:text-4xl font-display font-extrabold text-amber-400 tracking-tight">5 Core</p>
-              <p className="text-[11px] font-mono font-bold text-slate-400 uppercase tracking-widest mt-1.5">Growth Services</p>
+          {/* Right Content: Immersive Interactive Globe Visualization */}
+          <div className="lg:col-span-6 relative w-full aspect-square max-w-[500px] lg:max-w-none mx-auto flex items-center justify-center">
+            
+            {/* Globe frame container */}
+            <div className="relative w-[330px] h-[330px] sm:w-[380px] sm:h-[380px] flex items-center justify-center">
+              
+              {/* Backglows */}
+              <div className="absolute inset-4 rounded-full bg-gradient-to-tr from-[#6C63FF]/10 to-[#8B5CF6]/15 blur-2xl pointer-events-none" />
+              <div className="absolute -inset-6 rounded-full bg-indigo-500/5 blur-3xl pointer-events-none" />
+
+              {/* Grid concentric rings */}
+              <div className="absolute -inset-8 border border-white/5 rounded-full pointer-events-none flex items-center justify-center">
+                <div className="w-[102%] h-[102%] border border-dashed border-[#6C63FF]/10 rounded-full animate-[spin_100s_linear_infinite]" />
+              </div>
+
+              {/* Stylized Africa coordinate mesh */}
+              <svg className="absolute inset-0 w-full h-full z-10 overflow-visible" viewBox="0 0 300 300">
+                <defs>
+                  <linearGradient id="neonGlowLine" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#6C63FF" stopOpacity="0.8" />
+                    <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0.1" />
+                  </linearGradient>
+                  <radialGradient id="globeSphere" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stopColor="#0B132B" stopOpacity="1" />
+                    <stop offset="85%" stopColor="#070B1A" stopOpacity="0.9" />
+                    <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0.15" />
+                  </radialGradient>
+                </defs>
+
+                {/* Main Globe Sphere */}
+                <circle cx="150" cy="150" r="110" fill="url(#globeSphere)" stroke="#8B5CF6" strokeWidth="0.5" strokeOpacity="0.25" />
+
+                {/* Animated Orbits */}
+                <motion.ellipse 
+                  cx="150" cy="150" rx="135" ry="38" 
+                  stroke="#6C63FF" strokeWidth="1" strokeOpacity="0.4" fill="none"
+                  transform="rotate(-25 150 150)"
+                  strokeDasharray="6 8"
+                  animate={{ strokeDashoffset: [0, -40] }}
+                  transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                />
+                <motion.ellipse 
+                  cx="150" cy="150" rx="125" ry="50" 
+                  stroke="#8B5CF6" strokeWidth="1" strokeOpacity="0.2" fill="none"
+                  transform="rotate(35 150 150)"
+                  strokeDasharray="4 8"
+                  animate={{ strokeDashoffset: [0, 40] }}
+                  transition={{ duration: 11, repeat: Infinity, ease: "linear" }}
+                />
+
+                {/* Connected Neon lines */}
+                <path d="M 15 15 Q 80 80 120 166" fill="none" stroke="url(#neonGlowLine)" strokeWidth="1" strokeOpacity="0.5" />
+                <path d="M 285 15 Q 230 100 215 190" fill="none" stroke="url(#neonGlowLine)" strokeWidth="1" strokeOpacity="0.5" />
+                <path d="M 285 150 Q 240 160 215 190" fill="none" stroke="url(#neonGlowLine)" strokeWidth="1" strokeOpacity="0.5" />
+
+                {/* Africa Map points */}
+                {AFRICA_MAP_DOTS.map((dot, idx) => (
+                  <circle key={idx} cx={dot.x} cy={dot.y} r="1.1" fill="#6C63FF" fillOpacity="0.4" />
+                ))}
+
+                {/* Pulsating Major Hub indicators */}
+                {HUB_HUBS.map((hub, idx) => (
+                  <g key={idx}>
+                    <motion.circle
+                      cx={hub.x}
+                      cy={hub.y}
+                      r="6"
+                      stroke={hub.color}
+                      strokeWidth="1"
+                      fill="none"
+                      animate={{ scale: [0.8, 2.2, 0.8], opacity: [0.5, 0, 0.5] }}
+                      transition={{ duration: 2.5, repeat: Infinity, delay: idx * 0.4 }}
+                    />
+                    <circle cx={hub.x} cy={hub.y} r="2.5" fill={hub.color} />
+                  </g>
+                ))}
+              </svg>
+
+              {/* Floating linked cards connected to the globe */}
+              {/* Card 1: Ocula BI (Top Left) */}
+              <motion.div 
+                className="absolute top-[4%] left-[-2%] z-20 w-[130px] bg-[#101828]/70 backdrop-blur-md border border-white/10 rounded-xl p-2.5 shadow-xl hover:border-[#6C63FF]/40 cursor-pointer"
+                animate={{ y: [0, -5, 0] }}
+                transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+                onClick={() => onLaunchOculaBI()}
+              >
+                <div className="flex items-center gap-1.5 mb-1">
+                  <div className="p-1 rounded-lg bg-[#6C63FF]/10 text-[#6C63FF]">
+                    <Brain className="w-3 h-3" />
+                  </div>
+                  <span className="text-[9px] font-mono font-bold text-white tracking-wider">OCULA BI</span>
+                </div>
+                <p className="text-[9px] text-[#94A3B8] font-light leading-tight">AI Visibility Insights.</p>
+              </motion.div>
+
+              {/* Card 2: SEO Intelligence (Top Right) */}
+              <motion.div 
+                className="absolute top-[2%] right-[-2%] z-20 w-[130px] bg-[#101828]/70 backdrop-blur-md border border-white/10 rounded-xl p-2.5 shadow-xl hover:border-[#8B5CF6]/40 cursor-pointer"
+                animate={{ y: [0, -6, 0] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+                onClick={() => { setEmailSubject('SEO / SEM Services'); setEmailModalOpen(true); }}
+              >
+                <div className="flex items-center gap-1.5 mb-1">
+                  <div className="p-1 rounded-lg bg-[#8B5CF6]/10 text-[#8B5CF6]">
+                    <Search className="w-3 h-3" />
+                  </div>
+                  <span className="text-[9px] font-mono font-bold text-white tracking-wider">SEO INTEL</span>
+                </div>
+                <p className="text-[9px] text-[#94A3B8] font-light leading-tight">Rank higher on maps.</p>
+              </motion.div>
+
+              {/* Card 3: Social Media (Middle Right) */}
+              <motion.div 
+                className="absolute top-[45%] right-[-8%] z-20 w-[125px] bg-[#101828]/70 backdrop-blur-md border border-white/10 rounded-xl p-2.5 shadow-xl hover:border-[#4F8BFF]/40 cursor-pointer"
+                animate={{ y: [0, -4, 0] }}
+                transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
+                onClick={() => { setEmailSubject('Social Media Management'); setEmailModalOpen(true); }}
+              >
+                <div className="flex items-center gap-1.5 mb-1">
+                  <div className="p-1 rounded-lg bg-[#4F8BFF]/10 text-[#4F8BFF]">
+                    <Share2 className="w-3 h-3" />
+                  </div>
+                  <span className="text-[9px] font-mono font-bold text-white tracking-wider">SOCIAL</span>
+                </div>
+                <p className="text-[9px] text-[#94A3B8] font-light leading-tight">Build digital gravity.</p>
+              </motion.div>
+
+              {/* Card 4: Web Development (Bottom Right) */}
+              <motion.div 
+                className="absolute bottom-[2%] right-[-2%] z-20 w-[130px] bg-[#101828]/70 backdrop-blur-md border border-white/10 rounded-xl p-2.5 shadow-xl hover:border-emerald-500/40 cursor-pointer"
+                animate={{ y: [0, -5, 0] }}
+                transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 0.9 }}
+                onClick={() => { setEmailSubject('Website Development'); setEmailModalOpen(true); }}
+              >
+                <div className="flex items-center gap-1.5 mb-1">
+                  <div className="p-1 rounded-lg bg-emerald-500/10 text-emerald-400">
+                    <Code className="w-3 h-3" />
+                  </div>
+                  <span className="text-[9px] font-mono font-bold text-white tracking-wider">WEB DEV</span>
+                </div>
+                <p className="text-[9px] text-[#94A3B8] font-light leading-tight">High-performance sites.</p>
+              </motion.div>
+
+              {/* Card 5: Local Activation (Bottom Left) */}
+              <motion.div 
+                className="absolute bottom-[0%] left-[-2%] z-20 w-[135px] bg-[#101828]/70 backdrop-blur-md border border-white/10 rounded-xl p-2.5 shadow-xl hover:border-[#FDBA2D]/40 cursor-pointer"
+                animate={{ y: [0, -4, 0] }}
+                transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
+                onClick={() => { setEmailSubject('Local Market Activation'); setEmailModalOpen(true); }}
+              >
+                <div className="flex items-center gap-1.5 mb-1">
+                  <div className="p-1 rounded-lg bg-[#FDBA2D]/10 text-[#FDBA2D]">
+                    <Target className="w-3 h-3" />
+                  </div>
+                  <span className="text-[9px] font-mono font-bold text-white tracking-wider">LOCAL ACTV</span>
+                </div>
+                <p className="text-[9px] text-[#94A3B8] font-light leading-tight">Dominate your offline region.</p>
+              </motion.div>
+
             </div>
           </div>
 
         </div>
       </section>
 
-      {/* 5 CORE FLOKKER SERVICES SECTION */}
-      <section id="services" className="py-20 px-4 sm:px-8 bg-slate-900/40 border-t border-slate-800/80 relative">
-        <div className="max-w-7xl mx-auto space-y-12">
-          
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-mono font-bold uppercase tracking-widest mb-3">
-                <Layers className="w-3.5 h-3.5" /> What We Do
+      {/* SECTION 2: METRICS CONTAINER */}
+      <section className="relative py-12 px-6 sm:px-8 z-10">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-[#101828]/40 backdrop-blur-xl border border-white/5 rounded-3xl p-8 md:p-12 shadow-2xl">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 divide-y lg:divide-y-0 lg:divide-x divide-white/5">
+              
+              {/* Metric 1 */}
+              <div className="flex flex-col items-center text-center p-4 first:pt-0 lg:first:pt-4">
+                <div className="w-12 h-12 rounded-2xl bg-[#6C63FF]/10 border border-[#6C63FF]/20 flex items-center justify-center mb-4 text-[#6C63FF]">
+                  <TrendingUp className="w-6 h-6 animate-pulse" />
+                </div>
+                <span className="text-4xl md:text-5xl font-display font-black text-white tracking-tight">$120M+</span>
+                <span className="text-[10px] font-mono font-bold text-[#94A3B8] uppercase tracking-widest mt-2">Revenue Influenced</span>
               </div>
-              <h2 className="text-3xl sm:text-5xl font-display font-bold text-white tracking-tight">
-                Flokker’s 5 Core Services
-              </h2>
-              <p className="text-slate-400 text-sm max-w-xl mt-2 font-light">
-                Explore our full suite of digital capabilities. Click any service to book a call or send an email directly to our team.
-              </p>
-            </div>
 
-            {/* FILTER TABS */}
-            <div className="flex flex-wrap gap-2 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
-              {[
-                { id: 'all', label: 'All Services' },
-                { id: 'ocula', label: 'OCULA BI', icon: OculaLogo },
-                { id: 'seo', label: 'SEO / SEM' },
-                { id: 'social', label: 'Social Media' },
-                { id: 'web', label: 'Web Dev' },
-                { id: 'activation', label: 'Local Market' },
-              ].map((tab) => {
-                const IconComponent = tab.icon;
-                return (
-                  <button 
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id as any)}
-                    className={`px-3.5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 ${activeTab === tab.id ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
-                  >
-                    {IconComponent && <IconComponent className="w-3 h-3" />}
-                    <span>{tab.label}</span>
-                  </button>
-                );
-              })}
+              {/* Metric 2 */}
+              <div className="flex flex-col items-center text-center p-4 pt-8 lg:pt-4">
+                <div className="w-12 h-12 rounded-2xl bg-[#8B5CF6]/10 border border-[#8B5CF6]/20 flex items-center justify-center mb-4 text-[#8B5CF6]">
+                  <CheckCircle2 className="w-6 h-6" />
+                </div>
+                <span className="text-4xl md:text-5xl font-display font-black text-white tracking-tight">350+</span>
+                <span className="text-[10px] font-mono font-bold text-[#94A3B8] uppercase tracking-widest mt-2">Projects Delivered</span>
+              </div>
+
+              {/* Metric 3 */}
+              <div className="flex flex-col items-center text-center p-4 pt-8 lg:pt-4">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-4 text-emerald-400">
+                  <Award className="w-6 h-6" />
+                </div>
+                <span className="text-4xl md:text-5xl font-display font-black text-white tracking-tight">99.4%</span>
+                <span className="text-[10px] font-mono font-bold text-[#94A3B8] uppercase tracking-widest mt-2">Client Satisfaction</span>
+              </div>
+
+              {/* Metric 4 */}
+              <div className="flex flex-col items-center text-center p-4 pt-8 lg:pt-4">
+                <div className="w-12 h-12 rounded-2xl bg-[#FDBA2D]/10 border border-[#FDBA2D]/20 flex items-center justify-center mb-4 text-[#FDBA2D]">
+                  <Layers className="w-6 h-6" />
+                </div>
+                <span className="text-4xl md:text-5xl font-display font-black text-[#FDBA2D] tracking-tight">5 Core</span>
+                <span className="text-[10px] font-mono font-bold text-[#94A3B8] uppercase tracking-widest mt-2">Growth Services</span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 3: TRUSTED BY SECTION */}
+      <section className="relative py-12 px-6 sm:px-8 z-10 border-b border-white/5">
+        <div className="max-w-7xl mx-auto text-center">
+          <p className="text-[10px] font-mono font-bold text-[#94A3B8] uppercase tracking-widest mb-8">
+            TRUSTED BY LEADERS IN ENTERPRISE COMMERCE & DIGITAL FINANCE
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-9 gap-8 items-center opacity-30 select-none">
+            <span className="text-sm font-black font-mono tracking-tight text-white hover:opacity-100 transition-opacity">PAYSTACK</span>
+            <span className="text-sm font-black font-mono tracking-tight text-white hover:opacity-100 transition-opacity">FLUTTERWAVE</span>
+            <span className="text-sm font-black font-mono tracking-tight text-white hover:opacity-100 transition-opacity">MONIEPOINT</span>
+            <span className="text-sm font-black font-mono tracking-tight text-white hover:opacity-100 transition-opacity">KUDA BANK</span>
+            <span className="text-sm font-black font-mono tracking-tight text-white hover:opacity-100 transition-opacity">OPAY</span>
+            <span className="text-sm font-black font-mono tracking-tight text-white hover:opacity-100 transition-opacity">JUMIA</span>
+            <span className="text-sm font-black font-mono tracking-tight text-white hover:opacity-100 transition-opacity">ETRANZACT</span>
+            <span className="text-sm font-black font-mono tracking-tight text-white hover:opacity-100 transition-opacity">GTBANK</span>
+            <span className="text-sm font-black font-mono tracking-tight text-white hover:opacity-100 transition-opacity">ACCESS BANK</span>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 4: THE FLOKKER PLATFORM ECOSYSTEM VISUALIZATION */}
+      <section id="platform" className="relative py-24 px-6 sm:px-8 z-10 bg-slate-950/20">
+        <div className="max-w-7xl mx-auto">
+          
+          <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6C63FF]">
+              SYSTEM TOPOLOGY
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+              The Flokker Digital Growth Engine
+            </h2>
+            <p className="text-sm text-[#94A3B8] font-light leading-relaxed">
+              Every marketing action requires exact market data. Our service layer connects directly with Ocula BI to deploy hyper-targeted local visibility operations.
+            </p>
+          </div>
+
+          {/* Interactive Topology Graph */}
+          <div className="relative border border-white/5 rounded-3xl bg-[#101828]/25 p-8 md:p-12 min-h-[460px] flex items-center justify-center overflow-hidden">
+            
+            {/* SVG Connector Lines */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 800 400" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="glowG" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#6C63FF" stopOpacity="0.8" />
+                  <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0.2" />
+                </linearGradient>
+              </defs>
+              {/* Lines from center to outer orbits */}
+              <line x1="400" y1="200" x2="180" y2="100" stroke="url(#glowG)" strokeWidth="1" strokeDasharray="5 5" />
+              <line x1="400" y1="200" x2="620" y2="100" stroke="url(#glowG)" strokeWidth="1" strokeDasharray="5 5" />
+              <line x1="400" y1="200" x2="180" y2="300" stroke="url(#glowG)" strokeWidth="1" strokeDasharray="5 5" />
+              <line x1="400" y1="200" x2="620" y2="300" stroke="url(#glowG)" strokeWidth="1" strokeDasharray="5 5" />
+
+              <line x1="400" y1="200" x2="400" y2="60" stroke="url(#glowG)" strokeWidth="1" strokeDasharray="5 5" />
+              <line x1="400" y1="200" x2="400" y2="340" stroke="url(#glowG)" strokeWidth="1" strokeDasharray="5 5" />
+            </svg>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 w-full max-w-5xl gap-12 items-center relative z-10">
+              
+              {/* Left Orbit Nodes */}
+              <div className="space-y-6">
+                <div className="bg-[#101828]/80 border border-white/5 rounded-2xl p-4 flex items-center gap-4 hover:border-[#6C63FF]/30 transition-colors">
+                  <div className="p-2.5 rounded-xl bg-[#6C63FF]/15 text-[#6C63FF]">
+                    <Search className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-mono font-bold text-white uppercase">SEO Node</h4>
+                    <p className="text-[10px] text-[#94A3B8]">Automatic Map Rank Optimization</p>
+                  </div>
+                </div>
+
+                <div className="bg-[#101828]/80 border border-white/5 rounded-2xl p-4 flex items-center gap-4 hover:border-[#6C63FF]/30 transition-colors">
+                  <div className="p-2.5 rounded-xl bg-[#8B5CF6]/15 text-[#8B5CF6]">
+                    <Share2 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-mono font-bold text-white uppercase">Social Feed Node</h4>
+                    <p className="text-[10px] text-[#94A3B8]">Algorithmic Audience Generation</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* CENTER HUB: Ocula BI */}
+              <div className="flex flex-col items-center">
+                <div className="relative group cursor-pointer" onClick={() => onLaunchOculaBI()}>
+                  {/* Outer Pulsing Orbs */}
+                  <div className="absolute -inset-6 rounded-full bg-[#6C63FF]/10 blur-xl animate-pulse" />
+                  <div className="absolute -inset-4 border border-[#8B5CF6]/30 rounded-full animate-ping pointer-events-none" />
+                  
+                  <div className="w-32 h-32 rounded-full bg-[#111827] border-2 border-[#6C63FF] flex flex-col items-center justify-center p-4 text-center shadow-2xl transition-transform duration-300 group-hover:scale-105">
+                    <OculaLogo className="w-12 h-12 text-[#6C63FF] mb-2 animate-spin-slow" />
+                    <span className="text-xs font-black uppercase tracking-widest text-white">OCULA BI</span>
+                    <span className="text-[8px] font-mono text-[#6C63FF]">INTELLIGENCE CORE</span>
+                  </div>
+                </div>
+
+                <div className="mt-6 text-center">
+                  <span className="text-[10px] font-mono font-bold bg-[#6C63FF]/10 text-[#6C63FF] px-2.5 py-1 rounded-full border border-[#6C63FF]/20">
+                    Active Data Interlink
+                  </span>
+                </div>
+              </div>
+
+              {/* Right Orbit Nodes */}
+              <div className="space-y-6">
+                <div className="bg-[#101828]/80 border border-white/5 rounded-2xl p-4 flex items-center gap-4 hover:border-[#6C63FF]/30 transition-colors">
+                  <div className="p-2.5 rounded-xl bg-emerald-500/15 text-emerald-400">
+                    <Code className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-mono font-bold text-white uppercase">Web Engine Node</h4>
+                    <p className="text-[10px] text-[#94A3B8]">Vercel-backed edge performance</p>
+                  </div>
+                </div>
+
+                <div className="bg-[#101828]/80 border border-white/5 rounded-2xl p-4 flex items-center gap-4 hover:border-[#6C63FF]/30 transition-colors">
+                  <div className="p-2.5 rounded-xl bg-[#FDBA2D]/15 text-[#FDBA2D]">
+                    <Target className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-mono font-bold text-white uppercase">Local Activation Node</h4>
+                    <p className="text-[10px] text-[#94A3B8]">Geo-spatial regional campaigns</p>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
 
-          {/* SERVICE CARDS GRID */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Core Philosophy Banner */}
+          <div className="mt-12 text-center">
+            <h3 className="text-xl sm:text-2xl font-light text-[#94A3B8] leading-relaxed italic">
+              "We don't sell marketing. <span className="text-white font-extrabold not-italic">We build digital growth systems.</span>"
+            </h3>
+            <p className="text-[11px] font-mono text-[#6C63FF] uppercase tracking-widest mt-2">
+              Every asset operates directly through our state-of-the-art regional data loop.
+            </p>
+          </div>
 
-            {/* SERVICE 1: OCULA BI (FLAGSHIP FEATURED BENTO CARD) */}
-            {(activeTab === 'all' || activeTab === 'ocula') && (
-              <div 
-                id="ocula-bi" 
-                className={`bg-gradient-to-br from-indigo-950/90 via-slate-900 to-purple-950/90 border-2 border-indigo-500/40 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-2xl group hover:border-indigo-400/80 transition-all ${
-                  activeTab === 'all' ? 'lg:col-span-12' : 'lg:col-span-12'
-                }`}
-              >
-                {/* Background glow */}
-                <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        </div>
+      </section>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
-                  
-                  {/* LEFT COLUMN: INFO & DETAILS */}
-                  <div className="lg:col-span-7 space-y-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-2xl bg-indigo-600/30 border border-indigo-400/40 flex items-center justify-center shadow-inner shrink-0">
-                          <OculaLogo className="w-7 h-7 text-indigo-400" />
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="text-2xl font-display font-extrabold text-white tracking-tight">
-                              OCULA BI
-                            </h3>
-                            <span className="text-[10px] font-mono font-bold text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded border border-indigo-500/30">
-                              Service 01
-                            </span>
+      {/* SECTION 5: CORE SERVICES - FIVE PREMIUM HORIZONTAL CARDS */}
+      <section id="services" className="relative py-24 px-6 sm:px-8 z-10 border-t border-white/5">
+        <div className="max-w-7xl mx-auto space-y-16">
+          
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="space-y-3">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6C63FF]">
+                OUR CAPABILITIES
+              </span>
+              <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+                Core Digital Growth Services
+              </h2>
+            </div>
+            <p className="text-sm text-[#94A3B8] max-w-md font-light leading-relaxed">
+              Unrivaled strategic engineering for ambitious brands scaling across Lagos, Nairobi, Johannesburg, Cairo, and Accra.
+            </p>
+          </div>
+
+          {/* 5 Premium Horizontal Cards */}
+          <div className="space-y-6">
+            
+            {/* Card 1: Ocula BI */}
+            <div className="group relative rounded-3xl bg-[#101828]/40 border border-white/5 p-8 md:p-10 flex flex-col lg:flex-row gap-8 justify-between items-start lg:items-center hover:border-[#6C63FF]/30 hover:bg-[#101828]/65 transition-all">
+              <div className="space-y-4 max-w-2xl">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-2xl bg-[#6C63FF]/10 border border-[#6C63FF]/20 text-[#6C63FF]">
+                    <Brain className="w-6 h-6 animate-pulse" />
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-extrabold text-white">Ocula BI (AI Visibility Intelligence)</h3>
+                </div>
+                <p className="text-xs sm:text-sm text-[#94A3B8] font-light leading-relaxed">
+                  Our core intelligence platform that audits your local digital footprints, analyzes real-time competitor density, maps regional visibility clusters, and exposes clear local growth opportunities.
+                </p>
+                <div className="flex flex-wrap gap-2 pt-2">
+                  <span className="text-[10px] font-mono bg-white/5 text-white px-2.5 py-1 rounded-md">Real-time Audits</span>
+                  <span className="text-[10px] font-mono bg-white/5 text-white px-2.5 py-1 rounded-md">Competitor Density Mapping</span>
+                  <span className="text-[10px] font-mono bg-white/5 text-white px-2.5 py-1 rounded-md">Predictive Search Modeling</span>
+                </div>
+              </div>
+              <button onClick={() => onLaunchOculaBI()} className="w-full lg:w-auto px-6 py-3.5 rounded-full bg-[#6C63FF] hover:bg-[#5a52e0] text-white font-bold text-xs uppercase tracking-widest transition-all shadow-lg shadow-[#6C63FF]/10 flex items-center justify-center gap-2 group-hover:translate-x-1">
+                <span>Access Dashboard</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Card 2: SEO / SEM */}
+            <div className="group relative rounded-3xl bg-[#101828]/40 border border-white/5 p-8 md:p-10 flex flex-col lg:flex-row gap-8 justify-between items-start lg:items-center hover:border-[#8B5CF6]/30 hover:bg-[#101828]/65 transition-all">
+              <div className="space-y-4 max-w-2xl">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-2xl bg-[#8B5CF6]/10 border border-[#8B5CF6]/20 text-[#8B5CF6]">
+                    <Search className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-extrabold text-white">SEO / SEM Intelligence</h3>
+                </div>
+                <p className="text-xs sm:text-sm text-[#94A3B8] font-light leading-relaxed">
+                  Stop chasing raw clicks. We construct local map SEO authority networks and high-conversion paid channels backed by absolute regional search volume metrics.
+                </p>
+                <div className="flex flex-wrap gap-2 pt-2">
+                  <span className="text-[10px] font-mono bg-white/5 text-white px-2.5 py-1 rounded-md">Local Map Grid Dominance</span>
+                  <span className="text-[10px] font-mono bg-white/5 text-white px-2.5 py-1 rounded-md">Paid Funnel Engineering</span>
+                  <span className="text-[10px] font-mono bg-white/5 text-white px-2.5 py-1 rounded-md">Map Pack Optimization</span>
+                </div>
+              </div>
+              <button onClick={() => { setEmailSubject('SEO / SEM Request'); setEmailModalOpen(true); }} className="w-full lg:w-auto px-6 py-3.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-[#F8FAFC] font-bold text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2">
+                <span>Grow Search</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Card 3: Social Media */}
+            <div className="group relative rounded-3xl bg-[#101828]/40 border border-white/5 p-8 md:p-10 flex flex-col lg:flex-row gap-8 justify-between items-start lg:items-center hover:border-[#4F8BFF]/30 hover:bg-[#101828]/65 transition-all">
+              <div className="space-y-4 max-w-2xl">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-2xl bg-[#4F8BFF]/10 border border-[#4F8BFF]/20 text-[#4F8BFF]">
+                    <Share2 className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-extrabold text-white">Social Media Management</h3>
+                </div>
+                <p className="text-xs sm:text-sm text-[#94A3B8] font-light leading-relaxed">
+                  Engineered storytelling to capture high-value awareness, build audience cohorts, and maintain consistent, premium attention across modern networks.
+                </p>
+                <div className="flex flex-wrap gap-2 pt-2">
+                  <span className="text-[10px] font-mono bg-white/5 text-white px-2.5 py-1 rounded-md">Creative Brand Narrative</span>
+                  <span className="text-[10px] font-mono bg-white/5 text-white px-2.5 py-1 rounded-md">Audience Retention Analytics</span>
+                  <span className="text-[10px] font-mono bg-white/5 text-white px-2.5 py-1 rounded-md">Conversion Retargeting</span>
+                </div>
+              </div>
+              <button onClick={() => { setEmailSubject('Social Media Inquiry'); setEmailModalOpen(true); }} className="w-full lg:w-auto px-6 py-3.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-[#F8FAFC] font-bold text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2">
+                <span>Capture Attention</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Card 4: Web Development */}
+            <div className="group relative rounded-3xl bg-[#101828]/40 border border-white/5 p-8 md:p-10 flex flex-col lg:flex-row gap-8 justify-between items-start lg:items-center hover:border-emerald-500/30 hover:bg-[#101828]/65 transition-all">
+              <div className="space-y-4 max-w-2xl">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                    <Code className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-extrabold text-white">Website Development & Engineering</h3>
+                </div>
+                <p className="text-xs sm:text-sm text-[#94A3B8] font-light leading-relaxed">
+                  We deploy lightning-fast web architectures engineered with Next.js, React, Tailwind, and Vercel. Pristine responsiveness, high SEO fidelity, and conversions integrated natively.
+                </p>
+                <div className="flex flex-wrap gap-2 pt-2">
+                  <span className="text-[10px] font-mono bg-white/5 text-white px-2.5 py-1 rounded-md">Custom Next.js Systems</span>
+                  <span className="text-[10px] font-mono bg-white/5 text-white px-2.5 py-1 rounded-md">99+ Mobile Lighthouse Scores</span>
+                  <span className="text-[10px] font-mono bg-white/5 text-white px-2.5 py-1 rounded-md">Pristine Conversions</span>
+                </div>
+              </div>
+              <button onClick={() => { setEmailSubject('Web Development Request'); setEmailModalOpen(true); }} className="w-full lg:w-auto px-6 py-3.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-[#F8FAFC] font-bold text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2">
+                <span>Deploy Engine</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Card 5: Local Activation */}
+            <div className="group relative rounded-3xl bg-[#101828]/40 border border-white/5 p-8 md:p-10 flex flex-col lg:flex-row gap-8 justify-between items-start lg:items-center hover:border-[#FDBA2D]/30 hover:bg-[#101828]/65 transition-all">
+              <div className="space-y-4 max-w-2xl">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-2xl bg-[#FDBA2D]/10 border border-[#FDBA2D]/20 text-[#FDBA2D]">
+                    <Target className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-extrabold text-white">Local Market Activation</h3>
+                </div>
+                <p className="text-xs sm:text-sm text-[#94A3B8] font-light leading-relaxed">
+                  Bridge the gap between digital indicators and real-world activation. We build localized field visibility, physical map presence, and local campaigns designed to win major cities.
+                </p>
+                <div className="flex flex-wrap gap-2 pt-2">
+                  <span className="text-[10px] font-mono bg-white/5 text-white px-2.5 py-1 rounded-md">Physical Store Optimization</span>
+                  <span className="text-[10px] font-mono bg-white/5 text-white px-2.5 py-1 rounded-md">Geo-Targeted Local Marketing</span>
+                  <span className="text-[10px] font-mono bg-white/5 text-white px-2.5 py-1 rounded-md">Offline-to-Online Funnels</span>
+                </div>
+              </div>
+              <button onClick={() => { setEmailSubject('Local Market Activation Inquiry'); setEmailModalOpen(true); }} className="w-full lg:w-auto px-6 py-3.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-[#F8FAFC] font-bold text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2">
+                <span>Own Your City</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* SECTION 6: INTERACTIVE DEMO ANALYTICAL DASHBOARD */}
+      <section className="relative py-24 px-6 sm:px-8 z-10 bg-slate-950/40">
+        <div className="max-w-7xl mx-auto space-y-16">
+          
+          <div className="text-center max-w-2xl mx-auto space-y-4">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6C63FF]">
+              SYSTEM PREVIEW
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+              Ocula Intelligence Dashboard
+            </h2>
+            <p className="text-sm text-[#94A3B8] font-light leading-relaxed">
+              Explore the exact regional datasets generated by Ocula BI to track keyword dominance, map search coordinates, and outperform market rivals.
+            </p>
+          </div>
+
+          {/* Large Enterprise Dashboard Container */}
+          <div className="border border-white/5 rounded-3xl bg-[#101828]/40 shadow-2xl overflow-hidden backdrop-blur-xl">
+            
+            {/* Window Header */}
+            <div className="bg-[#111827]/80 px-6 py-4 border-b border-white/5 flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="flex gap-1.5">
+                  <span className="w-3 h-3 rounded-full bg-rose-500/80" />
+                  <span className="w-3 h-3 rounded-full bg-amber-500/80" />
+                  <span className="w-3 h-3 rounded-full bg-emerald-500/80" />
+                </div>
+                <span className="text-[11px] font-mono font-bold text-[#94A3B8] tracking-widest uppercase">
+                  Ocula BI • Interactive Simulator
+                </span>
+              </div>
+
+              {/* Mini Tabs */}
+              <div className="flex bg-slate-900/80 rounded-xl p-1 border border-white/5 text-xs font-bold font-mono">
+                <button 
+                  onClick={() => setDashboardTab('visibility')}
+                  className={`px-3 py-1.5 rounded-lg transition-all ${dashboardTab === 'visibility' ? 'bg-[#6C63FF] text-white shadow-sm' : 'text-[#94A3B8] hover:text-white'}`}
+                >
+                  Visibility Metrics
+                </button>
+                <button 
+                  onClick={() => setDashboardTab('keywords')}
+                  className={`px-3 py-1.5 rounded-lg transition-all ${dashboardTab === 'keywords' ? 'bg-[#6C63FF] text-white shadow-sm' : 'text-[#94A3B8] hover:text-white'}`}
+                >
+                  Keyword Growth
+                </button>
+                <button 
+                  onClick={() => setDashboardTab('competitors')}
+                  className={`px-3 py-1.5 rounded-lg transition-all ${dashboardTab === 'competitors' ? 'bg-[#6C63FF] text-white shadow-sm' : 'text-[#94A3B8] hover:text-white'}`}
+                >
+                  Competitor Grid
+                </button>
+              </div>
+            </div>
+
+            {/* Dashboard Content */}
+            <div className="p-6 md:p-8 space-y-6">
+              
+              <AnimatePresence mode="wait">
+                
+                {dashboardTab === 'visibility' && (
+                  <motion.div 
+                    key="visibility"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="grid grid-cols-1 md:grid-cols-3 gap-6"
+                  >
+                    {/* Stat Card 1 */}
+                    <div className="bg-[#111827]/60 border border-white/5 rounded-2xl p-5 space-y-2">
+                      <span className="text-[9px] font-mono font-bold text-[#94A3B8] uppercase">SEARCH VISIBILITY</span>
+                      <div className="flex items-baseline justify-between">
+                        <span className="text-3xl font-black text-white">88.4%</span>
+                        <span className="text-xs font-bold text-emerald-400 font-mono">+12.5%</span>
+                      </div>
+                      <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-[#6C63FF] to-[#8B5CF6] rounded-full w-[88%]" />
+                      </div>
+                      <p className="text-[10px] text-[#94A3B8] font-light">Leading local commerce segment density.</p>
+                    </div>
+
+                    {/* Stat Card 2 */}
+                    <div className="bg-[#111827]/60 border border-white/5 rounded-2xl p-5 space-y-2">
+                      <span className="text-[9px] font-mono font-bold text-[#94A3B8] uppercase">MAP PACK APPEARANCES</span>
+                      <div className="flex items-baseline justify-between">
+                        <span className="text-3xl font-black text-white">12.4K</span>
+                        <span className="text-xs font-bold text-[#6C63FF] font-mono">+8.2%</span>
+                      </div>
+                      <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-[#8B5CF6] to-[#4F8BFF] rounded-full w-[72%]" />
+                      </div>
+                      <p className="text-[10px] text-[#94A3B8] font-light">Organic discovery counts in target regions.</p>
+                    </div>
+
+                    {/* Stat Card 3 */}
+                    <div className="bg-[#111827]/60 border border-white/5 rounded-2xl p-5 space-y-2">
+                      <span className="text-[9px] font-mono font-bold text-[#94A3B8] uppercase">OVERALL INTEGRITY SCORE</span>
+                      <div className="flex items-baseline justify-between">
+                        <span className="text-3xl font-black text-[#FDBA2D]">94/100</span>
+                        <span className="text-xs font-bold text-[#FDBA2D] font-mono">Strong</span>
+                      </div>
+                      <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-[#4F8BFF] to-[#FDBA2D] rounded-full w-[94%]" />
+                      </div>
+                      <p className="text-[10px] text-[#94A3B8] font-light">Calculated brand footprint alignment score.</p>
+                    </div>
+
+                    {/* Interactive Heatmap visualizer */}
+                    <div className="md:col-span-3 bg-[#111827]/30 border border-white/5 rounded-2xl p-6 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-white">
+                          National Map Visibility Grid (Simulated Sector Heatmap)
+                        </h4>
+                        <span className="text-[10px] font-mono text-emerald-400">● 14 Scan points active</span>
+                      </div>
+
+                      {/* Mock Grid Matrix */}
+                      <div className="grid grid-cols-7 gap-2.5">
+                        {Array.from({ length: 14 }).map((_, i) => {
+                          const value = Math.round(Math.sin(i * 0.4) * 45 + 55);
+                          return (
+                            <div 
+                              key={i} 
+                              className="aspect-square rounded-lg flex flex-col justify-between p-2 relative group cursor-pointer transition-transform hover:scale-105"
+                              style={{ 
+                                background: `rgba(108, 99, 255, ${value / 130})`,
+                                border: '1px solid rgba(255, 255, 255, 0.05)'
+                              }}
+                            >
+                              <span className="text-[8px] font-mono text-[#94A3B8]">#0{i+1}</span>
+                              <span className="text-xs font-black text-white text-right">{value}%</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {dashboardTab === 'keywords' && (
+                  <motion.div 
+                    key="keywords"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="space-y-6"
+                  >
+                    <div className="bg-[#111827]/40 border border-white/5 rounded-2xl p-6">
+                      <div className="flex items-center justify-between mb-6">
+                        <h4 className="text-xs font-mono font-bold text-white uppercase">Top Keyword Growth Index</h4>
+                        <span className="text-[10px] font-mono text-indigo-400">Updated 4h ago</span>
+                      </div>
+
+                      <div className="space-y-4">
+                        {[
+                          { term: 'Fintech platforms Nigeria', volume: '18.4K/mo', growth: '+45%', share: 72 },
+                          { term: 'SaaS solutions Kenya', volume: '8.2K/mo', growth: '+88%', share: 58 },
+                          { term: 'Local map optimization Cape Town', volume: '5.5K/mo', growth: '+12%', share: 91 },
+                          { term: 'Africa business intelligence tools', volume: '3.1K/mo', growth: '+120%', share: 44 }
+                        ].map((kw, i) => (
+                          <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-900/60 rounded-xl border border-white/5 gap-4">
+                            <div className="space-y-1">
+                              <span className="text-xs font-bold text-white font-mono">"{kw.term}"</span>
+                              <div className="flex items-center gap-3 text-[10px] text-[#94A3B8]">
+                                <span>Vol: {kw.volume}</span>
+                                <span className="text-emerald-400">{kw.growth} growth</span>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-4 w-full sm:w-1/3">
+                              <div className="h-2 bg-white/5 rounded-full overflow-hidden w-full">
+                                <div className="h-full bg-gradient-to-r from-[#6C63FF] to-[#8B5CF6] rounded-full" style={{ width: `${kw.share}%` }} />
+                              </div>
+                              <span className="text-xs font-mono font-bold text-white whitespace-nowrap">{kw.share}% Share</span>
+                            </div>
                           </div>
-                          <p className="text-xs font-mono text-indigo-300 uppercase tracking-widest mt-0.5">
-                            Strategic Visibility Intelligence Platform
-                          </p>
-                        </div>
+                        ))}
                       </div>
-                      <span className="inline-flex px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-[10px] font-mono font-bold uppercase tracking-wider border border-indigo-500/30">
-                        Flagship
-                      </span>
                     </div>
+                  </motion.div>
+                )}
 
-                    <p className="text-slate-300 text-sm leading-relaxed font-light">
-                      OCULA BI delivers deep clarity into market positioning, competitor visibility gaps, search ranking performance, and growth tactics in one comprehensive analysis engine.
-                    </p>
-
-                    {/* FEATURE BULLETS */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                      <div className="bg-slate-950/70 border border-indigo-500/20 p-3.5 rounded-2xl flex items-center gap-3">
-                        <BarChart3 className="w-5 h-5 text-indigo-400 shrink-0" />
-                        <div>
-                          <p className="text-xs font-bold text-white">360° Visibility Audit</p>
-                          <p className="text-[10px] text-slate-400">Search & digital touchpoint analysis</p>
-                        </div>
-                      </div>
-                      <div className="bg-slate-950/70 border border-indigo-500/20 p-3.5 rounded-2xl flex items-center gap-3">
-                        <Target className="w-5 h-5 text-purple-400 shrink-0" />
-                        <div>
-                          <p className="text-xs font-bold text-white">Competitor Benchmarking</p>
-                          <p className="text-[10px] text-slate-400">Discover where rivals outrank you</p>
-                        </div>
-                      </div>
-                      <div className="bg-slate-950/70 border border-indigo-500/20 p-3.5 rounded-2xl flex items-center gap-3">
-                        <Zap className="w-5 h-5 text-amber-400 shrink-0" />
-                        <div>
-                          <p className="text-xs font-bold text-white">Actionable Strategy Roadmap</p>
-                          <p className="text-[10px] text-slate-400">Step-by-step priority guide</p>
-                        </div>
-                      </div>
-                      <div className="bg-slate-950/70 border border-indigo-500/20 p-3.5 rounded-2xl flex items-center gap-3">
-                        <Globe className="w-5 h-5 text-emerald-400 shrink-0" />
-                        <div>
-                          <p className="text-xs font-bold text-white">Live App Demo Access</p>
-                          <p className="text-[10px] text-slate-400">Interactive dashboard online</p>
-                        </div>
+                {dashboardTab === 'competitors' && (
+                  <motion.div 
+                    key="competitors"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                  >
+                    <div className="bg-[#111827]/40 border border-white/5 rounded-2xl p-6 space-y-4">
+                      <h4 className="text-xs font-mono font-bold text-white uppercase">Competitor Overlap Density</h4>
+                      
+                      <div className="space-y-4">
+                        {[
+                          { name: 'Local Rival A', overlap: 'High Overlap', score: 64, color: 'bg-rose-500' },
+                          { name: 'Market Competitor B', overlap: 'Moderate Overlap', score: 52, color: 'bg-amber-500' },
+                          { name: 'Search Disruptor C', overlap: 'Emerging Threat', score: 38, color: 'bg-indigo-400' }
+                        ].map((comp, i) => (
+                          <div key={i} className="space-y-1.5">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="font-bold text-white">{comp.name}</span>
+                              <span className="text-[#94A3B8] font-mono text-[10px]">{comp.overlap} • {comp.score}%</span>
+                            </div>
+                            <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                              <div className={`h-full ${comp.color}`} style={{ width: `${comp.score}%` }} />
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
 
-                    {/* CTAs FOR OCULA BI */}
-                    <div className="pt-4 border-t border-indigo-500/20 flex flex-wrap items-center justify-between gap-3">
-                      <div className="flex flex-wrap items-center gap-3">
-                        <button
-                          onClick={handleOpenCalendly}
-                          className="px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg flex items-center gap-2"
-                        >
-                          <PhoneCall className="w-3.5 h-3.5" />
-                          <span>Book a Call</span>
-                        </button>
-                        <button
-                          onClick={() => handleOpenEmailModal('OCULA BI Service')}
-                          className="px-5 py-3 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-600 text-slate-200 hover:text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2"
-                        >
-                          <Mail className="w-3.5 h-3.5 text-indigo-400" />
-                          <span>Send Email</span>
-                        </button>
+                    <div className="bg-[#111827]/40 border border-white/5 rounded-2xl p-6 flex flex-col justify-between">
+                      <div className="space-y-2">
+                        <span className="text-[9px] font-mono font-bold text-[#6C63FF] uppercase">AI STRATEGIC INSIGHT</span>
+                        <h4 className="text-base font-bold text-white">Vulnerability detected in West-Lagos Map Packs.</h4>
+                        <p className="text-xs text-[#94A3B8] font-light leading-relaxed">
+                          Your main rival lacks keyword compliance for local search tags. Rebuilding the map anchor strategy will result in a 24-30% organic visibility gain.
+                        </p>
                       </div>
 
-                      <button
-                        onClick={() => onLaunchOculaBI()}
-                        className="px-4 py-3 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 border border-indigo-500/30"
-                      >
-                        <span>Try OCULA App</span>
-                        <ArrowUpRight className="w-3.5 h-3.5" />
+                      <button onClick={() => onLaunchOculaBI()} className="mt-4 px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 border border-white/10">
+                        <span>Deploy SEO Shield</span>
+                        <ArrowRight className="w-4 h-4 text-[#8B5CF6]" />
                       </button>
                     </div>
-                  </div>
+                  </motion.div>
+                )}
 
-                  {/* RIGHT COLUMN: INTERACTIVE DEMO PREVIEW CARD */}
-                  <div className="lg:col-span-5 bg-slate-950/80 border border-indigo-500/30 rounded-2xl p-5 shadow-2xl space-y-4">
-                    <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-                        <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">
-                          OCULA BI • Sample Live Metric
-                        </span>
-                      </div>
-                      <span className="text-[10px] font-mono text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded">
-                        PRO VERSION
-                      </span>
-                    </div>
+              </AnimatePresence>
 
-                    <div className="space-y-3">
-                      <div className="bg-slate-900 p-3.5 rounded-xl border border-slate-800 flex items-center justify-between">
-                        <div>
-                          <p className="text-[10px] font-mono text-slate-400 uppercase">Search Authority Index</p>
-                          <p className="text-xl font-display font-bold text-white mt-0.5">88.4 / 100</p>
-                        </div>
-                        <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20">
-                          +14.2% YoY
-                        </span>
-                      </div>
-
-                      <div className="bg-slate-900 p-3.5 rounded-xl border border-slate-800 space-y-2">
-                        <div className="flex justify-between text-xs">
-                          <span className="text-slate-300 font-medium">Market Visibility Share</span>
-                          <span className="text-indigo-400 font-bold">Top 3%</span>
-                        </div>
-                        <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                          <div className="bg-gradient-to-r from-indigo-500 to-purple-500 h-full w-[88%]" />
-                        </div>
-                      </div>
-
-                      <div className="bg-slate-900 p-3.5 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
-                        <span className="text-slate-400">Monitored Competitors</span>
-                        <span className="font-mono text-white font-bold">12 Brands Tracked</span>
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => onLaunchOculaBI('Sample Company', 'Technology')}
-                      className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg"
-                    >
-                      <Rocket className="w-3.5 h-3.5 text-amber-300" />
-                      <span>Launch Interactive OCULA BI</span>
-                    </button>
-                  </div>
-
-                </div>
-              </div>
-            )}
-
-            {/* SERVICE 2: SEO & SEM */}
-            {(activeTab === 'all' || activeTab === 'seo') && (
-              <div className={`bg-slate-900/80 border border-slate-800 hover:border-indigo-500/40 rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all group ${activeTab === 'seo' ? 'lg:col-span-12' : 'lg:col-span-6'}`}>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
-                      <Search className="w-6 h-6" />
-                    </div>
-                    <span className="text-[10px] font-mono font-bold text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-full border border-blue-500/20 uppercase tracking-widest">
-                      Service 02
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-display font-bold text-white tracking-tight mt-0.5">
-                      SEO & SEM Growth
-                    </h3>
-                    <p className="text-xs font-mono text-slate-400 mt-0.5">Search Engine Dominance & Paid Media</p>
-                  </div>
-                  <p className="text-slate-400 text-xs leading-relaxed font-light">
-                    Search engine optimization, technical web authority building, and targeted Google Ads campaigns to get your business to the top of high-intent search results.
-                  </p>
-
-                  <div className="space-y-2.5 pt-2 text-xs text-slate-300">
-                    <div className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-blue-400 shrink-0" />
-                      <span>Commercial Keyword Ranking Strategy</span>
-                    </div>
-                    <div className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-blue-400 shrink-0" />
-                      <span>Technical & On-Page Audit & Fixes</span>
-                    </div>
-                    <div className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-blue-400 shrink-0" />
-                      <span>High-ROI Pay-Per-Click (PPC) Management</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* SERVICE CTAs */}
-                <div className="mt-8 pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center gap-2.5">
-                  <button 
-                    onClick={handleOpenCalendly} 
-                    className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md"
-                  >
-                    <PhoneCall className="w-3.5 h-3.5" />
-                    <span>Book a Call</span>
-                  </button>
-                  <button 
-                    onClick={() => handleOpenEmailModal('SEO / SEM Service')} 
-                    className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2"
-                  >
-                    <Mail className="w-3.5 h-3.5 text-indigo-400" />
-                    <span>Send Email</span>
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* SERVICE 3: SOCIAL MEDIA MANAGEMENT */}
-            {(activeTab === 'all' || activeTab === 'social') && (
-              <div className={`bg-slate-900/80 border border-slate-800 hover:border-purple-500/40 rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all group ${activeTab === 'social' ? 'lg:col-span-12' : 'lg:col-span-6'}`}>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
-                      <Share2 className="w-6 h-6" />
-                    </div>
-                    <span className="text-[10px] font-mono font-bold text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-full border border-purple-500/20 uppercase tracking-widest">
-                      Service 03
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-display font-bold text-white tracking-tight mt-0.5">
-                      Social Media Management
-                    </h3>
-                    <p className="text-xs font-mono text-slate-400 mt-0.5">Multi-Platform Content & Audience Engagement</p>
-                  </div>
-                  <p className="text-slate-400 text-xs leading-relaxed font-light">
-                    End-to-end social media management, content creation, brand voice curation, audience engagement, and campaign scheduling across LinkedIn, Twitter/X, Instagram & Meta.
-                  </p>
-
-                  <div className="space-y-2.5 pt-2 text-xs text-slate-300">
-                    <div className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0" />
-                      <span>Custom Content Calendar & Graphics</span>
-                    </div>
-                    <div className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0" />
-                      <span>Brand Sentiment & Audience Growth</span>
-                    </div>
-                    <div className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-purple-400 shrink-0" />
-                      <span>Executive & Thought Leadership Curation</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* SERVICE CTAs */}
-                <div className="mt-8 pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center gap-2.5">
-                  <button 
-                    onClick={handleOpenCalendly} 
-                    className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md"
-                  >
-                    <PhoneCall className="w-3.5 h-3.5" />
-                    <span>Book a Call</span>
-                  </button>
-                  <button 
-                    onClick={() => handleOpenEmailModal('Social Media Management Service')} 
-                    className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2"
-                  >
-                    <Mail className="w-3.5 h-3.5 text-indigo-400" />
-                    <span>Send Email</span>
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* SERVICE 4: WEBSITE DEVELOPMENT */}
-            {(activeTab === 'all' || activeTab === 'web') && (
-              <div className={`bg-slate-900/80 border border-slate-800 hover:border-emerald-500/40 rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all group ${activeTab === 'web' ? 'lg:col-span-12' : 'lg:col-span-6'}`}>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                      <Code className="w-6 h-6" />
-                    </div>
-                    <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20 uppercase tracking-widest">
-                      Service 04
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-display font-bold text-white tracking-tight mt-0.5">
-                      Website Development
-                    </h3>
-                    <p className="text-xs font-mono text-slate-400 mt-0.5">Modern High-Conversion Web Platforms</p>
-                  </div>
-                  <p className="text-slate-400 text-xs leading-relaxed font-light">
-                    High-performance custom websites, responsive marketing sites, e-commerce stores, and digital landing pages designed for conversion and lightning-fast speeds.
-                  </p>
-
-                  <div className="space-y-2.5 pt-2 text-xs text-slate-300">
-                    <div className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                      <span>Modern React, Vite & Tailwind Tech Stack</span>
-                    </div>
-                    <div className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                      <span>Mobile-First & High Conversion UX Design</span>
-                    </div>
-                    <div className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                      <span>Sub-second Speed & SEO Architecture</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* SERVICE CTAs */}
-                <div className="mt-8 pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center gap-2.5">
-                  <button 
-                    onClick={handleOpenCalendly} 
-                    className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md"
-                  >
-                    <PhoneCall className="w-3.5 h-3.5" />
-                    <span>Book a Call</span>
-                  </button>
-                  <button 
-                    onClick={() => handleOpenEmailModal('Website Development Service')} 
-                    className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2"
-                  >
-                    <Mail className="w-3.5 h-3.5 text-indigo-400" />
-                    <span>Send Email</span>
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* SERVICE 5: LOCAL MARKET ACTIVATION */}
-            {(activeTab === 'all' || activeTab === 'activation') && (
-              <div className={`bg-slate-900/80 border border-slate-800 hover:border-amber-500/40 rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all group ${activeTab === 'activation' ? 'lg:col-span-12' : 'lg:col-span-6'}`}>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-                      <Rocket className="w-6 h-6" />
-                    </div>
-                    <span className="text-[10px] font-mono font-bold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20 uppercase tracking-widest">
-                      Service 05
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-display font-bold text-white tracking-tight mt-0.5">
-                      Local Market Activation
-                    </h3>
-                    <p className="text-xs font-mono text-slate-400 mt-0.5">Geo-Targeted Sprints & Community Growth</p>
-                  </div>
-                  <p className="text-slate-400 text-xs leading-relaxed font-light">
-                    Hyper-local market launch strategies, geo-targeted campaigns, regional brand presence, and community activation sprints to capture local market share and drive customer engagement.
-                  </p>
-
-                  <div className="space-y-2.5 pt-2 text-xs text-slate-300">
-                    <div className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                      <span>Hyper-Local & Geo-Targeted Campaigns</span>
-                    </div>
-                    <div className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                      <span>Community Brand Building & Local Presence</span>
-                    </div>
-                    <div className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-                      <span>Customer Onboarding & Regional Conversion Funnels</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* SERVICE CTAs */}
-                <div className="mt-8 pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center gap-2.5">
-                  <button 
-                    onClick={handleOpenCalendly} 
-                    className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md"
-                  >
-                    <PhoneCall className="w-3.5 h-3.5" />
-                    <span>Book a Call</span>
-                  </button>
-                  <button 
-                    onClick={() => handleOpenEmailModal('Local Market Activation Service')} 
-                    className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2"
-                  >
-                    <Mail className="w-3.5 h-3.5 text-indigo-400" />
-                    <span>Send Email</span>
-                  </button>
-                </div>
-              </div>
-            )}
+            </div>
 
           </div>
 
         </div>
       </section>
 
-      {/* INTERACTIVE PROPOSAL & SCOPE CALCULATOR */}
-      <section id="calculator" className="py-20 px-4 sm:px-8 relative">
-        <div className="max-w-6xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
+      {/* SECTION 7: HOW FLOKKER WORKS - FIVE TIMELINE CARDS */}
+      <section className="relative py-24 px-6 sm:px-8 z-10 border-t border-white/5">
+        <div className="max-w-7xl mx-auto space-y-16">
+          
+          <div className="text-center max-w-2xl mx-auto space-y-4">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6C63FF]">
+              OUR METHODOLOGY
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+              The Path to Market Dominance
+            </h2>
+            <p className="text-sm text-[#94A3B8] font-light leading-relaxed">
+              We deploy our custom growth pipeline through five sequential stages, securing persistent visibility from audit to scale.
+            </p>
+          </div>
 
-          <div className="space-y-8 relative z-10">
-            <div className="text-center space-y-2 max-w-2xl mx-auto">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-mono font-bold uppercase tracking-widest">
-                <Calculator className="w-3.5 h-3.5" /> Scope Estimator
+          {/* Timeline Cards connected by animation lines */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 relative">
+            
+            {/* Timeline cards */}
+            {[
+              { num: '01', title: 'Discover', desc: 'Identify baseline visibility indicators, organic map footprints, and audit target commerce zones.' },
+              { num: '02', title: 'Analyze', desc: 'Isolate regional competitor overlap, map-pack clusters, and keyword traffic opportunities.' },
+              { num: '03', title: 'Recommend', desc: 'Formulate predictive growth models, map action targets, and outline custom local blueprints.' },
+              { num: '04', title: 'Execute', desc: 'Deploy high-performance web systems, build map-pack authority, and run field campaigns.' },
+              { num: '05', title: 'Scale', desc: 'Track traffic expansion, capture local markets, and continuously scale search prominence.' }
+            ].map((step, idx) => (
+              <div key={idx} className="bg-[#101828]/40 border border-white/5 rounded-2xl p-6 space-y-4 hover:border-[#6C63FF]/30 transition-all relative group">
+                <span className="text-4xl font-display font-black bg-gradient-to-r from-[#6C63FF] to-[#8B5CF6] bg-clip-text text-transparent opacity-80 group-hover:scale-105 duration-300 block">
+                  {step.num}
+                </span>
+                <h4 className="text-base font-bold text-white">{step.title}</h4>
+                <p className="text-xs text-[#94A3B8] font-light leading-relaxed">{step.desc}</p>
               </div>
-              <h2 className="text-2xl sm:text-4xl font-display font-bold text-white tracking-tight">
-                Estimate Your Growth Package
+            ))}
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* SECTION 8: CASE STUDIES - THREE PREMIUM SHOWCASE CARDS */}
+      <section id="results" className="relative py-24 px-6 sm:px-8 z-10 border-t border-white/5 bg-slate-950/20">
+        <div className="max-w-7xl mx-auto space-y-16">
+          
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="space-y-3">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6C63FF]">
+                PROOF OF CAPABILITY
+              </span>
+              <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+                Proven Growth Metrics
               </h2>
-              <p className="text-slate-400 text-xs">
-                Select the Flokker services you need to estimate your monthly scope and book a discussion.
+            </div>
+            <button onClick={handleOpenCalendly} className="w-full md:w-auto px-6 py-3 rounded-full bg-white/5 hover:bg-white/10 text-white font-bold text-xs uppercase tracking-widest border border-white/10 transition-colors">
+              Request Growth Blueprint
+            </button>
+          </div>
+
+          {/* Three Premium Case Study Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            {/* Case Study 1 */}
+            <div className="bg-[#101828]/30 border border-white/5 rounded-3xl p-6 hover:border-[#6C63FF]/30 transition-all flex flex-col justify-between">
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono font-bold bg-[#6C63FF]/10 text-[#6C63FF] px-2.5 py-1 rounded-md">FINTECH LEADER</span>
+                  <span className="text-[10px] font-mono text-[#94A3B8]">Lagos, NG</span>
+                </div>
+                
+                <div className="space-y-2">
+                  <span className="text-3xl font-display font-black text-white">+142%</span>
+                  <h4 className="text-base font-bold text-white">Map Pack Dominance Achieved</h4>
+                  <p className="text-xs text-[#94A3B8] font-light leading-relaxed">
+                    Overhauled GMB footprints across 12 physical branch locations to secure organic top-spot authority.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-white/5 mt-6 flex items-center justify-between">
+                <span className="text-[10px] font-mono font-bold text-slate-500">CONSUMER FINTECH</span>
+                <button onClick={() => { setEmailSubject('Lagos Case Study Request'); setEmailModalOpen(true); }} className="text-xs font-bold text-[#6C63FF] hover:text-white transition-colors flex items-center gap-1.5">
+                  <span>Read Case Study</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Case Study 2 */}
+            <div className="bg-[#101828]/30 border border-white/5 rounded-3xl p-6 hover:border-[#8B5CF6]/30 transition-all flex flex-col justify-between">
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono font-bold bg-[#8B5CF6]/10 text-[#8B5CF6] px-2.5 py-1 rounded-md">PROPTECH PLATFORM</span>
+                  <span className="text-[10px] font-mono text-[#94A3B8]">Nairobi, KE</span>
+                </div>
+
+                <div className="space-y-2">
+                  <span className="text-3xl font-display font-black text-white">4.8X</span>
+                  <h4 className="text-base font-bold text-white">Organic Direct Conversions</h4>
+                  <p className="text-xs text-[#94A3B8] font-light leading-relaxed">
+                    Constructed a Next.js web application coupled with regional keyword landing funnels, securing inbound leads.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-white/5 mt-6 flex items-center justify-between">
+                <span className="text-[10px] font-mono font-bold text-slate-500">REAL ESTATE SYSTEMS</span>
+                <button onClick={() => { setEmailSubject('Nairobi Case Study Request'); setEmailModalOpen(true); }} className="text-xs font-bold text-[#8B5CF6] hover:text-white transition-colors flex items-center gap-1.5">
+                  <span>Read Case Study</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Case Study 3 */}
+            <div className="bg-[#101828]/30 border border-white/5 rounded-3xl p-6 hover:border-[#FDBA2D]/30 transition-all flex flex-col justify-between">
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono font-bold bg-[#FDBA2D]/10 text-[#FDBA2D] px-2.5 py-1 rounded-md">COMMERCE COHORT</span>
+                  <span className="text-[10px] font-mono text-[#94A3B8]">Johannesburg, ZA</span>
+                </div>
+
+                <div className="space-y-2">
+                  <span className="text-3xl font-display font-black text-white">$14M+</span>
+                  <h4 className="text-base font-bold text-white">New Organic Channel Sales</h4>
+                  <p className="text-xs text-[#94A3B8] font-light leading-relaxed">
+                    Designed localized city-activation strategies coupled with search engine retargeting cohorts.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-white/5 mt-6 flex items-center justify-between">
+                <span className="text-[10px] font-mono font-bold text-slate-500">RETAIL ENTERPRISE</span>
+                <button onClick={() => { setEmailSubject('Johannesburg Case Study Request'); setEmailModalOpen(true); }} className="text-xs font-bold text-[#FDBA2D] hover:text-white transition-colors flex items-center gap-1.5">
+                  <span>Read Case Study</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* SECTION 9: INDUSTRIES WE SERVE */}
+      <section className="relative py-24 px-6 sm:px-8 z-10 border-t border-white/5">
+        <div className="max-w-7xl mx-auto space-y-12">
+          
+          <div className="text-center max-w-2xl mx-auto space-y-4">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6C63FF]">
+              MARKET ADAPTABILITY
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+              Sectors Under Management
+            </h2>
+            <p className="text-sm text-[#94A3B8] font-light leading-relaxed">
+              We deploy custom-tailored search optimization blueprints for high-stakes business landscapes.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
+            {[
+              { name: 'Healthcare Systems', icon: Brain, color: 'text-indigo-400' },
+              { name: 'Real Estate Platforms', icon: MapPin, color: 'text-[#8B5CF6]' },
+              { name: 'Hospitality Networks', icon: Star, color: 'text-[#FDBA2D]' },
+              { name: 'E-commerce Retail', icon: Smartphone, color: 'text-emerald-400' },
+              { name: 'Higher Education', icon: Award, color: 'text-[#4F8BFF]' },
+              { name: 'Professional Services', icon: Briefcase, color: 'text-indigo-400' },
+              { name: 'SaaS Platforms', icon: Cpu, color: 'text-rose-400' },
+              { name: 'Logistics Operators', icon: Globe, color: 'text-emerald-400' }
+            ].map((ind, i) => (
+              <div key={i} className="bg-[#101828]/40 border border-white/5 rounded-2xl p-5 flex items-center gap-4 hover:border-white/10 transition-colors">
+                <div className={`p-2.5 rounded-xl bg-white/5 ${ind.color}`}>
+                  <ind.icon className="w-5 h-5" />
+                </div>
+                <span className="text-xs sm:text-sm font-bold text-white">{ind.name}</span>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* SECTION 10: WHY FLOKKER */}
+      <section className="relative py-24 px-6 sm:px-8 z-10 border-t border-white/5 bg-slate-950/20">
+        <div className="max-w-7xl mx-auto space-y-16">
+          
+          <div className="text-center max-w-2xl mx-auto space-y-4">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6C63FF]">
+              THE FLOKKER ADVANTAGE
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+              Why High-Growth Brands Select Us
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            <div className="bg-[#101828]/30 border border-white/5 rounded-3xl p-8 space-y-4 hover:border-white/10 transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-[#6C63FF]/10 border border-[#6C63FF]/25 flex items-center justify-center text-[#6C63FF]">
+                <Cpu className="w-6 h-6" />
+              </div>
+              <h4 className="text-lg font-bold text-white">AI-Powered Intelligence</h4>
+              <p className="text-xs text-[#94A3B8] font-light leading-relaxed">
+                We do not guess. Our proprietary Ocula BI software scans, monitors, and evaluates search coordinates and competitor grids to expose genuine market voids.
               </p>
             </div>
 
-            {/* SERVICE SELECTION BOXES - 5 COLUMNS ON DESKTOP */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-              {[
-                { id: 'ocula', label: 'OCULA BI Intelligence', badge: 'Intelligence', icon: OculaLogo },
-                { id: 'seo', label: 'SEO & SEM Growth', badge: 'Search Engine', icon: Search },
-                { id: 'social', label: 'Social Media', badge: 'Social Media', icon: Share2 },
-                { id: 'web', label: 'Website Development', badge: 'Web Development', icon: Code },
-                { id: 'activation', label: 'Local Market Activation', badge: 'Local Activation', icon: Rocket },
-              ].map((srv) => {
-                const isSelected = selectedServices.includes(srv.id);
-                const IconComponent = srv.icon;
-                return (
-                  <button
-                    key={srv.id}
-                    type="button"
-                    onClick={() => handleServiceToggle(srv.id)}
-                    className={`p-4 rounded-2xl border text-left transition-all flex flex-col justify-between h-full relative overflow-hidden min-h-[110px] ${
-                      isSelected 
-                        ? 'border-indigo-500 bg-indigo-950/40 ring-1 ring-indigo-500/50' 
-                        : 'border-slate-800 bg-slate-950/50 hover:border-slate-700'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between w-full mb-3">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-400'}`}>
-                        <IconComponent className="w-4 h-4" />
-                      </div>
-                      <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${isSelected ? 'bg-indigo-600 border-indigo-400 text-white' : 'border-slate-700'}`}>
-                        {isSelected && <Check className="w-3 h-3" />}
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-white line-clamp-2">{srv.label}</p>
-                      <span className="text-[9px] font-mono text-slate-400 uppercase tracking-widest mt-0.5 block">{srv.badge}</span>
-                    </div>
-                  </button>
-                );
-              })}
+            <div className="bg-[#101828]/30 border border-white/5 rounded-3xl p-8 space-y-4 hover:border-white/10 transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-[#8B5CF6]/10 border border-[#8B5CF6]/25 flex items-center justify-center text-[#8B5CF6]">
+                <Users className="w-6 h-6" />
+              </div>
+              <h4 className="text-lg font-bold text-white">Senior Domain Experts</h4>
+              <p className="text-xs text-[#94A3B8] font-light leading-relaxed">
+                No junior account managers. You negotiate directly with battle-tested growth strategists who have built systems processing millions of page visits.
+              </p>
             </div>
 
-            {/* COMPANY SCALE SELECTOR */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-slate-800">
-              <div className="space-y-2">
-                <label className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
+            <div className="bg-[#101828]/30 border border-white/5 rounded-3xl p-8 space-y-4 hover:border-white/10 transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400">
+                <CheckCircle2 className="w-6 h-6" />
+              </div>
+              <h4 className="text-lg font-bold text-white">Absolute Execution</h4>
+              <p className="text-xs text-[#94A3B8] font-light leading-relaxed">
+                Pristine Next.js web applications, complex local activation operations, and robust SEO blueprints engineered to yield maximum conversions.
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* SECTION 11: TESTIMONIALS - CAROUSEL STYLE CARDS */}
+      <section className="relative py-24 px-6 sm:px-8 z-10 border-t border-white/5">
+        <div className="max-w-7xl mx-auto space-y-16">
+          
+          <div className="text-center max-w-2xl mx-auto space-y-4">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6C63FF]">
+              PARTNER VOICES
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+              Feedback From Ambitious Founders
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            
+            {/* Testimonial 1 */}
+            <div className="bg-[#101828]/40 border border-white/5 rounded-3xl p-8 space-y-6 flex flex-col justify-between">
+              <p className="text-sm text-[#94A3B8] font-light leading-relaxed italic">
+                "We had three marketing agencies failing to move our local map ranking in Lagos. Flokker deployed Ocula BI, isolated three competitor coordinate errors, and boosted our local search leads by 120% inside of 90 days. Their system is absolutely precise."
+              </p>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-[#6C63FF]/20 flex items-center justify-center font-bold text-white border border-[#6C63FF]/30">
+                  EA
+                </div>
+                <div>
+                  <h5 className="text-sm font-bold text-white">Emeka Anyaoku</h5>
+                  <p className="text-[10px] text-slate-500 font-mono">FOUNDER, LAGOS COMMERCE COHORT</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Testimonial 2 */}
+            <div className="bg-[#101828]/40 border border-white/5 rounded-3xl p-8 space-y-6 flex flex-col justify-between">
+              <p className="text-sm text-[#94A3B8] font-light leading-relaxed italic">
+                "Their custom website development speed was incredible. Our Next.js proptech platform went live in three weeks, scoring 98 on Lighthouse, and organic search leads grew 4.8X in Cairo and Nairobi. Best growth engineering on the continent."
+              </p>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-[#8B5CF6]/20 flex items-center justify-center font-bold text-white border border-[#8B5CF6]/30">
+                  WM
+                </div>
+                <div>
+                  <h5 className="text-sm font-bold text-white">Wanjiku Mwangi</h5>
+                  <p className="text-[10px] text-slate-500 font-mono">PRODUCT DIRECT, PORTAL KE</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* SECTION 12: PRICING PREVIEW - INTERACTIVE PACKAGE BUILDER */}
+      <section id="pricing" className="relative py-24 px-6 sm:px-8 z-10 border-t border-white/5 bg-slate-950/20">
+        <div className="max-w-7xl mx-auto space-y-16">
+          
+          <div className="text-center max-w-2xl mx-auto space-y-4">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6C63FF]">
+              INVESTMENT ESTIMATOR
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+              Construct Your Custom Plan
+            </h2>
+            <p className="text-sm text-[#94A3B8] font-light leading-relaxed">
+              Select your required growth modules, state your business parameters, and view a dynamic estimated monthly campaign investment.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 max-w-5xl mx-auto">
+            
+            {/* Interactive Selectors Left */}
+            <div className="lg:col-span-7 space-y-8 bg-[#101828]/35 border border-white/5 rounded-3xl p-6 sm:p-8">
+              
+              {/* Option 1: Services */}
+              <div className="space-y-3">
+                <label className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+                  Select Growth Services
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {[
+                    { id: 'ocula', name: 'Ocula BI Core', desc: 'Required database audit' },
+                    { id: 'seo', name: 'SEO & Search Engine', desc: 'Traffic & rankings' },
+                    { id: 'social', name: 'Social Management', desc: 'Story & cohorts' },
+                    { id: 'web', name: 'Custom Next.js Web', desc: 'Lightning-fast conversion' },
+                    { id: 'local', name: 'Local City Activation', desc: 'Field visibility' }
+                  ].map((srv) => (
+                    <button
+                      key={srv.id}
+                      onClick={() => toggleServiceBuilder(srv.id)}
+                      className={`p-3 rounded-xl border text-left transition-all flex flex-col justify-between ${
+                        selectedServices.includes(srv.id)
+                          ? 'border-[#6C63FF] bg-[#6C63FF]/10 text-white'
+                          : 'border-white/5 bg-slate-900/60 hover:border-white/10 text-[#94A3B8]'
+                      }`}
+                    >
+                      <span className="text-xs font-bold block">{srv.name}</span>
+                      <span className="text-[9px] font-light text-slate-500 mt-1">{srv.desc}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Option 2: Business Size */}
+              <div className="space-y-3">
+                <label className="text-xs font-mono font-bold text-white uppercase tracking-wider block">
                   Business Scale
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-3">
                   {[
-                    { id: 'startup', label: 'Startup / Early' },
-                    { id: 'growth', label: 'Growth Phase' },
-                    { id: 'enterprise', label: 'Enterprise' },
-                  ].map((tier) => (
+                    { id: 'startup', name: 'Startup', desc: 'Local' },
+                    { id: 'growth', name: 'Growth', desc: 'Multi-city' },
+                    { id: 'enterprise', name: 'Enterprise', desc: 'Continental' }
+                  ].map((size) => (
                     <button
-                      key={tier.id}
-                      type="button"
-                      onClick={() => setCompanyTier(tier.id)}
-                      className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all ${
-                        companyTier === tier.id 
-                          ? 'border-indigo-500 bg-indigo-600/20 text-white' 
-                          : 'border-slate-800 bg-slate-950 text-slate-400 hover:text-white'
+                      key={size.id}
+                      onClick={() => setBusinessSize(size.id as any)}
+                      className={`p-3 rounded-xl border text-center transition-all flex flex-col items-center ${
+                        businessSize === size.id
+                          ? 'border-[#8B5CF6] bg-[#8B5CF6]/10 text-white'
+                          : 'border-white/5 bg-slate-900/60 hover:border-white/10 text-[#94A3B8]'
                       }`}
                     >
-                      {tier.label}
+                      <span className="text-xs font-bold block">{size.name}</span>
+                      <span className="text-[9px] font-light text-slate-500 mt-1">{size.desc}</span>
                     </button>
                   ))}
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">
-                  Engagement Model
+              {/* Option 3: Campaign Target Region */}
+              <div className="space-y-3">
+                <label className="text-xs font-mono font-bold text-white uppercase tracking-wider block">
+                  Target Geographic Scope
                 </label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-3">
                   {[
-                    { id: 'monthly', label: 'Monthly Retainer' },
-                    { id: 'quarterly', label: '90-Day Sprint' },
-                  ].map((t) => (
+                    { id: 'national', name: 'National', desc: '1 Country' },
+                    { id: 'continental', name: 'Continental', desc: 'Pan-African' },
+                    { id: 'global', name: 'Global', desc: 'International' }
+                  ].map((region) => (
                     <button
-                      key={t.id}
-                      type="button"
-                      onClick={() => setTimeline(t.id)}
-                      className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all ${
-                        timeline === t.id 
-                          ? 'border-indigo-500 bg-indigo-600/20 text-white' 
-                          : 'border-slate-800 bg-slate-950 text-slate-400 hover:text-white'
+                      key={region.id}
+                      onClick={() => setTargetRegion(region.id as any)}
+                      className={`p-3 rounded-xl border text-center transition-all flex flex-col items-center ${
+                        targetRegion === region.id
+                          ? 'border-[#4F8BFF] bg-[#4F8BFF]/10 text-white'
+                          : 'border-white/5 bg-slate-900/60 hover:border-white/10 text-[#94A3B8]'
                       }`}
                     >
-                      {t.label}
+                      <span className="text-xs font-bold block">{region.name}</span>
+                      <span className="text-[9px] font-light text-slate-500 mt-1">{region.desc}</span>
                     </button>
                   ))}
                 </div>
               </div>
+
             </div>
 
-            {/* ESTIMATED OUTPUT & CTA */}
-            <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
-              <div>
-                <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Estimated Monthly Scope</p>
-                <p className="text-3xl font-display font-bold text-white mt-0.5">
-                  ${estimatedPriceRange().toLocaleString()} <span className="text-xs text-slate-400 font-sans font-normal">/ month starting</span>
-                </p>
-                <p className="text-xs text-indigo-400 mt-1 flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> Tailored execution plan & dedicated account strategist
-                </p>
+            {/* Price Output Display Right */}
+            <div className="lg:col-span-5 flex flex-col justify-between bg-gradient-to-br from-[#101828] to-[#111827] border border-white/5 rounded-3xl p-8 text-center space-y-8 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#6C63FF]/5 rounded-full blur-2xl pointer-events-none" />
+              
+              <div className="space-y-2">
+                <span className="text-[9px] font-mono font-bold bg-[#6C63FF]/15 text-[#6C63FF] px-2.5 py-1 rounded-full border border-[#6C63FF]/20 uppercase">
+                  Simulated Pricing Estimates
+                </span>
+                <p className="text-xs text-[#94A3B8] font-light pt-2">Your bespoke digital pipeline value is approximately:</p>
+                
+                <div className="pt-4">
+                  <span className="text-5xl font-display font-black text-white">${calculatedInvestment.toLocaleString()}</span>
+                  <span className="text-xs font-bold text-[#94A3B8]"> / month</span>
+                </div>
               </div>
 
-              <div className="w-full md:w-auto flex flex-col sm:flex-row items-center gap-3">
-                <button
-                  onClick={handleOpenCalendly}
-                  className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-xl flex items-center justify-center gap-2"
-                >
-                  <PhoneCall className="w-4 h-4" />
-                  <span>Book Strategy Call</span>
-                </button>
-                <button
-                  onClick={() => handleOpenEmailModal(`Custom Package ($${estimatedPriceRange()}/mo)`)}
-                  className="w-full sm:w-auto px-5 py-3.5 rounded-xl border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2"
-                >
-                  <Mail className="w-4 h-4 text-indigo-400" />
-                  <span>Email Scope</span>
-                </button>
+              <div className="space-y-4 pt-4 border-t border-white/5 text-left text-xs font-light text-[#94A3B8] space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-400" />
+                  <span>Includes full dashboard and continuous audit core.</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-400" />
+                  <span>Monthly reporting with custom visibility metrics.</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-400" />
+                  <span>No lock-in terms. Modify campaign parameters easily.</span>
+                </div>
               </div>
+
+              <button 
+                onClick={handleOpenCalendly}
+                className="w-full py-4 rounded-full bg-[#6C63FF] hover:bg-[#5a52e0] text-white font-bold text-xs uppercase tracking-widest transition-all shadow-lg shadow-[#6C63FF]/20"
+              >
+                Book Growth Consultation
+              </button>
             </div>
 
           </div>
+
         </div>
       </section>
 
-      {/* WHY FLOKKER? */}
-      <section id="why-flokker" className="py-20 px-4 sm:px-8 bg-slate-900/40 border-t border-slate-800">
-        <div className="max-w-7xl mx-auto space-y-12">
-          <div className="text-center max-w-3xl mx-auto space-y-3">
-            <span className="text-xs font-mono font-bold text-indigo-400 uppercase tracking-widest">
-              The Flokker Standard
+      {/* SECTION 13: FAQ - SMOOTH MINIMAL ACCORDIONS */}
+      <section id="faq" className="relative py-24 px-6 sm:px-8 z-10 border-t border-white/5">
+        <div className="max-w-4xl mx-auto space-y-16">
+          
+          <div className="text-center space-y-4">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6C63FF]">
+              SUPPORT CENTER
             </span>
-            <h2 className="text-3xl sm:text-5xl font-display font-bold text-white tracking-tight">
-              Why Partner With Flokker?
+            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+              Frequently Asked Questions
             </h2>
-            <p className="text-slate-400 text-sm font-light">
-              We bring strategic depth, modern design, and dedicated execution to every client engagement.
-            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-slate-950 p-7 sm:p-8 rounded-3xl border border-slate-800/80 hover:border-indigo-500/40 transition-all hover:-translate-y-1 space-y-4 shadow-xl flex flex-col justify-between h-full group">
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 group-hover:scale-105 transition-transform">
-                  <Activity className="w-6 h-6" />
-                </div>
-                <h3 className="text-xl font-display font-bold text-white tracking-tight">Data-Informed Precision</h3>
-                <p className="text-slate-400 text-xs leading-relaxed font-light">
-                  We combine thorough analytics with competitive intelligence to uncover exact growth levers for your brand.
-                </p>
-              </div>
-              <div className="pt-4 border-t border-slate-900 text-[11px] font-mono text-indigo-400 font-semibold flex items-center gap-1.5">
-                <span>Predictable Performance</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </div>
-            </div>
-
-            <div className="bg-slate-950 p-7 sm:p-8 rounded-3xl border border-slate-800/80 hover:border-purple-500/40 transition-all hover:-translate-y-1 space-y-4 shadow-xl flex flex-col justify-between h-full group">
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover:scale-105 transition-transform">
-                  <Users className="w-6 h-6" />
-                </div>
-                <h3 className="text-xl font-display font-bold text-white tracking-tight">Dedicated Execution Team</h3>
-                <p className="text-slate-400 text-xs leading-relaxed font-light">
-                  Work directly with senior strategists, developers, and marketers who take complete ownership of your milestones.
-                </p>
-              </div>
-              <div className="pt-4 border-t border-slate-900 text-[11px] font-mono text-purple-400 font-semibold flex items-center gap-1.5">
-                <span>Senior Talent Only</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </div>
-            </div>
-
-            <div className="bg-slate-950 p-7 sm:p-8 rounded-3xl border border-slate-800/80 hover:border-amber-500/40 transition-all hover:-translate-y-1 space-y-4 shadow-xl flex flex-col justify-between h-full group">
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-105 transition-transform">
-                  <Flame className="w-6 h-6" />
-                </div>
-                <h3 className="text-xl font-display font-bold text-white tracking-tight">Turnkey Implementation</h3>
-                <p className="text-slate-400 text-xs leading-relaxed font-light">
-                  From launching high-performing websites to managing social platforms and GTM sprints, we handle execution end-to-end.
-                </p>
-              </div>
-              <div className="pt-4 border-t border-slate-900 text-[11px] font-mono text-amber-400 font-semibold flex items-center gap-1.5">
-                <span>End-to-End Delivery</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </div>
-            </div>
-          </div>
-
-          {/* 4-STEP GROWTH PROCESS TIMELINE */}
-          <div id="process" className="pt-16 border-t border-slate-800/80 space-y-10 scroll-mt-24">
-            <div className="text-center max-w-2xl mx-auto space-y-3">
-              <span className="text-xs font-mono font-bold text-indigo-400 uppercase tracking-widest">
-                Our Proven Methodology
-              </span>
-              <h3 className="text-2xl sm:text-4xl font-display font-bold text-white">
-                How Flokker Delivers Growth
-              </h3>
-              <p className="text-slate-400 text-xs font-light">
-                A structured, transparent 4-stage execution model built for speed and measurable outcome.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
-              {[
-                {
-                  step: '01',
-                  title: 'Intelligence & Audit',
-                  desc: 'We deploy OCULA BI to audit search presence, competitor positioning, and brand sentiment.',
-                  color: 'border-indigo-500/40 bg-indigo-950/30 text-indigo-400'
-                },
-                {
-                  step: '02',
-                  title: 'Strategy & Scope',
-                  desc: 'We map out a targeted 90-day execution blueprint with KPIs and custom service packages.',
-                  color: 'border-purple-500/40 bg-purple-950/30 text-purple-400'
-                },
-                {
-                  step: '03',
-                  title: 'Agile Build & Launch',
-                  desc: 'Our specialists build modern websites, launch SEO & PPC campaigns, and setup social media.',
-                  color: 'border-emerald-500/40 bg-emerald-950/30 text-emerald-400'
-                },
-                {
-                  step: '04',
-                  title: 'Scale & Optimize',
-                  desc: 'Continuous performance tracking, weekly reporting, and strategic optimization iterations.',
-                  color: 'border-amber-500/40 bg-amber-950/30 text-amber-400'
-                }
-              ].map((p, idx) => (
-                <div 
-                  key={idx}
-                  onClick={() => setActiveProcessStep(idx)}
-                  className={`p-6 rounded-2xl border transition-all cursor-pointer relative ${
-                    activeProcessStep === idx 
-                      ? `${p.color} ring-1 ring-indigo-500/50 shadow-xl scale-[1.02]` 
-                      : 'border-slate-800 bg-slate-950/80 hover:border-slate-700'
-                  }`}
+          <div className="space-y-4">
+            {[
+              {
+                q: "What is Ocula BI and how does it power your marketing services?",
+                a: "Ocula BI is our proprietary local visibility software. Rather than guessing keyword rankings, Ocula runs massive daily local map and search engine audits, calculates competitor overlapping densities, and uncovers physical search coordinates. Our growth specialists use this live data to deploy targeted marketing efforts."
+              },
+              {
+                q: "Do you offer localized marketing outside of Lagos and Nairobi?",
+                a: "Yes. Our local activation pipelines cover major sub-Saharan metropolitan commerce centers, including Accra, Cairo, Johannesburg, Cape Town, and Abidjan. We customize operations to align directly with localized regional search nuances."
+              },
+              {
+                q: "Can I use Ocula BI independently of consulting packages?",
+                a: "Absolutely. Ocula BI is a stand-alone visibility platform. Ambitious brands can register to audit, map, and track competitor footprints independently."
+              },
+              {
+                q: "What is your typical campaign deployment timeline?",
+                a: "Initial Ocula visibility auditing begins immediately. Service blueprints are formulated and deployed within 14-21 days of strategy confirmation."
+              },
+              {
+                q: "How does the campaign estimator calculate investment?",
+                a: "Our estimator tracks baseline asset development costs (such as Next.js app construction or physical visibility tags) relative to chosen target geographical scopes and multi-location multipliers."
+              }
+            ].map((item, idx) => (
+              <div key={idx} className="bg-[#101828]/40 border border-white/5 rounded-2xl overflow-hidden transition-all hover:border-white/10">
+                <button
+                  onClick={() => setActiveFaq(activeFaq === idx ? null : idx)}
+                  className="w-full p-6 text-left flex items-center justify-between gap-4 font-bold text-white text-sm sm:text-base"
                 >
-                  <span className="text-2xl font-mono font-extrabold text-slate-500 block mb-3">{p.step}</span>
-                  <h4 className="text-base font-bold text-white mb-1.5">{p.title}</h4>
-                  <p className="text-xs text-slate-400 leading-relaxed font-light">{p.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* FEATURED CASE STUDIES & IMPACT */}
-          <div id="results" className="pt-16 border-t border-slate-800/80 space-y-10 scroll-mt-24">
-            <div className="text-center max-w-2xl mx-auto space-y-3">
-              <span className="text-xs font-mono font-bold text-emerald-400 uppercase tracking-widest">
-                Proven Client Results
-              </span>
-              <h3 className="text-2xl sm:text-4xl font-display font-bold text-white">
-                Impact Across Industries
-              </h3>
-              <p className="text-slate-400 text-xs font-light">
-                Real brands accelerated with Flokker’s full-spectrum digital services and OCULA BI.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                {
-                  client: 'Apex Fintech Solutions',
-                  tag: 'B2B Tech & SaaS',
-                  metric: '+280% Organic Search Leads',
-                  detail: 'Deployed OCULA BI audit + SEO sprint + high-converting React landing page rebuild.',
-                  badgeColor: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20'
-                },
-                {
-                  client: 'Veloce Luxury Apparel',
-                  tag: 'E-Commerce & Retail',
-                  metric: '$3.8M Attributed Sales',
-                  detail: 'End-to-end social media campaign management + multi-channel PPC search ads.',
-                  badgeColor: 'text-purple-400 bg-purple-500/10 border-purple-500/20'
-                },
-                {
-                  client: 'Beacon Health Network',
-                  tag: 'Regional Healthcare',
-                  metric: '14x Local Search Dominance',
-                  detail: 'Local market activation sprint + geo-targeted community outreach and reputation management.',
-                  badgeColor: 'text-amber-400 bg-amber-500/10 border-amber-500/20'
-                }
-              ].map((cs, idx) => (
-                <div key={idx} className="bg-slate-950 border border-slate-800/90 rounded-2xl p-6 flex flex-col justify-between hover:border-slate-700 transition-all shadow-lg space-y-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${cs.badgeColor}`}>
-                        {cs.tag}
-                      </span>
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    </div>
-                    <h4 className="text-lg font-bold text-white">{cs.client}</h4>
-                    <p className="text-2xl font-display font-extrabold text-emerald-400">{cs.metric}</p>
-                    <p className="text-xs text-slate-400 leading-relaxed font-light">{cs.detail}</p>
-                  </div>
-
-                  <button 
-                    onClick={handleOpenCalendly}
-                    className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-bold text-slate-300 hover:text-white transition-all flex items-center justify-center gap-1.5"
-                  >
-                    <span>Request Similar Case Study</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-indigo-400" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* FREQUENTLY ASKED QUESTIONS (FAQ) */}
-          <div id="faq" className="pt-16 border-t border-slate-800/80 space-y-10 scroll-mt-24">
-            <div className="text-center max-w-2xl mx-auto space-y-3">
-              <span className="text-xs font-mono font-bold text-amber-400 uppercase tracking-widest">
-                Got Questions?
-              </span>
-              <h3 className="text-2xl sm:text-4xl font-display font-bold text-white">
-                Frequently Asked Questions
-              </h3>
-              <p className="text-slate-400 text-xs font-light">
-                Everything you need to know about working with Flokker.
-              </p>
-            </div>
-
-            <div className="max-w-3xl mx-auto space-y-3">
-              {[
-                {
-                  q: 'What is Flokker and how does it relate to OCULA BI?',
-                  a: 'Flokker is a full-spectrum digital agency providing custom Web Development, SEO/SEM, Social Media Management, and Local Market Activation. OCULA BI is our signature proprietary intelligence platform that powers our client market audits and analytics.'
-                },
-                {
-                  q: 'How fast can a growth sprint be launched?',
-                  a: 'Our onboarding process takes under 48 hours. Following our initial strategy call and OCULA BI baseline analysis, campaign execution and website builds begin immediately in 2-week agile sprints.'
-                },
-                {
-                  q: 'Can I pick individual services or do I need a full package?',
-                  a: 'You can select individual services or combine multiple capabilities using our Scope Estimator tool. We offer custom monthly retainers as well as 90-day growth sprint models.'
-                },
-                {
-                  q: 'How do we track campaign performance and progress?',
-                  a: 'All clients receive live access to custom OCULA BI dashboards, weekly executive reports, and direct Slack/Email communications with dedicated senior strategists.'
-                }
-              ].map((faq, idx) => (
-                <div 
-                  key={idx}
-                  className="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden transition-all"
-                >
-                  <button
-                    onClick={() => setActiveFaq(activeFaq === idx ? null : idx)}
-                    className="w-full p-5 text-left flex items-center justify-between text-sm font-bold text-white hover:text-indigo-300 transition-colors"
-                  >
-                    <span>{faq.q}</span>
-                    <ChevronRight className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${activeFaq === idx ? 'rotate-90 text-indigo-400' : ''}`} />
-                  </button>
+                  <span>{item.q}</span>
+                  {activeFaq === idx ? <ChevronUp className="w-5 h-5 text-[#6C63FF]" /> : <ChevronDown className="w-5 h-5 text-slate-500" />}
+                </button>
+                
+                <AnimatePresence>
                   {activeFaq === idx && (
-                    <div className="px-5 pb-5 text-xs text-slate-400 leading-relaxed font-light border-t border-slate-900 pt-3">
-                      {faq.a}
-                    </div>
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="border-t border-white/5 bg-slate-950/20"
+                    >
+                      <p className="p-6 text-xs sm:text-sm text-[#94A3B8] font-light leading-relaxed">
+                        {item.a}
+                      </p>
+                    </motion.div>
                   )}
-                </div>
-              ))}
-            </div>
+                </AnimatePresence>
+              </div>
+            ))}
           </div>
 
-          {/* BOTTOM CALL TO ACTION BANNER */}
-          <div className="bg-gradient-to-r from-indigo-900/60 via-purple-900/60 to-indigo-950/60 border border-indigo-500/30 rounded-3xl p-8 text-center space-y-6">
-            <h3 className="text-2xl sm:text-4xl font-display font-bold text-white">
-              Ready to grow your digital presence with Flokker?
-            </h3>
-            <p className="text-slate-300 text-xs sm:text-sm max-w-xl mx-auto font-light">
-              Schedule a strategy call or send us your project brief. We respond to all inquiries within 24 hours.
+        </div>
+      </section>
+
+      {/* FINAL CTA: PREMIUM GRADIENT HERO */}
+      <section className="relative py-24 px-6 sm:px-8 z-10 border-t border-white/5 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-tr from-[#6C63FF]/15 via-transparent to-[#8B5CF6]/5 pointer-events-none" />
+        
+        <div className="max-w-5xl mx-auto bg-[#101828]/40 border border-white/5 rounded-3xl p-8 md:p-16 text-center space-y-8 relative overflow-hidden">
+          <div className="absolute -inset-10 bg-gradient-to-r from-[#6C63FF]/5 to-[#8B5CF6]/5 rounded-3xl blur-2xl pointer-events-none animate-pulse" />
+          
+          <div className="max-w-2xl mx-auto space-y-4">
+            <h2 className="text-3xl sm:text-6xl font-black text-white tracking-tight leading-[1.1]">
+              Ready to Build Your Next Growth Engine?
+            </h2>
+            <p className="text-sm sm:text-base text-[#94A3B8] font-light leading-relaxed">
+              Connect with senior digital growth strategists and map out your custom Ocula Visibility audit report.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <button
-                onClick={handleOpenCalendly}
-                className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2"
-              >
-                <PhoneCall className="w-4 h-4" />
-                <span>Book a Strategy Call</span>
-              </button>
-              <button
-                onClick={() => handleOpenEmailModal('Bottom Banner')}
-                className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-slate-600 text-slate-200 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2"
-              >
-                <Mail className="w-4 h-4 text-indigo-400" />
-                <span>Send Us an Email</span>
-              </button>
-            </div>
           </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button
+              onClick={handleOpenCalendly}
+              className="w-full sm:w-auto px-8 py-4 rounded-full bg-[#6C63FF] hover:bg-[#5a52e0] text-white font-bold text-xs uppercase tracking-widest transition-all shadow-lg shadow-[#6C63FF]/20"
+            >
+              Book Strategy Call
+            </button>
+            <button
+              onClick={() => { setEmailSubject('General Inquiry'); setEmailModalOpen(true); }}
+              className="w-full sm:w-auto px-8 py-4 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-[#F8FAFC] font-bold text-xs uppercase tracking-widest transition-all"
+            >
+              Contact Sales
+            </button>
+          </div>
+
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t border-slate-800 bg-slate-950 py-12 px-4 sm:px-8 text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-3">
-            <FlokkerLogo size="sm" />
+      <footer className="relative bg-[#070B1A] border-t border-white/5 py-16 px-6 sm:px-8 z-10">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-12 border-b border-white/5 pb-12">
+          
+          {/* Logo & Description */}
+          <div className="md:col-span-4 space-y-6">
+            <FlokkerLogo className="h-8 w-auto text-[#6C63FF]" />
+            <p className="text-xs text-[#94A3B8] font-light leading-relaxed max-w-sm">
+              Flokker builds digital growth pipelines. We combine proprietary Ocula BI intelligence with pristine search and web execution for ambitious enterprises.
+            </p>
+            <div className="text-[10px] font-mono text-slate-500">
+              © {new Date().getFullYear()} Flokker Digital Ltd. All rights reserved.
+            </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-6 font-medium text-slate-400">
-            <a href="#services" className="hover:text-white transition-colors">Services</a>
-            <button onClick={handleOpenCalendly} className="hover:text-amber-300 transition-colors flex items-center gap-1 text-slate-300">
-              <Calendar className="w-3 h-3 text-amber-300" /> Book Call
-            </button>
-            <button onClick={() => handleOpenEmailModal('Footer')} className="hover:text-indigo-400 transition-colors flex items-center gap-1 text-slate-300">
-              <Mail className="w-3 h-3 text-indigo-400" /> Send Email
-            </button>
-            {onViewPricing && <button onClick={onViewPricing} className="hover:text-white transition-colors">Pricing</button>}
-            {onViewLegal && <button onClick={onViewLegal} className="hover:text-white transition-colors">Legal & Privacy</button>}
+          {/* Links Multi-column */}
+          <div className="md:col-span-2 space-y-4">
+            <h5 className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6C63FF]">
+              Products
+            </h5>
+            <ul className="space-y-2 text-xs font-light text-[#94A3B8]">
+              <li><button onClick={() => onLaunchOculaBI()} className="hover:text-white transition-colors">Ocula BI</button></li>
+              <li><button onClick={() => onLaunchOculaBI()} className="hover:text-white transition-colors">Visibility Audits</button></li>
+              <li><button onClick={() => onLaunchOculaBI()} className="hover:text-white transition-colors">Competitor Overlap</button></li>
+              <li><button onClick={() => onLaunchOculaBI()} className="hover:text-white transition-colors">API Access</button></li>
+            </ul>
           </div>
 
-          <p className="text-[11px] font-mono text-slate-400">
-            © 2026 Flokker. All rights reserved.
-          </p>
+          <div className="md:col-span-2 space-y-4">
+            <h5 className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#8B5CF6]">
+              Solutions
+            </h5>
+            <ul className="space-y-2 text-xs font-light text-[#94A3B8]">
+              <li><a href="#services" className="hover:text-white transition-colors">SEO & SEM</a></li>
+              <li><a href="#services" className="hover:text-white transition-colors">Social Management</a></li>
+              <li><a href="#services" className="hover:text-white transition-colors">Next.js Web Dev</a></li>
+              <li><a href="#services" className="hover:text-white transition-colors">City Activation</a></li>
+            </ul>
+          </div>
+
+          <div className="md:col-span-2 space-y-4">
+            <h5 className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#FDBA2D]">
+              Resources
+            </h5>
+            <ul className="space-y-2 text-xs font-light text-[#94A3B8]">
+              <li><a href="#results" className="hover:text-white transition-colors">Case Studies</a></li>
+              <li><a href="#pricing" className="hover:text-white transition-colors">Pricing Builder</a></li>
+              <li><a href="#faq" className="hover:text-white transition-colors">Support FAQ</a></li>
+              <li><a href="#faq" className="hover:text-white transition-colors">Africa Digital Index</a></li>
+            </ul>
+          </div>
+
+          {/* Legal / Social */}
+          <div className="md:col-span-2 space-y-4">
+            <h5 className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-400">
+              Corporate
+            </h5>
+            <ul className="space-y-2 text-xs font-light text-[#94A3B8]">
+              <li><a href="#faq" className="hover:text-white transition-colors">About Us</a></li>
+              <li><a href="#faq" className="hover:text-white transition-colors">Careers</a></li>
+              <li><a href="#faq" className="hover:text-white transition-colors">Privacy Policy</a></li>
+              <li><a href="#faq" className="hover:text-white transition-colors">Terms of Service</a></li>
+            </ul>
+          </div>
+
+        </div>
+
+        <div className="max-w-7xl mx-auto pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] font-mono text-slate-600">
+          <div>
+            System status: <span className="text-emerald-400 font-bold">● Operational</span> • Latency: 12ms
+          </div>
+          <div>
+            Design Language v2.1 • Crafted alongside Stripe & Vercel paradigms.
+          </div>
         </div>
       </footer>
 
-      {/* MODAL FOR SENDING EMAIL */}
+      {/* EMAIL MODAL COMPONENT */}
       <AnimatePresence>
-        {isContactModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl relative"
+        {emailModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setEmailModalOpen(false)}
+              className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
+            />
+            
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="relative w-full max-w-lg bg-[#101828] border border-white/10 rounded-3xl p-8 shadow-2xl space-y-6 z-10"
             >
-              <button
-                onClick={() => setIsContactModalOpen(false)}
-                className="absolute top-6 right-6 p-2 rounded-xl text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-800 transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-
-              <div className="space-y-4">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
-                    <Mail className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-display font-bold text-white">Contact Flokker</h3>
-                    <p className="text-xs text-indigo-400 font-mono">Inquiry regarding: {selectedServiceForModal}</p>
-                  </div>
+                  <Mail className="w-5 h-5 text-[#6C63FF]" />
+                  <h3 className="text-lg font-bold text-white">Contact Ocula / Flokker</h3>
                 </div>
-
-                {isEmailSent ? (
-                  <div className="py-8 text-center space-y-3">
-                    <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto">
-                      <Check className="w-6 h-6" />
-                    </div>
-                    <h4 className="text-lg font-bold text-white">Opening Email Client...</h4>
-                    <p className="text-xs text-slate-400">
-                      Your message to <strong>hello@flokker.com</strong> is being sent. You can also reach us directly at <a href="mailto:hello@flokker.com" className="text-indigo-400 underline">hello@flokker.com</a>.
-                    </p>
-                    <button
-                      onClick={() => setIsContactModalOpen(false)}
-                      className="mt-4 px-6 py-2.5 rounded-xl bg-slate-800 text-white font-bold text-xs uppercase tracking-wider"
-                    >
-                      Close Window
-                    </button>
-                  </div>
-                ) : (
-                  <form onSubmit={handleSendEmailSubmit} className="space-y-4 pt-2">
-                    <div>
-                      <label className="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-1">
-                        Your Email Address
-                      </label>
-                      <input
-                        type="email"
-                        required
-                        value={modalEmail}
-                        onChange={(e) => setModalEmail(e.target.value)}
-                        placeholder="you@company.com"
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl p-3 text-sm text-white placeholder-slate-600 outline-none transition-colors"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-1">
-                        Project Details / Message
-                      </label>
-                      <textarea
-                        rows={4}
-                        value={modalMessage}
-                        onChange={(e) => setModalMessage(e.target.value)}
-                        placeholder="Tell us about your project goals or requirements..."
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl p-3 text-sm text-white placeholder-slate-600 outline-none transition-colors"
-                      />
-                    </div>
-
-                    <div className="flex items-center gap-3 pt-2">
-                      <button
-                        type="submit"
-                        className="flex-1 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg"
-                      >
-                        <Send className="w-4 h-4" />
-                        <span>Send Email Message</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleOpenCalendly}
-                        className="py-3.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5"
-                      >
-                        <PhoneCall className="w-3.5 h-3.5 text-amber-300" />
-                        <span>Book Call</span>
-                      </button>
-                    </div>
-                  </form>
-                )}
+                <button onClick={() => setEmailModalOpen(false)} className="p-1.5 rounded-lg hover:bg-white/5 transition-colors">
+                  <X className="w-4 h-4 text-slate-500 hover:text-white" />
+                </button>
               </div>
+
+              {emailSuccess ? (
+                <div className="text-center py-12 space-y-4">
+                  <div className="w-12 h-12 bg-emerald-500/10 text-emerald-400 rounded-full mx-auto flex items-center justify-center border border-emerald-500/20">
+                    <Check className="w-6 h-6" />
+                  </div>
+                  <h4 className="text-base font-bold text-white">Message Dispatched</h4>
+                  <p className="text-xs text-[#94A3B8]">A senior growth strategist will contact you within 24 hours.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleSendEmail} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-mono font-bold uppercase text-slate-500 block">Your Email</label>
+                    <input 
+                      type="email" 
+                      required 
+                      value={emailSender}
+                      onChange={(e) => setEmailSender(e.target.value)}
+                      placeholder="e.g. emeka@company.com" 
+                      className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:border-[#6C63FF] focus:ring-0 outline-none"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-mono font-bold uppercase text-slate-500 block">Subject</label>
+                    <input 
+                      type="text" 
+                      required 
+                      value={emailSubject}
+                      onChange={(e) => setEmailSubject(e.target.value)}
+                      className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:border-[#6C63FF] focus:ring-0 outline-none"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-mono font-bold uppercase text-slate-500 block">Strategic Growth Scope</label>
+                    <textarea 
+                      rows={4} 
+                      value={emailBody}
+                      onChange={(e) => setEmailBody(e.target.value)}
+                      placeholder="Briefly state your target locations, market blockers, or business size..." 
+                      className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:border-[#6C63FF] focus:ring-0 outline-none resize-none"
+                    />
+                  </div>
+
+                  <button 
+                    type="submit" 
+                    className="w-full py-3.5 rounded-xl bg-[#6C63FF] hover:bg-[#5a52e0] text-white text-xs font-bold uppercase tracking-widest transition-all"
+                  >
+                    Submit Scope Inquiry
+                  </button>
+                </form>
+              )}
+
             </motion.div>
           </div>
         )}

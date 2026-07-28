@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { APIProvider, Map, AdvancedMarker, Pin, InfoWindow, useMap } from '@vis.gl/react-google-maps';
 import { MapPin, Target, Eye, Layers, Compass, Sparkles, AlertCircle, ExternalLink, RefreshCw, Shield, CheckCircle2, ChevronRight } from 'lucide-react';
-import { VisibilityReport, Competitor } from '../types';
+import { VisibilityReport } from '../types';
 
 interface GoogleMapsVisibilityViewProps {
   report: VisibilityReport;
