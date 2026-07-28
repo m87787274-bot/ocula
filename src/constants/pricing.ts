@@ -34,7 +34,7 @@ export const TIER_CONFIGS: Record<SubscriptionTier, TierConfig> = {
   free: {
     name: 'Starter',
     price: 0,
-    units: 10,
+    units: 50,
     features: [
       'Visibility Health Check', 
       'Track 1 Competitor', 
@@ -58,7 +58,7 @@ export const TIER_CONFIGS: Record<SubscriptionTier, TierConfig> = {
   growth: {
     name: 'Growth',
     price: 49,
-    units: 50,
+    units: 250,
     features: [
       'Complete Visibility Audit',
       'Track Up to 5 Competitors',
@@ -85,7 +85,7 @@ export const TIER_CONFIGS: Record<SubscriptionTier, TierConfig> = {
   premium: {
     name: 'Scale',
     price: 199,
-    units: 200,
+    units: 1000,
     features: [
       'Complete Visibility Audit',
       'Unlimited Competitor Tracking',

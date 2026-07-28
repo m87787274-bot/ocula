@@ -78,9 +78,9 @@ export const authService = {
           avatar: firebaseUser.photoURL || undefined,
           account: {
             tier: 'free' as SubscriptionTier,
-            unitsTotal: 10,
+            unitsTotal: 50,
             unitsUsed: 0,
-            unitsRemaining: 10,
+            unitsRemaining: 50,
             renewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
             totalScans: 0
           },
@@ -113,9 +113,9 @@ export const authService = {
         avatar: firebaseUser.photoURL || undefined,
         account: {
           tier: 'free' as SubscriptionTier,
-          unitsTotal: 10,
+          unitsTotal: 50,
           unitsUsed: 0,
-          unitsRemaining: 10,
+          unitsRemaining: 50,
           renewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
           totalScans: 0
         },
