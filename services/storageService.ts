@@ -14,7 +14,7 @@ import {
   Timestamp,
   addDoc
 } from 'firebase/firestore';
-import { db, auth } from '../src/lib/firebase';
+import { db, auth, isConfigPlaceholder } from '../src/lib/firebase';
 import { 
   User, 
   UserRole, 
@@ -81,16 +81,57 @@ export const storageService = {
 
   getScans: async (userId?: string): Promise<SavedScan[]> => {
     const id = userId || auth.currentUser?.uid;
-    if (!id) return [];
+    if (!id) {
+      try {
+        const guestScans = JSON.parse(localStorage.getItem('ocula_guest_scans') || '[]');
+        return guestScans;
+      } catch (e) {
+        console.warn('Failed to load guest scans from local storage:', e);
+        return [];
+      }
+    }
+    
+    // If the Firebase configuration is a placeholder, run purely in local storage mode
+    if (isConfigPlaceholder) {
+      try {
+        const localScans = JSON.parse(localStorage.getItem(`ocula_scans_${id}`) || '[]');
+        return localScans;
+      } catch (e) {
+        return [];
+      }
+    }
     
     const path = `users/${id}/scans`;
     try {
       const snap = await getDocs(collection(db, path));
-      const scans = snap.docs.map(d => d.data() as SavedScan);
-      return scans.sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime());
+      const firestoreScans = snap.docs.map(d => d.data() as SavedScan);
+      
+      // Load local scans to merge for offline resilience
+      let localScans: SavedScan[] = [];
+      try {
+        localScans = JSON.parse(localStorage.getItem(`ocula_scans_${id}`) || '[]');
+      } catch (e) {
+        // ignore
+      }
+      
+      const scanMap = new Map<string, SavedScan>();
+      localScans.forEach(s => {
+        if (s && s.id) scanMap.set(s.id, s);
+      });
+      firestoreScans.forEach(s => {
+        if (s && s.id) scanMap.set(s.id, s);
+      });
+      
+      const allScans = Array.from(scanMap.values());
+      return allScans.sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime());
     } catch (error) {
-      console.warn('Could not load scans from Firestore:', error);
-      return [];
+      console.warn('Could not load scans from Firestore, falling back to local storage:', error);
+      try {
+        const localScans = JSON.parse(localStorage.getItem(`ocula_scans_${id}`) || '[]');
+        return localScans;
+      } catch (e) {
+        return [];
+      }
     }
   },
 
@@ -130,6 +171,19 @@ export const storageService = {
       report
     };
     
+    // Save locally first so we always have it immediately available
+    try {
+      const localScans = JSON.parse(localStorage.getItem(`ocula_scans_${user.uid}`) || '[]');
+      localScans.unshift(newScan);
+      localStorage.setItem(`ocula_scans_${user.uid}`, JSON.stringify(localScans.slice(0, 20)));
+    } catch (e) {
+      console.warn('Failed to save user scan locally:', e);
+    }
+
+    if (isConfigPlaceholder) {
+      return newScan;
+    }
+    
     try {
       const sanitizedScan = sanitizeForFirestore(newScan);
       await setDoc(doc(db, path), {
@@ -138,14 +192,7 @@ export const storageService = {
       });
       return newScan;
     } catch (error) {
-      console.warn('Firestore write failed for scan, storing in local storage:', error);
-      try {
-        const localScans = JSON.parse(localStorage.getItem(`ocula_scans_${user.uid}`) || '[]');
-        localScans.unshift(newScan);
-        localStorage.setItem(`ocula_scans_${user.uid}`, JSON.stringify(localScans.slice(0, 20)));
-      } catch (e) {
-        // ignore fallback errors
-      }
+      console.warn('Firestore write failed for scan (non-blocking fallback active):', error);
       return newScan;
     }
   },
@@ -383,7 +430,28 @@ export const storageService = {
 
   deleteScan: async (id: string) => {
     const user = auth.currentUser;
-    if (!user) return [];
+    if (!user) {
+      try {
+        const guestScans = JSON.parse(localStorage.getItem('ocula_guest_scans') || '[]');
+        const updated = guestScans.filter((s: any) => s.id !== id);
+        localStorage.setItem('ocula_guest_scans', JSON.stringify(updated));
+        return updated;
+      } catch (e) {
+        return [];
+      }
+    }
+    
+    try {
+      const localScans = JSON.parse(localStorage.getItem(`ocula_scans_${user.uid}`) || '[]');
+      const updated = localScans.filter((s: any) => s.id !== id);
+      localStorage.setItem(`ocula_scans_${user.uid}`, JSON.stringify(updated));
+    } catch (e) {
+      // ignore
+    }
+
+    if (isConfigPlaceholder) {
+      return await storageService.getScans();
+    }
     
     const path = `users/${user.uid}/scans/${id}`;
     try {
@@ -461,7 +529,28 @@ export const storageService = {
 
   deleteScans: async (ids: string[]) => {
     const user = auth.currentUser;
-    if (!user) return [];
+    if (!user) {
+      try {
+        const guestScans = JSON.parse(localStorage.getItem('ocula_guest_scans') || '[]');
+        const updated = guestScans.filter((s: any) => !ids.includes(s.id));
+        localStorage.setItem('ocula_guest_scans', JSON.stringify(updated));
+        return updated;
+      } catch (e) {
+        return [];
+      }
+    }
+    
+    try {
+      const localScans = JSON.parse(localStorage.getItem(`ocula_scans_${user.uid}`) || '[]');
+      const updated = localScans.filter((s: any) => !ids.includes(s.id));
+      localStorage.setItem(`ocula_scans_${user.uid}`, JSON.stringify(updated));
+    } catch (e) {
+      // ignore
+    }
+
+    if (isConfigPlaceholder) {
+      return await storageService.getScans();
+    }
     
     const path = `users/${user.uid}/scans`;
     try {
@@ -479,7 +568,24 @@ export const storageService = {
 
   clearAllScans: async () => {
     const user = auth.currentUser;
-    if (!user) return [];
+    if (!user) {
+      try {
+        localStorage.removeItem('ocula_guest_scans');
+      } catch (e) {
+        // ignore
+      }
+      return [];
+    }
+    
+    try {
+      localStorage.removeItem(`ocula_scans_${user.uid}`);
+    } catch (e) {
+      // ignore
+    }
+
+    if (isConfigPlaceholder) {
+      return [];
+    }
     
     const path = `users/${user.uid}/scans`;
     try {
