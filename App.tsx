@@ -27,6 +27,7 @@ import { storageService } from "./services/storageService";
 import { authService } from "./services/authService";
 import AuthModal from "./components/AuthModal";
 import BusinessNameInput from "./components/BusinessNameInput";
+import NewScanMissionControl from "./components/NewScanMissionControl";
 import { FEATURE_UNIT_COSTS, TIER_CONFIGS } from "./src/constants/pricing";
 import OculaLogo from "./components/OculaLogo";
 import { motion, AnimatePresence } from "framer-motion";
@@ -145,6 +146,24 @@ const SCRY_TEMPLATES: TemplateDefinition[] = [
       "Deep dive into Google My Business performance, local rankings, and review sentiment.",
     icon: "📍",
     focus: "Local Market Dominance",
+    requiredTier: "premium",
+  },
+  {
+    id: "sentiment",
+    name: "Review Intelligence",
+    description:
+      "Deep review analysis, customer feedback clustering, and voice metrics.",
+    icon: "💬",
+    focus: "Sentiment Analysis",
+    requiredTier: "premium",
+  },
+  {
+    id: "ai_readiness",
+    name: "AI Search Readiness",
+    description:
+      "Analyze representation and citations across ChatGPT, Gemini, Perplexity, Claude, and Bing.",
+    icon: "🤖",
+    focus: "LLM & AI Search Optimization",
     requiredTier: "premium",
   },
 ];
@@ -1750,315 +1769,57 @@ const AppContent: React.FC = () => {
                 </div>
               </Suspense>
             ) : (
-              <div className="pt-32 sm:pt-40 pb-20 px-4">
+              <div className="pt-24 pb-20">
                 {!state.isScanning && !state.report && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="max-w-2xl mx-auto text-center"
-                  >
-                    {user && hasNoScans && (
-                      <motion.div
-                        initial={{ scale: 0.9, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className="mb-12 p-4 bg-blue-600 text-white rounded-xl shadow-xl border border-blue-500"
-                      >
-                        <div className="flex items-center justify-center gap-2 mb-2">
-                          <Zap className="w-4 h-4" />
-                          <p className="text-[10px] font-mono font-bold uppercase tracking-widest">
-                            Advice: Initiate Scan
-                          </p>
-                        </div>
-                        <p className="text-blue-50 font-medium text-sm">
-                          Welcome, {user.name.split(" ")[0]}. To begin your
-                          intelligence journey, we advise you to initiate your
-                          first scan below.
-                        </p>
-                      </motion.div>
-                    )}
-
-                    <div className="space-y-4 mb-12">
-                      <h1 className="text-4xl sm:text-7xl font-display font-bold text-slate-900 dark:text-white tracking-tighter leading-none">
-                        Ocula{" "}
-                        <span className="text-indigo-600 dark:text-indigo-400">
-                          Scry v2.
-                        </span>
-                      </h1>
-                      <p className="text-lg text-slate-500 dark:text-slate-400 font-light">
-                        Map every digital signal. Gain clarity.
-                      </p>
-                    </div>
-
+                  <div>
                     {state.error && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="mb-4 p-4 bg-rose-50 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/50 rounded-xl text-rose-600 dark:text-rose-400 font-medium text-center text-sm flex items-center justify-center gap-2"
-                      >
-                        <Activity className="w-4 h-4" />
-                        {state.error}
-                      </motion.div>
+                      <div className="max-w-7xl mx-auto px-4 mb-4">
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="p-4 bg-rose-50 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/50 rounded-xl text-rose-600 dark:text-rose-400 font-medium text-center text-sm flex items-center justify-center gap-2"
+                        >
+                          <Activity className="w-4 h-4" />
+                          {state.error}
+                        </motion.div>
+                      </div>
                     )}
 
-                    <form
-                      onSubmit={startScan}
-                      className="surface p-6 space-y-6 relative overflow-hidden"
-                      id="scan-initiation-form"
-                    >
-                      <div className="space-y-6 text-left relative z-10">
-                        {entities.map((entity, idx) => (
-                          <div
-                            key={entity.id}
-                            className="space-y-4 p-4 bg-slate-50/50 dark:bg-slate-900/30 rounded-xl border border-slate-100 dark:border-slate-800/50 relative group"
-                          >
-                            {entities.length > 1 && (
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setEntities(
-                                    entities.filter((e) => e.id !== entity.id),
-                                  )
-                                }
-                                className="absolute top-2 right-2 p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
-                              >
-                                <X className="w-4 h-4" />
-                              </button>
-                            )}
-                            <BusinessNameInput
-                              value={entity.businessName}
-                              onChange={(val) =>
-                                setEntities(
-                                  entities.map((ent) =>
-                                    ent.id === entity.id
-                                      ? {
-                                          ...ent,
-                                          businessName: val,
-                                        }
-                                      : ent,
-                                  ),
-                                )
-                              }
-                              placeholder="e.g. Acme Corp"
-                              label={`Entity ${idx + 1} Name`}
-                              required={false}
-                              size="lg"
-                            />
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                              <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 ml-1 flex items-center gap-2">
-                                  <MapPin className="w-3 h-3" /> Primary Market
-                                </label>
-                                <input
-                                  type="text"
-                                  value={entity.location}
-                                  onChange={(e) =>
-                                    setEntities(
-                                      entities.map((ent) =>
-                                        ent.id === entity.id
-                                          ? { ...ent, location: e.target.value }
-                                          : ent,
-                                      ),
-                                    )
-                                  }
-                                  placeholder="City, Country"
-                                  className="w-full px-4 py-2.5 rounded-xl surface border border-slate-200 dark:border-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none font-medium text-sm dark:text-white transition-all"
-                                />
-                              </div>
-                              <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 ml-1 flex items-center gap-2">
-                                  <Globe className="w-3 h-3" /> Domain
-                                </label>
-                                <input
-                                  type="text"
-                                  value={entity.website}
-                                  onChange={(e) =>
-                                    setEntities(
-                                      entities.map((ent) =>
-                                        ent.id === entity.id
-                                          ? { ...ent, website: e.target.value }
-                                          : ent,
-                                      ),
-                                    )
-                                  }
-                                  placeholder="domain.com"
-                                  className="w-full px-4 py-2.5 rounded-xl surface border border-slate-200 dark:border-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none font-medium text-sm dark:text-white transition-all"
-                                />
-                              </div>
-                              <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 ml-1 flex items-center gap-2">
-                                  <Activity className="w-3 h-3" /> Industry
-                                </label>
-                                <select
-                                  value={entity.industry || ""}
-                                  onChange={(e) =>
-                                    setEntities(
-                                      entities.map((ent) =>
-                                        ent.id === entity.id
-                                          ? { ...ent, industry: e.target.value }
-                                          : ent,
-                                      ),
-                                    )
-                                  }
-                                  className="w-full px-4 py-2.5 rounded-xl surface border border-slate-200 dark:border-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none font-medium text-sm dark:text-white transition-all"
-                                >
-                                  <option value="" disabled>
-                                    Select Industry
-                                  </option>
-                                  {INDUSTRIES.map((ind) => (
-                                    <option key={ind.value} value={ind.value}>
-                                      {ind.label}
-                                    </option>
-                                  ))}
-                                </select>
-                              </div>
-                              <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 ml-1 flex items-center gap-2">
-                                  <Users className="w-3 h-3" /> Company Size
-                                </label>
-                                <select
-                                  value={entity.companySize || ""}
-                                  onChange={(e) =>
-                                    setEntities(
-                                      entities.map((ent) =>
-                                        ent.id === entity.id
-                                          ? {
-                                              ...ent,
-                                              companySize: e.target.value,
-                                            }
-                                          : ent,
-                                      ),
-                                    )
-                                  }
-                                  className="w-full px-4 py-2.5 rounded-xl surface border border-slate-200 dark:border-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none font-medium text-sm dark:text-white transition-all"
-                                >
-                                  <option value="" disabled>
-                                    Select Size
-                                  </option>
-                                  {COMPANY_SIZES.map((size) => (
-                                    <option key={size.value} value={size.value}>
-                                      {size.label}
-                                    </option>
-                                  ))}
-                                </select>
-                              </div>
+                    {user && hasNoScans && (
+                      <div className="max-w-7xl mx-auto px-4 mb-6">
+                        <motion.div
+                          initial={{ scale: 0.95, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          className="p-4 bg-indigo-600 text-white rounded-2xl shadow-xl border border-indigo-500/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                        >
+                          <div className="flex items-start sm:items-center gap-3">
+                            <span className="p-2 bg-white/10 rounded-xl">
+                              <Zap className="w-5 h-5 text-indigo-200 animate-pulse" />
+                            </span>
+                            <div>
+                              <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-indigo-200">
+                                Active Recommendation
+                              </p>
+                              <p className="font-semibold text-sm">
+                                Welcome, {user.name.split(" ")[0]}. Let's configure your business footprint and deploy Ocula AI.
+                              </p>
                             </div>
                           </div>
-                        ))}
-
-                        {entities.length < 4 && (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setEntities([
-                                ...entities,
-                                {
-                                  id: `entity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                                  businessName: "",
-                                  location: "",
-                                  website: "",
-                                  industry: "",
-                                  companySize: "",
-                                },
-                              ])
-                            }
-                            className="w-full py-3 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl text-slate-400 dark:text-slate-500 hover:border-indigo-500 hover:text-indigo-500 transition-all flex items-center justify-center gap-2 font-black text-[10px] uppercase tracking-widest"
-                          >
-                            <Plus className="w-4 h-4" /> Add Entity for
-                            Comparison
-                          </button>
-                        )}
-
-                        <div className="space-y-3 pt-2">
-                          <label className="text-xs font-medium text-slate-600 dark:text-slate-400 ml-1 flex items-center gap-2">
-                            <Activity className="w-3 h-3" /> Analysis Focus Mode
-                          </label>
-                          <div
-                            id="focus-modes-container"
-                            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
-                          >
-                            {SCRY_TEMPLATES.map((tmpl) => {
-                              const tierLevels = {
-                                free: 0,
-                                growth: 1,
-                                premium: 2,
-                              };
-                              const userTierLevel = user
-                                ? tierLevels[user.account.tier]
-                                : 0;
-                              const requiredTierLevel =
-                                tierLevels[tmpl.requiredTier || "free"];
-                              const isLocked = userTierLevel < requiredTierLevel;
-
-                              return (
-                                <button
-                                  key={tmpl.id}
-                                  type="button"
-                                  disabled={isLocked}
-                                  onClick={() =>
-                                    !isLocked && setSelectedTemplate(tmpl.id)
-                                  }
-                                  className={`p-4 rounded-2xl border transition-all text-left flex flex-col gap-3 group relative overflow-hidden ${
-                                    selectedTemplate === tmpl.id
-                                      ? "border-indigo-500 bg-indigo-50/50 dark:bg-indigo-900/20 shadow-sm ring-1 ring-indigo-500/50"
-                                      : isLocked
-                                        ? "border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 opacity-60 cursor-not-allowed"
-                                        : "surface hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-md"
-                                  }`}
-                                >
-                                  {isLocked && (
-                                    <div className="absolute top-3 right-3">
-                                      <span className="px-2 py-1 bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 text-[8px] font-black uppercase tracking-widest rounded-md flex items-center gap-1">
-                                        <Shield className="w-2 h-2" />{" "}
-                                        {tmpl.requiredTier}
-                                      </span>
-                                    </div>
-                                  )}
-                                  <div
-                                    className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl transition-transform duration-300 ${selectedTemplate === tmpl.id ? "bg-indigo-100 dark:bg-indigo-800 scale-110" : "bg-slate-100 dark:bg-slate-800 group-hover:scale-110 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/30"}`}
-                                  >
-                                    {tmpl.icon}
-                                  </div>
-                                  <div>
-                                    <p
-                                      className={`text-sm font-black tracking-tight ${selectedTemplate === tmpl.id ? "text-indigo-700 dark:text-indigo-300" : "text-slate-900 dark:text-white"}`}
-                                    >
-                                      {tmpl.name}
-                                    </p>
-                                    <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-widest">
-                                      {tmpl.focus}
-                                    </p>
-                                    <p
-                                      className={`text-xs mt-2 leading-relaxed ${selectedTemplate === tmpl.id ? "text-indigo-600/80 dark:text-indigo-200/70" : "text-slate-500 dark:text-slate-400"}`}
-                                    >
-                                      {tmpl.description}
-                                    </p>
-                                  </div>
-                                  {selectedTemplate === tmpl.id && (
-                                    <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-                                  )}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
+                        </motion.div>
                       </div>
+                    )}
 
-                      <button
-                        type="submit"
-                        onClick={(e) => startScan(e)}
-                        className={`w-full py-4 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-all bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 cursor-pointer`}
-                      >
-                        <span>Initialize Scanner</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </button>
-
-                      <p className="text-[10px] text-slate-400 dark:text-slate-600 text-center">
-                        Intelligence data is subject to change based on
-                        real-time market fluctuations.
-                      </p>
-                    </form>
-                  </motion.div>
+                    <NewScanMissionControl
+                      entities={entities}
+                      setEntities={setEntities}
+                      selectedTemplate={selectedTemplate}
+                      setSelectedTemplate={setSelectedTemplate}
+                      startScan={startScan}
+                      user={user}
+                      isDarkMode={isDarkMode}
+                      onSelectKey={handleSelectKey}
+                    />
+                  </div>
                 )}
 
                 <Suspense fallback={<div className="flex items-center justify-center py-20"><AILoader message="Synchronizing Intelligence..." /></div>}>

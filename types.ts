@@ -1,5 +1,5 @@
 
-export type ScryTemplate = 'standard' | 'competitor' | 'market' | 'social' | 'gmb';
+export type ScryTemplate = 'standard' | 'competitor' | 'market' | 'social' | 'gmb' | 'sentiment' | 'ai_readiness';
 
 export interface TemplateDefinition {
   id: ScryTemplate;
