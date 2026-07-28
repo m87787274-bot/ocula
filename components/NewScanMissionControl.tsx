@@ -860,7 +860,7 @@ export const NewScanMissionControl: React.FC<NewScanMissionControlProps> = ({
               {/* Connected Orbit Nodes Line Constellation */}
               <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 220">
                 {/* Connecting Lines */}
-                <motion.line x1="80" y1="110" x2="200" y2="40" stroke="#4f46e5" strokeWidth="1" strokeDasharray="4 2" className="opacity-40 animate-pulse" />
+                <motion.line x1="80" y1="110" x2="200" y2="40" stroke="#5b5fff" strokeWidth="1" strokeDasharray="4 2" className="opacity-40 animate-pulse" />
                 <motion.line x1="80" y1="110" x2="200" y2="180" stroke="#0891b2" strokeWidth="1" strokeDasharray="3 3" />
                 <motion.line x1="320" y1="110" x2="200" y2="40" stroke="#7c3aed" strokeWidth="1" strokeDasharray="5 2" />
                 <motion.line x1="320" y1="110" x2="200" y2="180" stroke="#ec4899" strokeWidth="1" />

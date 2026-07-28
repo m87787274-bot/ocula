@@ -1105,14 +1105,14 @@ const Dashboard: React.FC<DashboardProps> = ({ report, onReset, onRescan, initia
             <meta charset='utf-8'>
             <style>
               body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; }
-              h1 { color: #4338ca; border-bottom: 2px solid #4338ca; padding-bottom: 10px; }
-              h2 { color: #3730a3; margin-top: 30px; }
-              h3 { color: #4f46e5; }
-              .score-box { background: #f1f5f9; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0; }
-              .score { font-size: 48px; font-weight: bold; color: #312e81; }
+              h1 { color: #5b5fff; border-bottom: 2px solid #5b5fff; padding-bottom: 10px; }
+              h2 { color: #3433b4; margin-top: 30px; }
+              h3 { color: #5b5fff; }
+              .score-box { background: #f8faff; padding: 20px; border-radius: 10px; text-align: center; margin: 20px 0; border: 1px solid #e6eaf2; }
+              .score { font-size: 48px; font-weight: bold; color: #09111f; }
               table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-              th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: left; }
-              th { background-color: #f8fafc; font-weight: bold; }
+              th, td { border: 1px solid #e6eaf2; padding: 12px; text-align: left; }
+              th { background-color: #f8faff; font-weight: bold; }
               .priority-high { color: #e11d48; font-weight: bold; }
               .priority-medium { color: #d97706; font-weight: bold; }
               .priority-low { color: #059669; font-weight: bold; }
@@ -1121,9 +1121,9 @@ const Dashboard: React.FC<DashboardProps> = ({ report, onReset, onRescan, initia
           <body>
             <div style="text-align: center; margin-bottom: 50px;">
               ${effectiveLogo ? `<div style="text-align: center; margin-bottom: 20px;"><img src="${effectiveLogo}" style="max-height: 90px; max-width: 240px; object-fit: contain;" alt="Brand Logo" /></div>` : ''}
-              <h1 style="font-size: 32px; color: ${user?.businessDetails?.brandColor || '#4338ca'}; border: none; margin: 0;">${(user?.businessDetails?.name || report.businessName).toUpperCase()} STRATEGIC DOSSIER</h1>
+              <h1 style="font-size: 32px; color: ${user?.businessDetails?.brandColor || '#5b5fff'}; border: none; margin: 0;">${(user?.businessDetails?.name || report.businessName).toUpperCase()} STRATEGIC DOSSIER</h1>
               <p style="font-size: 18px; color: #64748b;">Intelligence Report for ${user?.businessDetails?.name || report.businessName}</p>
-              ${report.focusMode ? `<p style="font-size: 14px; color: ${user?.businessDetails?.brandColor || '#4f46e5'}; font-weight: bold; text-transform: uppercase;">Focus Mode: ${report.focusMode}</p>` : ''}
+              ${report.focusMode ? `<p style="font-size: 14px; color: ${user?.businessDetails?.brandColor || '#5b5fff'}; font-weight: bold; text-transform: uppercase;">Focus Mode: ${report.focusMode}</p>` : ''}
               <p style="font-size: 12px; color: #94a3b8;">Generated on ${new Date().toLocaleDateString()}</p>
             </div>
 
@@ -2249,9 +2249,9 @@ const Dashboard: React.FC<DashboardProps> = ({ report, onReset, onRescan, initia
                                           {keywordMatrixData.map((entry, index) => (
                                             <Cell 
                                               key={`keyword-scatter-cell-overview-${index}-${entry.name}`} 
-                                              fill={entry.impactLabel === 'high' ? '#10b981' : entry.impactLabel === 'medium' ? '#6366f1' : '#94a3b8'} 
+                                              fill={entry.impactLabel === 'high' ? '#10b981' : entry.impactLabel === 'medium' ? '#8b8eff' : '#94a3b8'} 
                                               fillOpacity={0.7}
-                                              stroke={entry.impactLabel === 'high' ? '#059669' : entry.impactLabel === 'medium' ? '#4f46e5' : '#64748b'}
+                                              stroke={entry.impactLabel === 'high' ? '#059669' : entry.impactLabel === 'medium' ? '#5b5fff' : '#64748b'}
                                               strokeWidth={2}
                                             />
                                           ))}
@@ -2284,10 +2284,10 @@ const Dashboard: React.FC<DashboardProps> = ({ report, onReset, onRescan, initia
                                         nameKey="name"
                                         aspectRatio={4 / 3}
                                         stroke="#fff"
-                                        fill="#6366f1"
+                                        fill="#5b5fff"
                                         content={((props: any) => {
                                           const { x, y, width, height, index, payload, name } = props;
-                                          const colorsList = ['#4f46e5', '#6366f1', '#8b5cf6', '#ec4899', '#9333ea', '#f59e0b', '#10b981'];
+                                          const colorsList = ['#5b5fff', '#7c80ff', '#8b5cf6', '#a78bfa', '#00d4ff', '#10b981', '#f59e0b'];
                                           const color = colorsList[index % colorsList.length];
                                           
                                           return (
@@ -4920,8 +4920,8 @@ const Dashboard: React.FC<DashboardProps> = ({ report, onReset, onRescan, initia
                     <AreaChart data={dossierTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                       <defs>
                         <linearGradient id="dossierScoreGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.35} />
-                          <stop offset="95%" stopColor="#4f46e5" stopOpacity={0.02} />
+                          <stop offset="5%" stopColor="#5b5fff" stopOpacity={0.35} />
+                          <stop offset="95%" stopColor="#5b5fff" stopOpacity={0.02} />
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
@@ -4952,12 +4952,12 @@ const Dashboard: React.FC<DashboardProps> = ({ report, onReset, onRescan, initia
                         type="monotone" 
                         dataKey="score" 
                         name="Visibility Score" 
-                        stroke="#4f46e5" 
+                        stroke="#5b5fff" 
                         strokeWidth={3} 
                         fillOpacity={1} 
                         fill="url(#dossierScoreGrad)" 
-                        dot={{ r: 4, fill: '#4f46e5', stroke: '#ffffff', strokeWidth: 2 }}
-                        activeDot={{ r: 6, fill: '#4f46e5', stroke: '#ffffff', strokeWidth: 3 }}
+                        dot={{ r: 4, fill: '#5b5fff', stroke: '#ffffff', strokeWidth: 2 }}
+                        activeDot={{ r: 6, fill: '#5b5fff', stroke: '#ffffff', strokeWidth: 3 }}
                       />
                       <Line 
                         type="monotone" 

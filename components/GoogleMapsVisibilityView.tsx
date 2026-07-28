@@ -97,7 +97,7 @@ export const GoogleMapsVisibilityView: React.FC<GoogleMapsVisibilityViewProps> =
             locationName: loc.address,
             lat: Number(loc.lat),
             lng: Number(loc.lng),
-            color: '#4f46e5',
+            color: '#5b5fff',
             visibilityLevel: report.profileBadge?.visibilityLevel || 'Strong',
           });
         }

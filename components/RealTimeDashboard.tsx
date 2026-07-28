@@ -223,9 +223,9 @@ const RealTimeDashboard: React.FC<RealTimeDashboardProps> = ({ report, isDarkMod
 
   // 3. Market Position
     const marketPositionData = [
-      { name: 'Dominant', value: 30, fill: '#1e3a8a' }, // slate-900
-      { name: 'Visible', value: 55, fill: '#4f46e5' }, // indigo-600
-      { name: 'Discoverable', value: 80, fill: '#818cf8' }, // indigo-400
+      { name: 'Dominant', value: 30, fill: '#121e33' }, // premium dark
+      { name: 'Visible', value: 55, fill: '#5b5fff' }, // premium primary
+      { name: 'Discoverable', value: 80, fill: '#8b8eff' }, // premium light-primary
       { name: 'Emerging', value: 45, fill: '#f97316' }, // orange-500
       { name: 'Invisible', value: 20, fill: '#94a3b8' }  // slate-400
     ];

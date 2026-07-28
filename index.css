@@ -7,10 +7,33 @@
   --font-display: "Outfit", "Inter", sans-serif;
   --font-serif: "Playfair Display", "Georgia", serif;
   
-  --color-ocula-primary: #4f46e5;
-  --color-ocula-dark: #0f172a;
-  --color-ocula-surface: #f8fafc;
-  --color-ocula-accent: #10b981;
+  --color-ocula-primary: #5b5fff;
+  --color-ocula-dark: #09111f;
+  --color-ocula-surface: #ffffff;
+  --color-ocula-accent: #00d4ff;
+
+  /* Overrides for standard tailwind shades to inject the new premium palette globally */
+  --color-indigo-50: #f0f2ff;
+  --color-indigo-100: #e1e4ff;
+  --color-indigo-200: #c8cdff;
+  --color-indigo-300: #a2abff;
+  --color-indigo-400: #787eff;
+  --color-indigo-500: #5b5fff;
+  --color-indigo-600: #4c4eff;
+  --color-indigo-700: #3f3edd;
+  --color-indigo-800: #3433b4;
+  --color-indigo-900: #2c2b90;
+  --color-indigo-950: #1b1a59;
+
+  --color-slate-50: #f8faff;
+  --color-slate-100: #f1f4fa;
+  --color-slate-200: #e6eaf2;
+  --color-slate-800: #1a2436;
+  --color-slate-900: #10192a;
+  --color-slate-950: #09111f;
+
+  --color-cyan-500: #00d4ff;
+  --color-cyan-600: #00b0e0;
 }
 
 /* Support for .dark class in Tailwind v4 */

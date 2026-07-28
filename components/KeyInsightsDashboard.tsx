@@ -73,8 +73,8 @@ const KeyInsightsDashboard: React.FC<KeyInsightsDashboardProps> = React.memo(({ 
                   />
                   <defs>
                     <linearGradient id="indigoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#6366f1" />
-                      <stop offset="100%" stopColor="#4f46e5" />
+                      <stop offset="0%" stopColor="#8b8eff" />
+                      <stop offset="100%" stopColor="#5b5fff" />
                     </linearGradient>
                   </defs>
                 </svg>

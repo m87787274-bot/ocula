@@ -1271,7 +1271,7 @@ const AppContent: React.FC = () => {
                   <div className="relative">
                     <OculaLogo
                       className="w-8 h-8 text-indigo-600 dark:text-white micro-bounce"
-                      color="#4f46e5"
+                      color="#5b5fff"
                     />
                     <div className="absolute inset-0 bg-indigo-500/20 rounded-full blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   </div>
