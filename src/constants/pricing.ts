@@ -36,11 +36,11 @@ export const TIER_CONFIGS: Record<SubscriptionTier, TierConfig> = {
     price: 0,
     units: 10,
     features: [
-      'Basic Visibility Scan', 
-      '1 Competitor Tracking', 
-      'Basic SWOT Analysis',
-      'Limited Intelligence Insights',
-      'Performance Stats (Basic)'
+      'Visibility Health Check', 
+      'Track 1 Competitor', 
+      'Website Performance Check',
+      'AI Growth Tips',
+      'Visibility Performance Overview'
     ],
     limits: {
       scans: 10,
@@ -56,18 +56,18 @@ export const TIER_CONFIGS: Record<SubscriptionTier, TierConfig> = {
     },
   },
   growth: {
-    name: 'Market Growth',
+    name: 'Growth',
     price: 49,
     units: 50,
     features: [
-      'Deep Visibility Scan',
-      '5 Competitor Tracking',
-      'Full SWOT Analysis',
-      'Intelligence Insights',
-      'Global Mission Control (Basic)',
-      'Market Dominance Hub (Basic)',
-      'Compare Entities (Up to 2)',
-      'KPI Intelligence (Basic)'
+      'Complete Visibility Audit',
+      'Track Up to 5 Competitors',
+      'Business SWOT Report',
+      'AI Growth Recommendations',
+      'Growth Dashboard',
+      'Market Insights',
+      'Side-by-Side Competitor Comparison',
+      'Performance Analytics'
     ],
     limits: {
       scans: 20,
@@ -87,17 +87,17 @@ export const TIER_CONFIGS: Record<SubscriptionTier, TierConfig> = {
     price: 199,
     units: 200,
     features: [
-      'Deep Visibility Scan',
+      'Complete Visibility Audit',
       'Unlimited Competitor Tracking',
-      'Advanced Intelligence Insights',
-      'Global Mission Control (Advanced)',
-      'Market Dominance Hub (Advanced)',
-      'Compare Entities (Unlimited)',
-      'Real-Time Dashboard',
-      'KPI Intelligence (Advanced)',
-      'Market Trajectory Tracking',
+      'Advanced AI Recommendations',
+      'Business Command Center',
+      'Market Intelligence Hub',
+      'Unlimited Competitor Comparison',
+      'Live Visibility Dashboard',
+      'Advanced Performance Analytics',
+      'Market Trend Tracking',
       'Priority AI Processing',
-      'Custom Reports',
+      'Executive Reports',
     ],
     limits: {
       scans: 100,
