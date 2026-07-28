@@ -32,7 +32,7 @@ export interface TierConfig {
 
 export const TIER_CONFIGS: Record<SubscriptionTier, TierConfig> = {
   free: {
-    name: 'Explorer',
+    name: 'Starter',
     price: 0,
     units: 10,
     features: [
@@ -83,7 +83,7 @@ export const TIER_CONFIGS: Record<SubscriptionTier, TierConfig> = {
     },
   },
   premium: {
-    name: 'Dominance',
+    name: 'Scale',
     price: 199,
     units: 200,
     features: [
