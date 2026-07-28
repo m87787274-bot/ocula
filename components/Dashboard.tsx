@@ -610,6 +610,21 @@ const Dashboard: React.FC<DashboardProps> = ({ report, onReset, onRescan, initia
   const [localSwot, setLocalSwot] = useState(report.swotAnalysis);
   const [isGeneratingSwot, setIsGeneratingSwot] = useState(false);
 
+  // Sync state when report changes
+  useEffect(() => {
+    setLocalCampaigns(report.campaigns || []);
+    setLocalSwot(report.swotAnalysis);
+    setLocalSocialPresence(report.socialPresence || []);
+    
+    const connected = new Set<string>();
+    (report.socialPresence || []).forEach(p => {
+      if (p.handle && p.handle !== '@unclaimed') {
+        connected.add(p.platform);
+      }
+    });
+    setConnectedPlatforms(connected);
+  }, [report]);
+
   useEffect(() => {
     if (!report.swotAnalysis && !localSwot && !isGeneratingSwot) {
       const fetchSwot = async () => {

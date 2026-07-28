@@ -383,15 +383,19 @@ const GlobalMissionControl: React.FC<GlobalMissionControlProps> = ({ onBack, isD
   const aggregatedMissions = useMemo(() => {
     let missions: (Campaign & { businessName: string; report: VisibilityReport; scanId: string })[] = [];
     scans.forEach(scan => {
-      (scan.report.campaigns || []).forEach(c => {
-        missions.push({ 
-          ...c, 
-          progress: typeof c.progress === 'number' && !isNaN(c.progress) ? c.progress : 0,
-          businessName: scan.businessName, 
-          report: scan.report,
-          scanId: scan.id
+      if (scan && scan.report) {
+        (scan.report.campaigns || []).forEach(c => {
+          if (c) {
+            missions.push({ 
+              ...c, 
+              progress: typeof c.progress === 'number' && !isNaN(c.progress) ? c.progress : 0,
+              businessName: scan.businessName || 'Unknown Entity', 
+              report: scan.report,
+              scanId: scan.id
+            });
+          }
         });
-      });
+      }
     });
     
     if (filter !== 'all') {
@@ -413,12 +417,16 @@ const GlobalMissionControl: React.FC<GlobalMissionControlProps> = ({ onBack, isD
     }
 
     return missions;
-  }, [scans, filter, searchQuery]);
+  }, [scans, filter, priorityFilter, searchQuery]);
 
   const missionCounts = useMemo(() => {
     const allMissions: Campaign[] = [];
     scans.forEach(scan => {
-      (scan.report.campaigns || []).forEach(c => allMissions.push(c));
+      if (scan && scan.report && scan.report.campaigns) {
+        (scan.report.campaigns || []).forEach(c => {
+          if (c) allMissions.push(c);
+        });
+      }
     });
     return {
       all: allMissions.length,
@@ -430,7 +438,7 @@ const GlobalMissionControl: React.FC<GlobalMissionControlProps> = ({ onBack, isD
 
   const selectedScanCompetitors = useMemo(() => {
     const scan = scans.find(s => s.id === newMission.scanId);
-    return scan?.report.competitorComparison || [];
+    return scan?.report?.competitorComparison || [];
   }, [newMission.scanId, scans]);
 
   const handleCreateGlobalMission = async (e: React.FormEvent) => {
