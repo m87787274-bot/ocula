@@ -74,6 +74,10 @@ export const FlokkerPreLanding: React.FC<FlokkerPreLandingProps> = ({
   const [companyTier, setCompanyTier] = useState<string>('growth');
   const [timeline, setTimeline] = useState<string>('quarterly');
 
+  // Interactive State
+  const [activeFaq, setActiveFaq] = useState<number | null>(null);
+  const [activeProcessStep, setActiveProcessStep] = useState<number>(0);
+
   const handleOpenCalendly = () => {
     window.open('https://calendly.com/teamflokker/new-meeting', '_blank');
   };
@@ -156,13 +160,15 @@ export const FlokkerPreLanding: React.FC<FlokkerPreLandingProps> = ({
           </div>
 
           {/* DESKTOP NAV LINKS */}
-          <nav className="hidden lg:flex items-center gap-8 text-xs font-bold uppercase tracking-widest text-slate-300">
-            <a href="#services" className="hover:text-indigo-400 transition-colors">Our Services</a>
-            <a href="#ocula-bi" className="hover:text-indigo-400 transition-colors flex items-center gap-1.5 text-indigo-300">
+          <nav className="hidden lg:flex items-center gap-6 xl:gap-8 text-xs font-bold uppercase tracking-widest text-slate-300">
+            <a href="#services" className="hover:text-indigo-400 transition-colors">Services</a>
+            <a href="#ocula-bi" className="hover:text-indigo-400 transition-colors flex items-center gap-1 text-indigo-300">
               <OculaLogo className="w-3.5 h-3.5 text-indigo-400" /> OCULA BI
             </a>
-            <a href="#calculator" className="hover:text-indigo-400 transition-colors">Scope Estimator</a>
-            <a href="#why-flokker" className="hover:text-indigo-400 transition-colors">Why Flokker</a>
+            <a href="#process" className="hover:text-indigo-400 transition-colors">Process</a>
+            <a href="#results" className="hover:text-indigo-400 transition-colors">Results</a>
+            <a href="#calculator" className="hover:text-indigo-400 transition-colors">Estimator</a>
+            <a href="#faq" className="hover:text-indigo-400 transition-colors">FAQ</a>
           </nav>
 
           {/* ACTION BUTTONS */}
@@ -916,6 +922,181 @@ export const FlokkerPreLanding: React.FC<FlokkerPreLandingProps> = ({
                 <span>End-to-End Delivery</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </div>
+            </div>
+          </div>
+
+          {/* 4-STEP GROWTH PROCESS TIMELINE */}
+          <div id="process" className="pt-16 border-t border-slate-800/80 space-y-10 scroll-mt-24">
+            <div className="text-center max-w-2xl mx-auto space-y-3">
+              <span className="text-xs font-mono font-bold text-indigo-400 uppercase tracking-widest">
+                Our Proven Methodology
+              </span>
+              <h3 className="text-2xl sm:text-4xl font-display font-bold text-white">
+                How Flokker Delivers Growth
+              </h3>
+              <p className="text-slate-400 text-xs font-light">
+                A structured, transparent 4-stage execution model built for speed and measurable outcome.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
+              {[
+                {
+                  step: '01',
+                  title: 'Intelligence & Audit',
+                  desc: 'We deploy OCULA BI to audit search presence, competitor positioning, and brand sentiment.',
+                  color: 'border-indigo-500/40 bg-indigo-950/30 text-indigo-400'
+                },
+                {
+                  step: '02',
+                  title: 'Strategy & Scope',
+                  desc: 'We map out a targeted 90-day execution blueprint with KPIs and custom service packages.',
+                  color: 'border-purple-500/40 bg-purple-950/30 text-purple-400'
+                },
+                {
+                  step: '03',
+                  title: 'Agile Build & Launch',
+                  desc: 'Our specialists build modern websites, launch SEO & PPC campaigns, and setup social media.',
+                  color: 'border-emerald-500/40 bg-emerald-950/30 text-emerald-400'
+                },
+                {
+                  step: '04',
+                  title: 'Scale & Optimize',
+                  desc: 'Continuous performance tracking, weekly reporting, and strategic optimization iterations.',
+                  color: 'border-amber-500/40 bg-amber-950/30 text-amber-400'
+                }
+              ].map((p, idx) => (
+                <div 
+                  key={idx}
+                  onClick={() => setActiveProcessStep(idx)}
+                  className={`p-6 rounded-2xl border transition-all cursor-pointer relative ${
+                    activeProcessStep === idx 
+                      ? `${p.color} ring-1 ring-indigo-500/50 shadow-xl scale-[1.02]` 
+                      : 'border-slate-800 bg-slate-950/80 hover:border-slate-700'
+                  }`}
+                >
+                  <span className="text-2xl font-mono font-extrabold text-slate-500 block mb-3">{p.step}</span>
+                  <h4 className="text-base font-bold text-white mb-1.5">{p.title}</h4>
+                  <p className="text-xs text-slate-400 leading-relaxed font-light">{p.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* FEATURED CASE STUDIES & IMPACT */}
+          <div id="results" className="pt-16 border-t border-slate-800/80 space-y-10 scroll-mt-24">
+            <div className="text-center max-w-2xl mx-auto space-y-3">
+              <span className="text-xs font-mono font-bold text-emerald-400 uppercase tracking-widest">
+                Proven Client Results
+              </span>
+              <h3 className="text-2xl sm:text-4xl font-display font-bold text-white">
+                Impact Across Industries
+              </h3>
+              <p className="text-slate-400 text-xs font-light">
+                Real brands accelerated with Flokker’s full-spectrum digital services and OCULA BI.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[
+                {
+                  client: 'Apex Fintech Solutions',
+                  tag: 'B2B Tech & SaaS',
+                  metric: '+280% Organic Search Leads',
+                  detail: 'Deployed OCULA BI audit + SEO sprint + high-converting React landing page rebuild.',
+                  badgeColor: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20'
+                },
+                {
+                  client: 'Veloce Luxury Apparel',
+                  tag: 'E-Commerce & Retail',
+                  metric: '$3.8M Attributed Sales',
+                  detail: 'End-to-end social media campaign management + multi-channel PPC search ads.',
+                  badgeColor: 'text-purple-400 bg-purple-500/10 border-purple-500/20'
+                },
+                {
+                  client: 'Beacon Health Network',
+                  tag: 'Regional Healthcare',
+                  metric: '14x Local Search Dominance',
+                  detail: 'Local market activation sprint + geo-targeted community outreach and reputation management.',
+                  badgeColor: 'text-amber-400 bg-amber-500/10 border-amber-500/20'
+                }
+              ].map((cs, idx) => (
+                <div key={idx} className="bg-slate-950 border border-slate-800/90 rounded-2xl p-6 flex flex-col justify-between hover:border-slate-700 transition-all shadow-lg space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${cs.badgeColor}`}>
+                        {cs.tag}
+                      </span>
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    </div>
+                    <h4 className="text-lg font-bold text-white">{cs.client}</h4>
+                    <p className="text-2xl font-display font-extrabold text-emerald-400">{cs.metric}</p>
+                    <p className="text-xs text-slate-400 leading-relaxed font-light">{cs.detail}</p>
+                  </div>
+
+                  <button 
+                    onClick={handleOpenCalendly}
+                    className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-bold text-slate-300 hover:text-white transition-all flex items-center justify-center gap-1.5"
+                  >
+                    <span>Request Similar Case Study</span>
+                    <ArrowUpRight className="w-3.5 h-3.5 text-indigo-400" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* FREQUENTLY ASKED QUESTIONS (FAQ) */}
+          <div id="faq" className="pt-16 border-t border-slate-800/80 space-y-10 scroll-mt-24">
+            <div className="text-center max-w-2xl mx-auto space-y-3">
+              <span className="text-xs font-mono font-bold text-amber-400 uppercase tracking-widest">
+                Got Questions?
+              </span>
+              <h3 className="text-2xl sm:text-4xl font-display font-bold text-white">
+                Frequently Asked Questions
+              </h3>
+              <p className="text-slate-400 text-xs font-light">
+                Everything you need to know about working with Flokker.
+              </p>
+            </div>
+
+            <div className="max-w-3xl mx-auto space-y-3">
+              {[
+                {
+                  q: 'What is Flokker and how does it relate to OCULA BI?',
+                  a: 'Flokker is a full-spectrum digital agency providing custom Web Development, SEO/SEM, Social Media Management, and Local Market Activation. OCULA BI is our signature proprietary intelligence platform that powers our client market audits and analytics.'
+                },
+                {
+                  q: 'How fast can a growth sprint be launched?',
+                  a: 'Our onboarding process takes under 48 hours. Following our initial strategy call and OCULA BI baseline analysis, campaign execution and website builds begin immediately in 2-week agile sprints.'
+                },
+                {
+                  q: 'Can I pick individual services or do I need a full package?',
+                  a: 'You can select individual services or combine multiple capabilities using our Scope Estimator tool. We offer custom monthly retainers as well as 90-day growth sprint models.'
+                },
+                {
+                  q: 'How do we track campaign performance and progress?',
+                  a: 'All clients receive live access to custom OCULA BI dashboards, weekly executive reports, and direct Slack/Email communications with dedicated senior strategists.'
+                }
+              ].map((faq, idx) => (
+                <div 
+                  key={idx}
+                  className="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden transition-all"
+                >
+                  <button
+                    onClick={() => setActiveFaq(activeFaq === idx ? null : idx)}
+                    className="w-full p-5 text-left flex items-center justify-between text-sm font-bold text-white hover:text-indigo-300 transition-colors"
+                  >
+                    <span>{faq.q}</span>
+                    <ChevronRight className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${activeFaq === idx ? 'rotate-90 text-indigo-400' : ''}`} />
+                  </button>
+                  {activeFaq === idx && (
+                    <div className="px-5 pb-5 text-xs text-slate-400 leading-relaxed font-light border-t border-slate-900 pt-3">
+                      {faq.a}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
 

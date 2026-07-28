@@ -178,11 +178,12 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, isDarkMode, onToggl
   };
 
   const handleScanAction = (action: 'new' | 'rescan', report?: VisibilityReport, scanId?: string) => {
-    const tierConfig = TIER_CONFIGS[user.account.tier];
-    const currentScanCount = user.account.tier === 'free' ? (user.account.totalScans || 0) : scans.length;
+    const userTier = user?.account?.tier || 'free';
+    const tierConfig = TIER_CONFIGS[userTier] || TIER_CONFIGS['free'];
+    const currentScanCount = userTier === 'free' ? (user?.account?.totalScans || 0) : scans.length;
     
-    if (currentScanCount >= tierConfig.limits.scans) {
-      setScanError(`Scan Limit Reached. The ${tierConfig.name} tier is limited to ${tierConfig.limits.scans} scan(s). Please upgrade to continue.`);
+    if (currentScanCount >= (tierConfig?.limits?.scans ?? 1)) {
+      setScanError(`Scan Limit Reached. The ${tierConfig?.name || 'Free'} tier is limited to ${tierConfig?.limits?.scans ?? 1} scan(s). Please upgrade to continue.`);
       setTimeout(() => {
         setScanError(null);
         setIsManagingSubscription(true);
@@ -190,7 +191,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, isDarkMode, onToggl
       return;
     }
 
-    if ((user.account.unitsRemaining || 0) < 2.0) {
+    if ((user?.account?.unitsRemaining || 0) < 2.0) {
       setScanError("Insufficient Intelligence Units. Please top up or upgrade your plan to perform more scans.");
       setTimeout(() => {
         setScanError(null);
@@ -213,6 +214,12 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, isDarkMode, onToggl
   };
 
   const [displayUser, setDisplayUser] = useState(user);
+
+  useEffect(() => {
+    if (user) {
+      setDisplayUser(user);
+    }
+  }, [user]);
   const [businessSwots, setBusinessSwots] = useState<Record<string, any>>({});
   const [isGeneratingSwot, setIsGeneratingSwot] = useState(false);
   const [selectedScanId, setSelectedScanId] = useState<string | null>(null);
@@ -264,32 +271,62 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, isDarkMode, onToggl
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [editForm, setEditForm] = useState({
+    businessName: user.businessDetails?.name || user.name || '',
     industry: user.businessDetails?.industry || 'other',
     companySize: user.businessDetails?.companySize || '1-10',
-    businessGoals: user.businessDetails?.businessGoals || ''
+    businessGoals: user.businessDetails?.businessGoals || '',
+    logo: user.businessDetails?.logo || '',
+    brandColor: user.businessDetails?.brandColor || '#6366f1'
   });
 
   useEffect(() => {
     setDisplayUser(user);
     setEditForm({
-        industry: user.businessDetails?.industry || 'other',
-        companySize: user.businessDetails?.companySize || '1-10',
-        businessGoals: user.businessDetails?.businessGoals || ''
+      businessName: user.businessDetails?.name || user.name || '',
+      industry: user.businessDetails?.industry || 'other',
+      companySize: user.businessDetails?.companySize || '1-10',
+      businessGoals: user.businessDetails?.businessGoals || '',
+      logo: user.businessDetails?.logo || '',
+      brandColor: user.businessDetails?.brandColor || '#6366f1'
     });
   }, [user]);
 
+  const handleLogoFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 3 * 1024 * 1024) {
+        setScanError("Image size should be under 3MB.");
+        setTimeout(() => setScanError(null), 3000);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          setEditForm(prev => ({ ...prev, logo: reader.result as string }));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSaveProfile = async () => {
-    const updatedUser = {
+    const updatedUser: User = {
       ...displayUser,
       businessDetails: {
-        ...displayUser.businessDetails,
+        ...(displayUser.businessDetails || { name: editForm.businessName, industry: editForm.industry }),
+        name: editForm.businessName,
         industry: editForm.industry,
         companySize: editForm.companySize,
-        businessGoals: editForm.businessGoals
+        businessGoals: editForm.businessGoals,
+        logo: editForm.logo,
+        brandColor: editForm.brandColor
       }
     };
     setDisplayUser(updatedUser);
     await storageService.setUser(updatedUser);
+    if (onUpdateUser) {
+      onUpdateUser(updatedUser);
+    }
     setIsEditingProfile(false);
   };
 
@@ -316,7 +353,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, isDarkMode, onToggl
   };
 
   const handleTierChange = (newTier: SubscriptionTier) => {
-    const currentTier = displayUser.account.tier;
+    const currentTier = displayUser?.account?.tier || 'free';
     const tierOrder: Record<SubscriptionTier, number> = { free: 0, growth: 1, premium: 2 };
 
     // If upgrading to a paid tier
@@ -627,7 +664,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, isDarkMode, onToggl
                 {report.campaigns?.slice(0, 5).map((c, i) => (
                   <div key={i} className="flex items-start gap-3 group">
                     <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0 group-hover:scale-150 transition-transform"></div>
-                    <p className="text-[11px] font-medium text-slate-300 leading-relaxed">{c.name}</p>
+                    <p className="text-[11px] font-medium text-slate-300 leading-relaxed">{c?.name || 'Campaign'}</p>
                   </div>
                 ))}
               </div>
@@ -671,10 +708,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, isDarkMode, onToggl
           </div>
         );
       case 'kpis':
-        return TIER_CONFIGS[displayUser.account.tier].capabilities.canViewKPIs ? (
+        return TIER_CONFIGS[displayUser?.account?.tier || 'free']?.capabilities?.canViewKPIs ? (
           <KPIDashboard 
-            kpis={displayUser.businessDetails?.kpis || []} 
-            businessName={viewingBusiness || displayUser.businessDetails?.name || displayUser.name}
+            kpis={displayUser?.businessDetails?.kpis || []} 
+            businessName={viewingBusiness || displayUser?.businessDetails?.name || displayUser?.name || 'Business'}
             industry={displayUser.businessDetails?.industry}
             reportSummary={businessScans[0]?.report?.summary || businessScans[0]?.report?.visibilityIndex?.summary}
             suggestedFromReport={businessScans[0]?.report?.suggestedKPIs}
@@ -806,18 +843,132 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, isDarkMode, onToggl
         <div className="lg:col-span-2 flex flex-col md:flex-row justify-between items-center gap-4 surface p-4">
           <div className="flex flex-col md:flex-row items-center text-center md:text-left space-y-4 md:space-y-0 md:space-x-8 w-full md:w-auto">
             <div className="relative group shrink-0">
-              <div className="w-28 h-28 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 relative transition-transform hover:scale-[1.02]">
-                <img src={displayUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayUser.name)}&background=random`} className="w-full h-full object-cover" alt={displayUser.name} />
+              <div 
+                className="w-28 h-28 rounded-xl overflow-hidden border-2 relative transition-transform hover:scale-[1.02] flex items-center justify-center bg-slate-100 dark:bg-slate-800"
+                style={{ borderColor: displayUser?.businessDetails?.brandColor || '#6366f1' }}
+              >
+                {displayUser?.businessDetails?.logo ? (
+                  <img src={displayUser.businessDetails.logo} className="w-full h-full object-cover" alt={displayUser?.businessDetails?.name || 'Business Logo'} />
+                ) : (
+                  <img src={displayUser?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayUser?.businessDetails?.name || displayUser?.name || 'User')}&background=random`} className="w-full h-full object-cover" alt={displayUser?.name || 'User'} />
+                )}
+                <div 
+                  className="absolute bottom-1 right-1 w-4 h-4 rounded-full ring-2 ring-white dark:ring-slate-900 shadow-sm"
+                  style={{ backgroundColor: displayUser?.businessDetails?.brandColor || '#6366f1' }}
+                  title="Brand Color Active"
+                />
               </div>
             </div>
             <div className="space-y-4 w-full md:w-auto">
               <div className="space-y-1">
-                <h2 className="text-2xl font-display md:text-2xl font-medium text-slate-900 dark:text-white tracking-tight">{displayUser.name.split(' ')[0]}</h2>
-                <p className="text-[10px] font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Vision Profile Active</p>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-2xl font-display md:text-2xl font-medium text-slate-900 dark:text-white tracking-tight">
+                    {displayUser?.businessDetails?.name || displayUser?.name || 'Business Profile'}
+                  </h2>
+                  {displayUser?.businessDetails?.brandColor && (
+                    <span 
+                      className="px-2 py-0.5 rounded-full text-[9px] font-black text-white uppercase tracking-widest shadow-sm"
+                      style={{ backgroundColor: displayUser.businessDetails.brandColor }}
+                    >
+                      Brand Active
+                    </span>
+                  )}
+                </div>
+                <p className="text-[10px] font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">
+                  Vision Profile Active {displayUser?.name ? `• ${displayUser.name}` : ''}
+                </p>
               </div>
 
               {isEditingProfile ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
+                  <div className="space-y-1 text-left sm:col-span-2">
+                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center">
+                      Business Display Name
+                      <InfoTooltip content="The official name of your business used in intelligence reports and scans." />
+                    </label>
+                    <input 
+                      type="text" 
+                      value={editForm.businessName}
+                      onChange={(e) => setEditForm({...editForm, businessName: e.target.value})}
+                      placeholder="e.g. Acme Corp"
+                      className="w-full surface rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-indigo-500 text-slate-900 dark:text-white"
+                    />
+                  </div>
+
+                  {/* Business Logo Upload */}
+                  <div className="space-y-1 text-left sm:col-span-2 bg-white dark:bg-slate-900/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center justify-between mb-1">
+                      <span>Business Custom Logo</span>
+                      <InfoTooltip content="Upload your brand logo (PNG, JPG, SVG). It will be embedded into all dashboard reports and executive briefs." />
+                    </label>
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 shrink-0 flex items-center justify-center">
+                        {editForm.logo ? (
+                          <img src={editForm.logo} alt="Logo Preview" className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-[10px] font-bold text-slate-400">No Logo</span>
+                        )}
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <input 
+                          type="file" 
+                          accept="image/*"
+                          onChange={handleLogoFileUpload}
+                          className="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 dark:file:bg-indigo-900/40 dark:file:text-indigo-300 hover:file:bg-indigo-100 cursor-pointer"
+                        />
+                        {editForm.logo && (
+                          <button 
+                            type="button" 
+                            onClick={() => setEditForm(prev => ({ ...prev, logo: '' }))}
+                            className="text-[10px] font-bold text-rose-500 hover:underline"
+                          >
+                            Remove Logo
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Brand Primary Color Selection */}
+                  <div className="space-y-1 text-left sm:col-span-2 bg-white dark:bg-slate-900/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center justify-between mb-2">
+                      <span>Brand Primary Color</span>
+                      <InfoTooltip content="Choose your primary brand accent color to customize dashboard highlights, badges, and exported report charts." />
+                    </label>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {[
+                        { name: 'Indigo', hex: '#6366f1' },
+                        { name: 'Emerald', hex: '#10b981' },
+                        { name: 'Cobalt', hex: '#2563eb' },
+                        { name: 'Violet', hex: '#8b5cf6' },
+                        { name: 'Rose', hex: '#e11d48' },
+                        { name: 'Amber', hex: '#d97706' },
+                        { name: 'Cyan', hex: '#0891b2' },
+                        { name: 'Slate', hex: '#334155' }
+                      ].map((c) => (
+                        <button
+                          key={c.hex}
+                          type="button"
+                          onClick={() => setEditForm({ ...editForm, brandColor: c.hex })}
+                          className={`w-7 h-7 rounded-full border-2 transition-transform hover:scale-110 flex items-center justify-center ${
+                            editForm.brandColor === c.hex ? 'border-white ring-2 ring-indigo-500 scale-110' : 'border-transparent'
+                          }`}
+                          style={{ backgroundColor: c.hex }}
+                          title={c.name}
+                        />
+                      ))}
+                      <div className="flex items-center gap-2 ml-auto">
+                        <span className="text-[10px] font-bold text-slate-400">Custom:</span>
+                        <input 
+                          type="color" 
+                          value={editForm.brandColor} 
+                          onChange={(e) => setEditForm({ ...editForm, brandColor: e.target.value })}
+                          className="w-8 h-8 rounded-lg cursor-pointer border border-slate-200 dark:border-slate-700 bg-transparent"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="space-y-1 text-left">
                     <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center">
                       Industry
@@ -872,7 +1023,13 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, isDarkMode, onToggl
                     />
                   </div>
                   <div className="col-span-1 sm:col-span-2 flex gap-2 pt-2">
-                    <button onClick={handleSaveProfile} className="flex-1 btn-primary btn-sm bg-indigo-600 hover:bg-indigo-700">Save</button>
+                    <button 
+                      onClick={handleSaveProfile} 
+                      className="flex-1 btn-primary btn-sm text-white font-bold"
+                      style={{ backgroundColor: editForm.brandColor || '#6366f1' }}
+                    >
+                      Save Brand Profile
+                    </button>
                     <button onClick={() => setIsEditingProfile(false)} className="flex-1 btn-secondary btn-sm">Cancel</button>
                   </div>
                 </div>
@@ -979,48 +1136,60 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, isDarkMode, onToggl
         </div>
 
         {/* Subscription & Units Card */}
-        <div className="bg-slate-900 dark:bg-slate-800 p-4 rounded-xl shadow-sm text-white relative overflow-hidden border border-slate-800">
-          <div className="relative z-10 h-full flex flex-col justify-between">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <p className="text-[10px] font-medium text-indigo-400 uppercase tracking-widest mb-1">Subscription Tier</p>
-                <h3 className="text-2xl font-display font-medium tracking-tight capitalize">{TIER_CONFIGS[user.account?.tier || 'free'].name}</h3>
-              </div>
-              <div className="px-3 py-1 bg-slate-800 dark:bg-slate-700 rounded-lg border border-slate-700 dark:border-slate-600">
-                <span className="text-[9px] font-medium text-indigo-400 uppercase tracking-widest">Active</span>
-              </div>
-            </div>
+        {(() => {
+          const activeTier = displayUser?.account?.tier || user?.account?.tier || 'free';
+          const tierConfig = TIER_CONFIGS[activeTier] || TIER_CONFIGS['free'];
+          const unitsRemaining = displayUser?.account?.unitsRemaining ?? user?.account?.unitsRemaining ?? tierConfig.units;
+          const unitsTotal = displayUser?.account?.unitsTotal || user?.account?.unitsTotal || tierConfig.units;
+          const renewalDate = displayUser?.account?.renewalDate || user?.account?.renewalDate;
+          const renewalStr = renewalDate ? new Date(renewalDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'Active';
+          const usagePercent = unitsTotal > 0 ? Math.min(100, Math.max(0, (unitsRemaining / unitsTotal) * 100)) : 100;
 
-            <div className="space-y-4 mb-4">
-              <div className="flex justify-between items-end">
-                <div>
-                  <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mb-1">Available Units</p>
-                  <div className="flex items-baseline gap-2">
-                    <span className="stat-value text-slate-900 dark:text-white">{user.account?.unitsRemaining || 0}</span>
-                    <span className="text-xs font-medium text-slate-500">Units / {user.account?.unitsTotal || 0} Total</span>
+          return (
+            <div className="bg-slate-900 dark:bg-slate-800 p-4 rounded-xl shadow-sm text-white relative overflow-hidden border border-slate-800">
+              <div className="relative z-10 h-full flex flex-col justify-between">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <p className="text-[10px] font-medium text-indigo-400 uppercase tracking-widest mb-1">Subscription Tier</p>
+                    <h3 className="text-2xl font-display font-medium tracking-tight capitalize">{tierConfig.name}</h3>
+                  </div>
+                  <div className="px-3 py-1 bg-slate-800 dark:bg-slate-700 rounded-lg border border-slate-700 dark:border-slate-600">
+                    <span className="text-[9px] font-medium text-indigo-400 uppercase tracking-widest">Active</span>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mb-1">Renewal</p>
-                  <p className="text-xs font-medium">{new Date(user.account?.renewalDate || '').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</p>
+
+                <div className="space-y-4 mb-4">
+                  <div className="flex justify-between items-end">
+                    <div>
+                      <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mb-1">Available Credits / Units</p>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-2xl font-black text-white">{unitsRemaining}</span>
+                        <span className="text-xs font-medium text-slate-400">/ {unitsTotal} Total</span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mb-1">Renewal</p>
+                      <p className="text-xs font-medium text-white">{renewalStr}</p>
+                    </div>
+                  </div>
+                  <div className="h-2.5 bg-slate-800 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-indigo-500 rounded-full transition-all duration-500" 
+                      style={{ width: `${usagePercent}%` }}
+                    ></div>
+                  </div>
                 </div>
-              </div>
-              <div className="h-2.5 bg-slate-800 dark:bg-slate-700 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-indigo-500 rounded-full transition-all duration-1000" 
-                  style={{ width: `${((user.account?.unitsRemaining || 0) / (user.account?.unitsTotal || 1)) * 100}%` }}
-                ></div>
+
+                <button 
+                  onClick={() => setIsManagingSubscription(true)}
+                  className="w-full btn-base bg-white text-slate-900 btn-md shadow-sm font-bold hover:bg-slate-100 transition-colors"
+                >
+                  Manage Subscription →
+                </button>
               </div>
             </div>
-
-            <button 
-              onClick={() => setIsManagingSubscription(true)}
-              className="w-full btn-base bg-white text-slate-900 btn-md shadow-sm"
-            >
-              Manage Subscription →
-            </button>
-          </div>
-        </div>
+          );
+        })()}
       </div>
 
       {/* Dashboard Widgets with Customization */}

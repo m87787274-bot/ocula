@@ -5,6 +5,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Ba
 import { Swords, Shield, Sparkles, AlertCircle, Filter, Twitter, Facebook, Linkedin, Instagram, Youtube, Globe, Check, ChevronDown, ChevronUp, Bot, Loader2, Target, Zap, Map as MapIcon, Table } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateCompetitorSummary } from '../services/aiService';
+import GoogleMapsVisibilityView from './GoogleMapsVisibilityView';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -875,137 +876,7 @@ const CompetitorTracking: React.FC<CompetitorTrackingProps> = React.memo(({ repo
 
         <div className="space-y-6">
           {viewMode === 'map' ? (
-            <div className="h-[500px] rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 relative z-10">
-              <MapContainer 
-                key={`map-${viewMode}-${report.businessName}`}
-                center={[
-                  !isNaN(Number(report.profileBadge.lat)) ? Number(report.profileBadge.lat) : 51.505, 
-                  !isNaN(Number(report.profileBadge.lng)) ? Number(report.profileBadge.lng) : -0.09
-                ]} 
-                zoom={13} 
-                scrollWheelZoom={false}
-                className="h-full w-full"
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <MapBounds 
-                  markers={[
-                    [
-                      !isNaN(Number(report.profileBadge.lat)) ? Number(report.profileBadge.lat) : 51.505, 
-                      !isNaN(Number(report.profileBadge.lng)) ? Number(report.profileBadge.lng) : -0.09
-                    ],
-                    ...(report.profileBadge.locations || [])
-                      .filter(loc => loc.lat != null && loc.lng != null && !isNaN(Number(loc.lat)) && !isNaN(Number(loc.lng)))
-                      .map(loc => [Number(loc.lat), Number(loc.lng)] as [number, number]),
-                    ...competitors
-                      .filter(comp => comp.lat != null && comp.lng != null && !isNaN(Number(comp.lat)) && !isNaN(Number(comp.lng)))
-                      .map(comp => [Number(comp.lat), Number(comp.lng)] as [number, number]),
-                    ...competitors.flatMap(comp => (comp.locations || [])
-                      .filter(loc => loc.lat != null && loc.lng != null && !isNaN(Number(loc.lat)) && !isNaN(Number(loc.lng)))
-                      .map(loc => [Number(loc.lat), Number(loc.lng)] as [number, number]))
-                  ]} 
-                />
-                <Marker 
-                  position={[
-                    !isNaN(Number(report.profileBadge.lat)) ? Number(report.profileBadge.lat) : 51.505, 
-                    !isNaN(Number(report.profileBadge.lng)) ? Number(report.profileBadge.lng) : -0.09
-                  ]} 
-                  icon={UserIcon}
-                >
-                  <Popup>
-                    <div className="p-2 min-w-[150px]">
-                      <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-1">YOUR BUSINESS</p>
-                      <h4 className="text-sm font-bold text-slate-900">{report.businessName}</h4>
-                      <p className="text-[10px] text-slate-500 mt-1">{report.profileBadge.location}</p>
-                      <div className="mt-2 pt-2 border-t border-slate-100">
-                        <span className="text-[10px] font-black text-slate-900">Score: {Number(report.overallScore) || 0}</span>
-                      </div>
-                    </div>
-                  </Popup>
-                </Marker>
-                {report.profileBadge.locations?.map((loc, idx) => {
-                  if (loc.lat == null || loc.lng == null || isNaN(Number(loc.lat)) || isNaN(Number(loc.lng))) return null;
-                  const isSameAsPrimary = Number(loc.lat) === Number(report.profileBadge.lat) && Number(loc.lng) === Number(report.profileBadge.lng);
-                  const offsetLat = isSameAsPrimary ? Number(loc.lat) + (Math.random() - 0.5) * 0.0005 : Number(loc.lat);
-                  const offsetLng = isSameAsPrimary ? Number(loc.lng) + (Math.random() - 0.5) * 0.0005 : Number(loc.lng);
-                  
-                  return (
-                    <Marker 
-                      key={`primary-loc-${idx}`}
-                      position={[offsetLat, offsetLng]} 
-                      icon={UserIcon}
-                    >
-                      <Popup>
-                        <div className="p-2 min-w-[150px]">
-                          <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-1">YOUR BUSINESS (LOCATION)</p>
-                          <h4 className="text-sm font-bold text-slate-900">{report.businessName}</h4>
-                          <p className="text-[10px] text-slate-500 mt-1">{loc.address}</p>
-                          <div className="mt-2 pt-2 border-t border-slate-100">
-                            <span className="text-[10px] font-black text-slate-900">Score: {Number(report.overallScore) || 0}</span>
-                          </div>
-                        </div>
-                      </Popup>
-                    </Marker>
-                  );
-                })}
-                {competitors.map((comp, idx) => (
-                  <React.Fragment key={`comp-group-${idx}`}>
-                    {comp.lat != null && comp.lng != null && !isNaN(Number(comp.lat)) && !isNaN(Number(comp.lng)) && (
-                      <Marker key={`marker-${idx}`} position={[Number(comp.lat), Number(comp.lng)]} icon={createMarkerIcon(COLORS[(idx + 1) % COLORS.length])}>
-                        <Popup>
-                          <div className="p-2 min-w-[150px]">
-                            <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: COLORS[(idx + 1) % COLORS.length] }}>COMPETITOR</p>
-                            <h4 className="text-sm font-bold text-slate-900">{comp.name}</h4>
-                            <div className="mt-2 pt-2 border-t border-slate-100 space-y-2">
-                              <div className="flex justify-between items-center">
-                                <span className="text-[10px] font-bold text-slate-500">Score:</span>
-                                <span className="text-[10px] font-black text-slate-900">{Number(comp.score) || 0}</span>
-                              </div>
-                              {comp.strengths && comp.strengths.length > 0 && (
-                                <div>
-                                  <span className="text-[9px] font-black text-emerald-600 uppercase">Top Strength:</span>
-                                  <p className="text-[10px] text-slate-600 leading-tight">{comp.strengths[0]}</p>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </Popup>
-                      </Marker>
-                    )}
-                    {comp.locations?.map((loc, locIdx) => {
-                      if (loc.lat == null || loc.lng == null || isNaN(Number(loc.lat)) || isNaN(Number(loc.lng))) return null;
-                      const isSameAsPrimary = Number(loc.lat) === Number(comp.lat) && Number(loc.lng) === Number(comp.lng);
-                      const offsetLat = isSameAsPrimary ? Number(loc.lat) + (Math.random() - 0.5) * 0.0005 : Number(loc.lat);
-                      const offsetLng = isSameAsPrimary ? Number(loc.lng) + (Math.random() - 0.5) * 0.0005 : Number(loc.lng);
-                      
-                      return (
-                        <Marker 
-                          key={`comp-loc-${idx}-${locIdx}`}
-                          position={[offsetLat, offsetLng]} 
-                          icon={createMarkerIcon(COLORS[(idx + 1) % COLORS.length])}
-                        >
-                          <Popup>
-                            <div className="p-2 min-w-[150px]">
-                              <p className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: COLORS[(idx + 1) % COLORS.length] }}>COMPETITOR (LOCATION)</p>
-                              <h4 className="text-sm font-bold text-slate-900">{comp.name}</h4>
-                              <p className="text-[10px] text-slate-500 mt-1">{loc.address}</p>
-                              <div className="mt-2 pt-2 border-t border-slate-100 space-y-2">
-                                <div className="flex justify-between items-center">
-                                  <span className="text-[10px] font-bold text-slate-500">Score:</span>
-                                  <span className="text-[10px] font-black text-slate-900">{Number(comp.score) || 0}</span>
-                                </div>
-                              </div>
-                            </div>
-                          </Popup>
-                        </Marker>
-                      );
-                    })}
-                  </React.Fragment>
-                ))}
-              </MapContainer>
-            </div>
+            <GoogleMapsVisibilityView report={report} isDarkMode={isDarkMode} />
           ) : viewMode === 'matrix' ? (
             <RelativePerformanceHeatmap />
           ) : (

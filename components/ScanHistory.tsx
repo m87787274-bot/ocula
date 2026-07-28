@@ -571,8 +571,8 @@ const ScanHistory: React.FC<ScanHistoryProps> = ({ user, isDarkMode, onSelectSca
                     <div className="flex flex-col items-end space-y-3">
                        <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest"><span className="font-mono">{(scan.report.campaigns?.length || 0)}</span> Missions Active</span>
                        <div className="flex -space-x-2">
-                          {(scan.report.campaigns || []).slice(0, 5).map((m, i) => (
-                            <div key={i} className="w-6 h-6 rounded-lg border-2 border-white dark:border-slate-900 bg-blue-600 shadow-sm" title={m.name}></div>
+                          {(scan.report?.campaigns || []).slice(0, 5).map((m, i) => (
+                            <div key={i} className="w-6 h-6 rounded-lg border-2 border-white dark:border-slate-900 bg-blue-600 shadow-sm" title={m?.name || 'Mission'}></div>
                           ))}
                           {(scan.report.campaigns?.length || 0) > 5 && (
                             <div className="w-6 h-6 rounded-lg border-2 border-white dark:border-slate-900 bg-slate-200 dark:bg-slate-700 text-[8px] font-black flex items-center justify-center text-slate-600 dark:text-slate-300 font-mono">

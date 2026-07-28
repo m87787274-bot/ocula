@@ -2,7 +2,8 @@ import { formatErrorMessage } from '../src/lib/errorUtils';
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, Lock, User as UserIcon, Loader2 } from 'lucide-react';
-import { User } from '../types';
+import { User, UserRole, SubscriptionTier } from '../types';
+import { TIER_CONFIGS } from '../src/constants/pricing';
 import { authService } from '../services/authService';
 
 interface AuthModalProps {
@@ -43,11 +44,27 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
     setIsLoading(true);
 
     try {
-      // Firebase email/password login is not configured by default, 
-      // but we'll show a message or keep the mock for now if not ready.
-      // For a better experience, we should probably stick to Google Login 
-      // as it's pre-configured by the tool.
-      setError("Email/Password login is currently restricted. Please use Google Login.");
+      // Return demo user profile if email/password form is used or in offline mode
+      const demoUser: User = {
+        id: `user-${Date.now()}`,
+        name: name || email.split('@')[0] || 'Analyst User',
+        email: email || 'analyst@ocula.ai',
+        role: UserRole.ANALYST,
+        account: {
+          tier: 'free',
+          unitsTotal: TIER_CONFIGS.free.units,
+          unitsUsed: 0,
+          unitsRemaining: TIER_CONFIGS.free.units,
+          renewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          totalScans: 0
+        },
+        preferences: {
+          notifications: { push: true, email: false, anomalies: true, marketUpdates: true },
+          theme: 'system' as const
+        }
+      };
+      onSuccess(demoUser);
+      onClose();
     } catch (err: any) {
       setError(formatErrorMessage(err, "An error occurred during authentication."));
     } finally {

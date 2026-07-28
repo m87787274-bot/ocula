@@ -8,6 +8,7 @@ import BusinessNameInput from './BusinessNameInput';
 import { analyzeBusinessVisibility } from '../services/aiService';
 import { storageService } from '../services/storageService';
 import { INDUSTRIES, COMPANY_SIZES } from '../src/constants/industries';
+import { FEATURE_UNIT_COSTS } from '../src/constants/pricing';
 import { Search, MapPin, Globe, ArrowRight, Loader2, Plus, X, Activity, BarChart2, Users, TrendingUp, Calendar } from 'lucide-react';
 import { 
   ResponsiveContainer, 
@@ -146,7 +147,7 @@ const CompareEntities: React.FC<CompareEntitiesProps> = ({ user, isDarkMode, onB
       const results = await Promise.all(promises);
       
       if (user) {
-        const scanCost = 50 * validEntities.length;
+        const scanCost = FEATURE_UNIT_COSTS.VISIBILITY_SCAN * validEntities.length;
         await storageService.updateUserUnits(scanCost, validEntities.length);
         
         // Re-fetch user data to reflect updated unit count

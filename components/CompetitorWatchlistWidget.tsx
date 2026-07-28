@@ -18,8 +18,8 @@ export const CompetitorWatchlistWidget: React.FC<CompetitorWatchlistWidgetProps>
         setWatchlist(JSON.parse(stored));
       } else {
         // Pre-populate with first rival if empty just for user delight
-        const rivals = report.competitorComparison || [];
-        if (rivals.length > 0) {
+        const rivals = report?.competitorComparison || [];
+        if (rivals.length > 0 && rivals[0]?.name) {
           const initial = [rivals[0].name];
           localStorage.setItem('ocula_competitor_watchlist', JSON.stringify(initial));
           setWatchlist(initial);
@@ -76,15 +76,15 @@ export const CompetitorWatchlistWidget: React.FC<CompetitorWatchlistWidgetProps>
 
   // Extract all competitors matching watchlist names
   const watchlistedCompetitors = useMemo(() => {
-    const all = report.competitorComparison || [];
-    return all.filter(c => watchlist.includes(c.name));
-  }, [report.competitorComparison, watchlist]);
+    const all = report?.competitorComparison || [];
+    return all.filter(c => c && c.name && watchlist.includes(c.name));
+  }, [report?.competitorComparison, watchlist]);
 
   // Non-watchlisted competitors for the quick-add option
   const availableRivals = useMemo(() => {
-    const all = report.competitorComparison || [];
-    return all.filter(c => !watchlist.includes(c.name));
-  }, [report.competitorComparison, watchlist]);
+    const all = report?.competitorComparison || [];
+    return all.filter(c => c && c.name && !watchlist.includes(c.name));
+  }, [report?.competitorComparison, watchlist]);
 
   return (
     <div className="p-6 h-full flex flex-col bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl relative overflow-hidden group">

@@ -52,6 +52,8 @@ const Settings: React.FC<SettingsProps> = ({
     website: user.businessDetails?.website || '',
     location: user.businessDetails?.location || '',
     businessGoals: user.businessDetails?.businessGoals || user.businessDetails?.goals || '',
+    logo: user.businessDetails?.logo || '',
+    brandColor: user.businessDetails?.brandColor || '#6366f1',
     notificationsPush: user.preferences?.notifications.push ?? true,
     notificationsEmail: user.preferences?.notifications.email ?? false,
     notificationsAnomalies: user.preferences?.notifications.anomalies ?? true,
@@ -93,7 +95,9 @@ const Settings: React.FC<SettingsProps> = ({
         companySize: formData.companySize,
         website: formData.website,
         location: formData.location,
-        businessGoals: formData.businessGoals
+        businessGoals: formData.businessGoals,
+        logo: formData.logo,
+        brandColor: formData.brandColor
       },
       preferences: {
         ...user.preferences,
@@ -247,6 +251,110 @@ const Settings: React.FC<SettingsProps> = ({
                         ))}
                       </select>
                     </div>
+
+                    {/* Custom Business Logo Upload */}
+                    <div className="md:col-span-2 p-4 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Business Custom Logo</h4>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">Upload your official brand logo to personalize dashboard reports and PDF exports.</p>
+                        </div>
+                        {formData.logo && (
+                          <button 
+                            type="button" 
+                            onClick={() => setFormData({ ...formData, logo: '' })}
+                            className="text-xs font-bold text-rose-500 hover:underline"
+                          >
+                            Remove Logo
+                          </button>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-4 pt-1">
+                        <div 
+                          className="w-16 h-16 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex items-center justify-center overflow-hidden shrink-0"
+                          style={{ borderColor: formData.brandColor || '#6366f1' }}
+                        >
+                          {formData.logo ? (
+                            <img src={formData.logo} alt="Business Logo" className="w-full h-full object-cover" />
+                          ) : (
+                            <Building2 className="w-8 h-8 text-slate-400" />
+                          )}
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          <input 
+                            type="file" 
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                if (file.size > 3 * 1024 * 1024) {
+                                  alert("Image file should be under 3MB.");
+                                  return;
+                                }
+                                const reader = new FileReader();
+                                reader.onload = () => {
+                                  if (typeof reader.result === 'string') {
+                                    setFormData(prev => ({ ...prev, logo: reader.result as string }));
+                                  }
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                            className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer"
+                          />
+                          <p className="text-[10px] text-slate-400">Supports PNG, JPG, WebP, SVG. Recommended square or horizontal mark.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Brand Primary Color Selection */}
+                    <div className="md:col-span-2 p-4 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3">
+                      <div>
+                        <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Brand Primary Color</h4>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Select your primary brand theme color applied across reports, widgets, and key metrics.</p>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-3 pt-1">
+                        {[
+                          { name: 'Indigo', hex: '#6366f1' },
+                          { name: 'Emerald', hex: '#10b981' },
+                          { name: 'Cobalt', hex: '#2563eb' },
+                          { name: 'Violet', hex: '#8b5cf6' },
+                          { name: 'Rose', hex: '#e11d48' },
+                          { name: 'Amber', hex: '#d97706' },
+                          { name: 'Cyan', hex: '#0891b2' },
+                          { name: 'Slate', hex: '#334155' }
+                        ].map((color) => (
+                          <button
+                            key={color.hex}
+                            type="button"
+                            onClick={() => setFormData({ ...formData, brandColor: color.hex })}
+                            className={`w-9 h-9 rounded-xl border-2 transition-all flex items-center justify-center ${
+                              formData.brandColor === color.hex ? 'border-white ring-2 ring-indigo-500 scale-105 shadow-md' : 'border-transparent opacity-80 hover:opacity-100'
+                            }`}
+                            style={{ backgroundColor: color.hex }}
+                            title={color.name}
+                          >
+                            {formData.brandColor === color.hex && <Check className="w-4 h-4 text-white" />}
+                          </button>
+                        ))}
+                        <div className="flex items-center gap-2 ml-auto">
+                          <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Custom Hex:</span>
+                          <input 
+                            type="color" 
+                            value={formData.brandColor}
+                            onChange={(e) => setFormData({ ...formData, brandColor: e.target.value })}
+                            className="w-9 h-9 rounded-xl cursor-pointer border border-slate-200 dark:border-slate-700 bg-transparent"
+                          />
+                          <input 
+                            type="text" 
+                            value={formData.brandColor}
+                            onChange={(e) => setFormData({ ...formData, brandColor: e.target.value })}
+                            className="w-20 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 text-xs font-mono font-bold text-slate-900 dark:text-white"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Website URL</label>
                       <div className="relative">
@@ -288,70 +396,80 @@ const Settings: React.FC<SettingsProps> = ({
                 </motion.div>
               )}
 
-              {activeTab === 'subscription' && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="space-y-6"
-                >
-                  <div className="bg-slate-900 dark:bg-slate-950 rounded-2xl p-6 text-white relative overflow-hidden">
-                    <div className="relative z-10">
-                      <div className="flex justify-between items-start mb-6">
-                        <div>
-                          <p className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-1">Current Plan</p>
-                          <h3 className="text-2xl font-bold tracking-tight capitalize">{TIER_CONFIGS[user.account.tier].name}</h3>
-                        </div>
-                        <div className="px-3 py-1 bg-white/10 rounded-lg border border-white/20">
-                          <span className="text-[10px] font-bold uppercase tracking-widest">Active</span>
-                        </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-6">
-                        <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Units Remaining</p>
-                          <p className="text-xl font-bold">{user.account.unitsRemaining} / {user.account.unitsTotal}</p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Next Renewal</p>
-                          <p className="text-xl font-bold">{new Date(user.account.renewalDate).toLocaleDateString()}</p>
-                        </div>
-                        <div className="hidden md:block">
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Scans</p>
-                          <p className="text-xl font-bold">{user.account.totalScans}</p>
-                        </div>
-                      </div>
+              {activeTab === 'subscription' && (() => {
+                const tierKey = (user?.account?.tier || 'free') as keyof typeof TIER_CONFIGS;
+                const tierConfig = TIER_CONFIGS[tierKey] || TIER_CONFIGS['free'];
+                const unitsRemaining = user?.account?.unitsRemaining ?? tierConfig.units;
+                const unitsTotal = user?.account?.unitsTotal || tierConfig.units;
+                const renewalDateStr = user?.account?.renewalDate ? new Date(user.account.renewalDate).toLocaleDateString() : 'N/A';
+                const totalScans = user?.account?.totalScans ?? 0;
+                const unitProgress = unitsTotal > 0 ? Math.min(100, Math.max(0, (unitsRemaining / unitsTotal) * 100)) : 100;
 
-                      <div className="h-2 bg-white/10 rounded-full overflow-hidden mb-6">
-                        <div 
-                          className="h-full bg-indigo-500 rounded-full" 
-                          style={{ width: `${(user.account.unitsRemaining / user.account.unitsTotal) * 100}%` }}
-                        />
-                      </div>
+                return (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="space-y-6"
+                  >
+                    <div className="bg-slate-900 dark:bg-slate-950 rounded-2xl p-6 text-white relative overflow-hidden">
+                      <div className="relative z-10">
+                        <div className="flex justify-between items-start mb-6">
+                          <div>
+                            <p className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-1">Current Plan</p>
+                            <h3 className="text-2xl font-bold tracking-tight capitalize">{tierConfig.name}</h3>
+                          </div>
+                          <div className="px-3 py-1 bg-white/10 rounded-lg border border-white/20">
+                            <span className="text-[10px] font-bold uppercase tracking-widest">Active</span>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-6">
+                          <div>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Units Remaining</p>
+                            <p className="text-xl font-bold">{unitsRemaining} / {unitsTotal}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Next Renewal</p>
+                            <p className="text-xl font-bold">{renewalDateStr}</p>
+                          </div>
+                          <div className="hidden md:block">
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Scans</p>
+                            <p className="text-xl font-bold">{totalScans}</p>
+                          </div>
+                        </div>
 
-                      <button 
-                        onClick={onUpgradePlan}
-                        className="btn-base bg-white text-slate-900 btn-md font-bold"
-                      >
-                        Upgrade Plan
-                      </button>
+                        <div className="h-2 bg-white/10 rounded-full overflow-hidden mb-6">
+                          <div 
+                            className="h-full bg-indigo-500 rounded-full transition-all duration-300" 
+                            style={{ width: `${unitProgress}%` }}
+                          />
+                        </div>
+
+                        <button 
+                          onClick={onUpgradePlan}
+                          className="btn-base bg-white text-slate-900 btn-md font-bold hover:bg-slate-100 transition-colors"
+                        >
+                          Upgrade Plan
+                        </button>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Payment Methods</h4>
-                    <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-8 bg-slate-200 dark:bg-slate-700 rounded flex items-center justify-center font-bold text-[10px]">VISA</div>
-                        <div>
-                          <p className="text-sm font-bold text-slate-900 dark:text-white">•••• •••• •••• 4242</p>
-                          <p className="text-xs text-slate-500">Expires 12/26</p>
+                    <div className="space-y-4">
+                      <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Payment Methods</h4>
+                      <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-8 bg-slate-200 dark:bg-slate-700 rounded flex items-center justify-center font-bold text-[10px]">VISA</div>
+                          <div>
+                            <p className="text-sm font-bold text-slate-900 dark:text-white">•••• •••• •••• 4242</p>
+                            <p className="text-xs text-slate-500">Expires 12/26</p>
+                          </div>
                         </div>
+                        <button className="text-xs font-bold text-indigo-600 hover:text-indigo-700">Edit</button>
                       </div>
-                      <button className="text-xs font-bold text-indigo-600 hover:text-indigo-700">Edit</button>
                     </div>
-                  </div>
-                </motion.div>
-              )}
+                  </motion.div>
+                );
+              })()}
 
 
 

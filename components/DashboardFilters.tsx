@@ -29,20 +29,25 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = React.memo(({
 
   const [isCompetitorDropdownOpen, setIsCompetitorDropdownOpen] = useState(false);
 
-  useEffect(() => {
-    onFilterChange(filters);
-  }, [filters, onFilterChange]);
+  const updateFilters = (updater: (prev: FilterState) => FilterState) => {
+    setFilters(prev => {
+      const next = updater(prev);
+      onFilterChange(next);
+      return next;
+    });
+  };
 
   const handleKeywordSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFilters(prev => ({ ...prev, keywordSearch: e.target.value }));
+    const val = e.target.value;
+    updateFilters(prev => ({ ...prev, keywordSearch: val }));
   };
 
   const handleDifficultyChange = (difficulty: FilterState['keywordDifficulty']) => {
-    setFilters(prev => ({ ...prev, keywordDifficulty: difficulty }));
+    updateFilters(prev => ({ ...prev, keywordDifficulty: difficulty }));
   };
 
   const toggleCompetitor = (competitor: string) => {
-    setFilters(prev => {
+    updateFilters(prev => {
       const current = prev.selectedCompetitors;
       const isSelected = current.includes(competitor);
       let newSelected;
@@ -56,16 +61,18 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = React.memo(({
   };
 
   const handleDateRangeChange = (range: FilterState['dateRange']) => {
-    setFilters(prev => ({ ...prev, dateRange: range }));
+    updateFilters(prev => ({ ...prev, dateRange: range }));
   };
 
   const clearFilters = () => {
-    setFilters({
+    const cleared: FilterState = {
       keywordSearch: '',
       keywordDifficulty: 'all',
       selectedCompetitors: [],
       dateRange: 'all',
-    });
+    };
+    setFilters(cleared);
+    onFilterChange(cleared);
   };
 
   const activeFilterCount = (filters.keywordSearch ? 1 : 0) + 

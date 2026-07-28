@@ -1,6 +1,5 @@
-import { formatErrorMessage } from '../src/lib/errorUtils';
 import React, { useState } from 'react';
-import { CreditCard, Lock, CheckCircle, AlertCircle, X } from 'lucide-react';
+import { CreditCard, Lock, CheckCircle, X } from 'lucide-react';
 import { SubscriptionTier } from '../types';
 import { TIER_CONFIGS, CurrencyConfig } from '../src/constants/pricing';
 
@@ -12,12 +11,7 @@ interface PaymentModalProps {
 }
 
 const PaymentModal: React.FC<PaymentModalProps> = ({ tier, currency, onClose, onSuccess }) => {
-  const [cardNumber, setCardNumber] = useState('');
-  const [expiry, setExpiry] = useState('');
-  const [cvc, setCvc] = useState('');
-  const [name, setName] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
   const config = TIER_CONFIGS[tier];
@@ -32,51 +26,20 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ tier, currency, onClose, on
   const isPaystackTier = tier === 'growth' || tier === 'premium';
   const paystackUrl = isPaystackTier ? PAYSTACK_LINKS[tier as keyof typeof PAYSTACK_LINKS] : null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (isProcessing || success) return;
-    setError(null);
-
-    if (isPaystackTier && paystackUrl) {
-      window.open(paystackUrl, '_blank');
-      onSuccess(); // Update the user account in the demo
-      return;
-    }
-
     setIsProcessing(true);
 
-    // Simulate API call
+    // Simulate fast payment gateway API processing
     setTimeout(() => {
-      // Basic validation simulation
-      if (cardNumber.replace(/\s/g, '').length < 16) {
-        setError('Invalid card number');
-        setIsProcessing(false);
-        return;
-      }
-
       setIsProcessing(false);
       setSuccess(true);
       
       setTimeout(() => {
         onSuccess();
-      }, 1500);
-    }, 2000);
-  };
-
-  const handleCardInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/\D/g, '');
-    if (value.length > 16) value = value.slice(0, 16);
-    const formatted = value.replace(/(\d{4})/g, '$1 ').trim();
-    setCardNumber(formatted);
-  };
-
-  const handleExpiryInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/\D/g, '');
-    if (value.length > 4) value = value.slice(0, 4);
-    if (value.length > 2) {
-      value = `${value.slice(0, 2)}/${value.slice(2)}`;
-    }
-    setExpiry(value);
+      }, 1200);
+    }, 600);
   };
 
   if (success) {
@@ -135,105 +98,48 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ tier, currency, onClose, on
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {isPaystackTier ? (
-              <div className="space-y-6 pt-4">
-                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800 text-center">
-                  <p className="text-sm font-bold text-slate-600 dark:text-slate-300">
-                    You are one step away from upgrading to <span className="text-blue-600 dark:text-blue-400">{config.name}</span>. Click the button below to complete your payment securely on Paystack.
-                  </p>
-                </div>
-                <button 
-                  type="submit"
-                  className="w-full btn-primary btn-lg gap-3"
+          <div className="space-y-4">
+            <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-800 text-center space-y-2">
+              <span className="inline-block px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider bg-emerald-600 text-white rounded-full">
+                Simulated Payment Mode
+              </span>
+              <p className="text-xs font-bold text-slate-600 dark:text-slate-300">
+                Payment gateways are set to quick simulation mode. Upgrade instantly to <span className="text-emerald-600 dark:text-emerald-400 font-extrabold">{config.name}</span> with one click.
+              </p>
+            </div>
+
+            <button 
+              type="button"
+              onClick={() => handleSubmit()}
+              disabled={isProcessing}
+              className="w-full btn-primary btn-lg bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-600/20 py-4 text-sm font-black tracking-wide flex items-center justify-center gap-2"
+            >
+              {isProcessing ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Simulating Gateway Authorization...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="w-5 h-5" />
+                  Simulate Successful Payment ({formattedPrice})
+                </>
+              )}
+            </button>
+
+            {isPaystackTier && paystackUrl && (
+              <div className="text-center pt-1">
+                <a 
+                  href={paystackUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-xs font-bold text-slate-400 hover:text-blue-500 underline"
                 >
-                  <Lock className="w-4 h-4" />
-                  Continue to Paystack
-                </button>
+                  Or test external Paystack link directly
+                </a>
               </div>
-            ) : (
-              <>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Card Information</label>
-                    <div className="relative">
-                      <input 
-                        type="text" 
-                        value={cardNumber}
-                        onChange={handleCardInput}
-                        placeholder="0000 0000 0000 0000"
-                        className="w-full pl-12 pr-4 py-4 rounded-xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500/20 outline-none font-mono font-bold text-slate-900 dark:text-white transition-all"
-                        required
-                      />
-                      <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Expiry</label>
-                      <input 
-                        type="text" 
-                        value={expiry}
-                        onChange={handleExpiryInput}
-                        placeholder="MM/YY"
-                        className="w-full px-4 py-4 rounded-xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500/20 outline-none font-mono font-bold text-slate-900 dark:text-white transition-all text-center"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">CVC</label>
-                      <input 
-                        type="text" 
-                        value={cvc}
-                        onChange={(e) => setCvc(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                        placeholder="123"
-                        className="w-full px-4 py-4 rounded-xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500/20 outline-none font-mono font-bold text-slate-900 dark:text-white transition-all text-center"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Cardholder Name</label>
-                    <input 
-                      type="text" 
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="JOHN DOE"
-                      className="w-full px-4 py-4 rounded-xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500/20 outline-none font-bold text-slate-900 dark:text-white transition-all uppercase"
-                      required
-                    />
-                  </div>
-                </div>
-
-                {error && (
-                  <div className="flex items-center gap-2 text-rose-500 bg-rose-50 dark:bg-rose-900/20 p-3 rounded-xl text-xs font-bold">
-                    <AlertCircle className="w-4 h-4 shrink-0" />
-                    {error}
-                  </div>
-                )}
-
-                <button 
-                  type="submit" 
-                  disabled={isProcessing}
-                  className="w-full btn-primary btn-lg gap-3"
-                >
-                  {isProcessing ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <Lock className="w-4 h-4" />
-                      Pay {formattedPrice}
-                    </>
-                  )}
-                </button>
-              </>
             )}
-          </form>
+          </div>
           
           <div className="flex items-center justify-center gap-2 text-[10px] font-bold text-slate-400">
             <Lock className="w-3 h-3" />

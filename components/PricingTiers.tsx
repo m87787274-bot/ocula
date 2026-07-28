@@ -92,7 +92,7 @@ const PricingTiers: React.FC<PricingTiersProps> = ({ currentTier, selectedTier, 
                   </div>
                   <div>
                     <h4 className="font-black text-lg text-slate-900 dark:text-white tracking-tight leading-none">{config.name}</h4>
-                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1.5">{config.units} Units / Month</p>
+                    <p className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mt-1.5">{config.units} Credits (Units) / Month</p>
                   </div>
                 </div>
                 

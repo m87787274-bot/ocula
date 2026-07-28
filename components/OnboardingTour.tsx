@@ -182,18 +182,28 @@ export default function OnboardingTour({ onComplete, widgets, setWidgets, select
 
   const steps = allSteps.filter(s => !s.protected || user);
 
+  const hasSetTemplateRef = useRef(false);
+
+  useEffect(() => {
+    hasSetTemplateRef.current = false;
+  }, [step]);
+
   useEffect(() => {
     const currentStep = steps[step];
     if (!currentStep) return;
     
     // Handle view navigation if required
     if (currentStep.requiredView && currentView !== currentStep.requiredView) {
+      const protectedViews = ["dashboard", "history", "missions", "compare", "settings", "users"];
+      if (!user && protectedViews.includes(currentStep.requiredView)) {
+        return;
+      }
       setView(currentStep.requiredView);
-      // Give some time for the view to render before finding the element
       return;
     }
 
-    if (currentStep.id === 'new-scan' && onSetTemplate) {
+    if (currentStep.id === 'new-scan' && onSetTemplate && !hasSetTemplateRef.current) {
+      hasSetTemplateRef.current = true;
       onSetTemplate('competitor');
     }
 

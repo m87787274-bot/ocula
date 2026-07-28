@@ -209,6 +209,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ user, onStartAudit, onLogin, 
                         onChange={setBusinessName}
                         placeholder="Business Name (e.g. Acme Corp)"
                         size="lg"
+                        required={false}
                         inputClassName="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 font-sans font-bold tracking-tight"
                       />
                       
@@ -243,7 +244,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ user, onStartAudit, onLogin, 
                       </div>
                     </div>
 
-                    <button type="submit" className="w-full h-14 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-display font-black uppercase tracking-[0.2em] rounded-xl flex items-center justify-center gap-3 hover:-translate-y-1 hover:shadow-xl transition-all active:scale-[0.98]">
+                    <button 
+                      type="submit" 
+                      onClick={handleStartScan}
+                      className="w-full h-14 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-display font-black uppercase tracking-[0.2em] rounded-xl flex items-center justify-center gap-3 hover:-translate-y-1 hover:shadow-xl transition-all active:scale-[0.98] cursor-pointer"
+                    >
                        <Zap className="w-5 h-5 fill-current" />
                        Initialize Scan
                     </button>

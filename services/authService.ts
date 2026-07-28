@@ -5,7 +5,7 @@ import {
   onAuthStateChanged,
   User as FirebaseUser
 } from 'firebase/auth';
-import { auth, db } from '../src/lib/firebase';
+import { auth, db, isConfigPlaceholder } from '../src/lib/firebase';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { User, UserRole, SubscriptionTier } from '../types';
 import { handleFirestoreError, OperationType } from '../src/lib/firestoreUtils';
@@ -13,7 +13,38 @@ import { handleFirestoreError, OperationType } from '../src/lib/firestoreUtils';
 const googleProvider = new GoogleAuthProvider();
 
 export const authService = {
-  loginWithGoogle: async () => {
+  getDemoUser: (): User => ({
+    id: 'demo-analyst-1',
+    name: 'Demo Analyst',
+    email: 'analyst@ocula.ai',
+    role: UserRole.ANALYST,
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+    account: {
+      tier: 'enterprise' as SubscriptionTier,
+      unitsTotal: 100,
+      unitsUsed: 12,
+      unitsRemaining: 88,
+      renewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      totalScans: 8
+    },
+    preferences: {
+      notifications: {
+        push: true,
+        email: true,
+        anomalies: true,
+        marketUpdates: true
+      },
+      theme: 'system' as const
+    }
+  }),
+
+  loginWithGoogle: async (): Promise<User> => {
+    // If configuration uses placeholder values, bypass live network call and return demo session
+    if (isConfigPlaceholder) {
+      console.log('[AuthService] Operating with placeholder configuration. Returning demo analyst session.');
+      return authService.getDemoUser();
+    }
+
     let firebaseUser;
     try {
       const result = await signInWithPopup(auth, googleProvider);
@@ -21,6 +52,14 @@ export const authService = {
     } catch (error: any) {
       if (error.code === 'auth/popup-blocked') {
         throw new Error('Authentication popup was blocked by your browser. Please allow popups for this site or open the application in a new tab.');
+      }
+      if (
+        error.code === 'auth/api-key-not-valid' || 
+        error.message?.includes('api-key-not-valid') ||
+        error.message?.includes('API key')
+      ) {
+        console.warn('[AuthService] Firebase API key invalid or unconfigured. Falling back to demo session.');
+        return authService.getDemoUser();
       }
       throw error;
     }
@@ -52,7 +91,7 @@ export const authService = {
               anomalies: true,
               marketUpdates: true
             },
-            theme: 'system'
+            theme: 'system' as const
           }
         };
         await setDoc(userRef, {
@@ -65,8 +104,26 @@ export const authService = {
       
       return userSnap.data() as User;
     } catch (error) {
-      handleFirestoreError(error, OperationType.WRITE, 'users');
-      return null;
+      console.warn('[AuthService] Firestore write failed or permission denied during auth sync. Returning local user profile.');
+      return {
+        id: firebaseUser.uid,
+        name: firebaseUser.displayName || 'Anonymous',
+        email: firebaseUser.email || '',
+        role: UserRole.ANALYST,
+        avatar: firebaseUser.photoURL || undefined,
+        account: {
+          tier: 'free' as SubscriptionTier,
+          unitsTotal: 10,
+          unitsUsed: 0,
+          unitsRemaining: 10,
+          renewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          totalScans: 0
+        },
+        preferences: {
+          notifications: { push: true, email: false, anomalies: true, marketUpdates: true },
+          theme: 'system' as const
+        }
+      };
     }
   },
 

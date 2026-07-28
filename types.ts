@@ -53,6 +53,8 @@ export interface User {
     location?: string;
     goals?: string;
     businessGoals?: string;
+    logo?: string;
+    brandColor?: string;
     kpis?: KPI[];
   };
   onboardingCompleted?: boolean;

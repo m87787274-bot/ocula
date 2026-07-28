@@ -85,22 +85,40 @@ export const storageService = {
     
     const path = `users/${id}/scans`;
     try {
-      const q = query(collection(db, path), orderBy('timestamp', 'desc'));
-      const snap = await getDocs(q);
-      return snap.docs.map(d => d.data() as SavedScan);
+      const snap = await getDocs(collection(db, path));
+      const scans = snap.docs.map(d => d.data() as SavedScan);
+      return scans.sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime());
     } catch (error) {
-      handleFirestoreError(error, OperationType.LIST, path);
+      console.warn('Could not load scans from Firestore:', error);
       return [];
     }
   },
 
   saveScan: async (businessName: string, score: number, report: VisibilityReport) => {
     const user = auth.currentUser;
-    if (!user) throw new Error("Authentication required to save scans");
-    
-    // Ensure critical fields are not undefined
     const finalBusinessName = businessName || report.businessName || "Unknown Business";
     const scanId = 'scan_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+    
+    if (!user) {
+      // Guest or unauthenticated user: save to local storage
+      const newScan: SavedScan = {
+        id: scanId,
+        userId: 'guest',
+        timestamp: new Date().toISOString(),
+        businessName: finalBusinessName,
+        score: score || 0,
+        report
+      };
+      try {
+        const guestScans = JSON.parse(localStorage.getItem('ocula_guest_scans') || '[]');
+        guestScans.unshift(newScan);
+        localStorage.setItem('ocula_guest_scans', JSON.stringify(guestScans.slice(0, 20)));
+      } catch (e) {
+        console.warn('Failed to save guest scan locally:', e);
+      }
+      return newScan;
+    }
+    
     const path = `users/${user.uid}/scans/${scanId}`;
     
     const newScan: SavedScan = {
@@ -120,8 +138,15 @@ export const storageService = {
       });
       return newScan;
     } catch (error) {
-      handleFirestoreError(error, OperationType.WRITE, path);
-      throw error;
+      console.warn('Firestore write failed for scan, storing in local storage:', error);
+      try {
+        const localScans = JSON.parse(localStorage.getItem(`ocula_scans_${user.uid}`) || '[]');
+        localScans.unshift(newScan);
+        localStorage.setItem(`ocula_scans_${user.uid}`, JSON.stringify(localScans.slice(0, 20)));
+      } catch (e) {
+        // ignore fallback errors
+      }
+      return newScan;
     }
   },
 

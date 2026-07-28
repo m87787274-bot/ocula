@@ -14,6 +14,7 @@ import {
   VisibilityReport,
   User,
   UserRole,
+  SubscriptionTier,
   ScryTemplate,
   TemplateDefinition,
   EntityInput,
@@ -299,7 +300,24 @@ const AppContent: React.FC = () => {
     const unsubscribe = authService.subscribeToAuth(async (firebaseUser) => {
       if (firebaseUser) {
         const userData = await storageService.getUser(firebaseUser.uid);
-        setUser(userData);
+        if (userData) {
+          const tier = (userData.account?.tier || 'free') as SubscriptionTier;
+          const tierConfig = TIER_CONFIGS[tier] || TIER_CONFIGS.free;
+          const sanitizedUser: User = {
+            ...userData,
+            account: {
+              tier,
+              unitsTotal: userData.account?.unitsTotal || tierConfig.units,
+              unitsRemaining: userData.account?.unitsRemaining ?? tierConfig.units,
+              unitsUsed: userData.account?.unitsUsed ?? 0,
+              renewalDate: userData.account?.renewalDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+              totalScans: userData.account?.totalScans ?? 0,
+            },
+          };
+          setUser(sanitizedUser);
+        } else {
+          setUser(null);
+        }
       } else {
         setUser(null);
       }
@@ -333,7 +351,7 @@ const AppContent: React.FC = () => {
         setView("landing");
       }
     }
-  }, [user, view, isInitialLoading]);
+  }, [user?.id, view, isInitialLoading]);
 
   const [initialTab, setInitialTab] = useState<
     | "overview"
@@ -532,19 +550,20 @@ const AppContent: React.FC = () => {
       localStorage.getItem("ocula_has_scanned");
 
     if (!user && hasScanned) {
-      setView("pricing");
+      dispatch({
+        type: "SET_ERROR",
+        error: "Guest trial scan completed. Please log in or upgrade to run additional scans.",
+      });
+      setTimeout(() => setView("pricing"), 3000);
       return;
     }
 
-    if (scanEntities.length === 0) return;
-
-    // API Key Check: Ensure we have at least one provider configured
-    if (!config || (!config.openaiApiKey && !config.openaiConfigured)) {
-        dispatch({
-            type: "SET_ERROR",
-            error: "No AI API key configured. Please configure an API key in settings.",
-        });
-        return;
+    if (scanEntities.length === 0) {
+      dispatch({
+        type: "SET_ERROR",
+        error: "Please enter a business name to initiate a visibility scan.",
+      });
+      return;
     }
 
     // Unit Check: Ensure user has enough units for a scan (only for logged in users)
@@ -559,20 +578,24 @@ const AppContent: React.FC = () => {
 
     // Tier Limit Check: Ensure user hasn't exceeded their scan limit (only for logged in users)
     if (user && !options?.force) {
-      const tierConfig = TIER_CONFIGS[user.account.tier];
-      const scans = await storageService.getScans();
-      const currentScanCount =
-        user.account.tier === "free"
-          ? user.account.totalScans || 0
-          : scans.length;
+      try {
+        const tierConfig = TIER_CONFIGS[user.account?.tier || "free"] || TIER_CONFIGS.free;
+        const scans = await storageService.getScans().catch(() => []);
+        const currentScanCount =
+          user.account?.tier === "free"
+            ? user.account?.totalScans || 0
+            : scans.length;
 
-      if (currentScanCount + scanEntities.length > tierConfig.limits.scans) {
-        dispatch({
-          type: "SET_ERROR",
-          error: `Scan Limit Reached. The ${tierConfig.name} tier is limited to ${tierConfig.limits.scans} scan(s). Please upgrade to continue.`,
-        });
-        setTimeout(() => setView("pricing"), 3000);
-        return;
+        if (currentScanCount + scanEntities.length > tierConfig.limits.scans) {
+          dispatch({
+            type: "SET_ERROR",
+            error: `Scan Limit Reached. The ${tierConfig.name} tier is limited to ${tierConfig.limits.scans} scan(s). Please upgrade to continue.`,
+          });
+          setTimeout(() => setView("pricing"), 3000);
+          return;
+        }
+      } catch (err) {
+        console.warn("Scan limit check warning:", err);
       }
     }
 
@@ -752,17 +775,17 @@ const AppContent: React.FC = () => {
           
           const refreshedUser = await storageService.getUser();
           if (refreshedUser) setUser(refreshedUser);
-  
-          for (const report of reports) {
-            report.focusMode = scanTemplate;
-            await storageService.saveScan(
-              report.businessName,
-              report.overallScore,
-              report,
-            );
-          }
         } else if (typeof window !== "undefined") {
           localStorage.setItem("ocula_has_scanned", "true");
+        }
+
+        for (const report of reports) {
+          report.focusMode = scanTemplate;
+          await storageService.saveScan(
+            report.businessName,
+            report.overallScore,
+            report,
+          );
         }
 
         setInitialTab("overview");
@@ -793,17 +816,17 @@ const AppContent: React.FC = () => {
     setEntities([
       {
         id: "1",
-        businessName: "",
-        location: "",
-        website: "",
-        industry: "",
-        companySize: "",
+        businessName: user?.businessDetails?.name || "",
+        location: user?.businessDetails?.location || "",
+        website: user?.businessDetails?.website || "",
+        industry: user?.businessDetails?.industry || "",
+        companySize: user?.businessDetails?.companySize || "",
       },
     ]);
     setSelectedTemplate("standard");
     setView("home");
     navigate("/");
-  }, [navigate]);
+  }, [navigate, user]);
 
   const handleRescan = useCallback(
     async (customReport?: VisibilityReport, customScanId?: string) => {
@@ -871,6 +894,9 @@ const AppContent: React.FC = () => {
   };
 
   if (isInitialLoading || !isAuthReady) {
+    if (view === "flokker") {
+      return <FlokkerLoadingFallback />;
+    }
     return <SplashScreen />;
   }
 
@@ -1392,7 +1418,7 @@ const AppContent: React.FC = () => {
                   </div>
                 }
               >
-                {showOnboarding && (
+                {showOnboarding && view !== "flokker" && (
                   <OnboardingTour
                     onComplete={() => setShowOnboarding(false)}
                     widgets={widgets}
@@ -1815,6 +1841,7 @@ const AppContent: React.FC = () => {
                               }
                               placeholder="e.g. Acme Corp"
                               label={`Entity ${idx + 1} Name`}
+                              required={false}
                               size="lg"
                             />
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -2019,7 +2046,8 @@ const AppContent: React.FC = () => {
 
                       <button
                         type="submit"
-                        className={`w-full py-4 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-all bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900`}
+                        onClick={(e) => startScan(e)}
+                        className={`w-full py-4 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-all bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 cursor-pointer`}
                       >
                         <span>Initialize Scanner</span>
                         <ArrowRight className="w-4 h-4" />

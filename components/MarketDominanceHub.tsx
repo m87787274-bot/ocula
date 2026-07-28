@@ -34,7 +34,7 @@ const MarketDominanceHub: React.FC<MarketDominanceHubProps> = ({ scans, isDarkMo
       }));
     } else if (Array.isArray(report?.categories) && report.categories.length > 0) {
       radarData = report.categories.map(cat => ({
-        subject: cat.name ? cat.name.split(' ')[0] : 'Metric',
+        subject: cat && cat.name ? cat.name.split(' ')[0] : 'Metric',
         A: Number(cat.score) || 0,
         benchmark: 65,
         fullMark: 100
