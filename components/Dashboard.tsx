@@ -930,48 +930,74 @@ const Dashboard: React.FC<DashboardProps> = ({ report, onReset, onRescan, initia
   };
 
   const deployVsMission = useCallback(async (competitor: any) => {
-    const scans = await storageService.getScans();
-    const scanId = scans.find(s => s.businessName === report.businessName)?.id;
-
-    const missionId = 'vs_' + Math.random().toString(36).substr(2, 9);
-    const objective = competitor.suggestedObjective || `Directly bypass ${competitor.name}'s search and social presence to recapture local market share.`;
-    const missionName = `Vs. ${competitor.name} Domination`;
-
-    const mission: Campaign = {
-      id: missionId,
-      name: missionName,
-      objective: objective,
-      targetCompetitor: competitor.name,
-      kpi: 'Rival Visibility Delta',
-      priority: 'high',
-      status: 'active',
-      progress: 0,
-      isVsMission: true,
-      targetMetrics: '',
-      notes: '',
-      assignee: ''
-    };
-
-    // Update local state for immediate UI feedback
-    setLocalCampaigns(prev => [mission, ...prev]);
-
-    // Persist to storage only if a scanId is found (logged in user)
-    if (scanId) {
-      await storageService.addCampaignToScan(scanId, mission);
-    }
-
-    setErrorMessage({ title: "Mission Deployed", body: `VS Mission against ${competitor.name} is now active. Tactical analysis starting...` });
-    setActiveTab('missions');
-
-    // Auto-generate tactics
     try {
-      const tactics = await generateMissionTactics(report.businessName, objective, missionName);
-      setLocalCampaigns(prev => prev.map(m => m.id === missionId ? { ...m, tacticalPlan: tactics } : m));
-      if (scanId) {
-        await storageService.updateCampaign(scanId, missionId, { tacticalPlan: tactics });
+      console.log("[deployVsMission] Starting deployment against:", competitor);
+      if (!competitor || !competitor.name) {
+        console.warn("[deployVsMission] Competitor is missing or invalid:", competitor);
+        setErrorMessage({ title: "Deployment Error", body: "Could not retrieve competitor information for deployment." });
+        return;
       }
-    } catch (e) {
-      console.error("Auto-tactic generation failed", e);
+
+      console.log("[deployVsMission] Loading scans from storageService...");
+      const scans = await storageService.getScans();
+      const currentBusinessName = report?.businessName || "Your Business";
+      const scanId = scans.find(s => s && s.businessName === currentBusinessName)?.id;
+
+      const missionId = 'vs_' + Math.random().toString(36).substr(2, 9);
+      const objective = competitor.suggestedObjective || `Directly bypass ${competitor.name}'s search and social presence to recapture local market share.`;
+      const missionName = `Vs. ${competitor.name} Domination`;
+
+      const mission: Campaign = {
+        id: missionId,
+        name: missionName,
+        objective: objective,
+        targetCompetitor: competitor.name,
+        kpi: 'Rival Visibility Delta',
+        priority: 'high',
+        status: 'active',
+        progress: 0,
+        isVsMission: true,
+        targetMetrics: '',
+        notes: '',
+        assignee: ''
+      };
+
+      console.log("[deployVsMission] Created campaign object:", mission);
+
+      // Update local state for immediate UI feedback
+      setLocalCampaigns(prev => [mission, ...prev]);
+
+      // Persist to storage only if a scanId is found (logged in user)
+      if (scanId) {
+        try {
+          console.log("[deployVsMission] Persisting campaign to scan id:", scanId);
+          await storageService.addCampaignToScan(scanId, mission);
+        } catch (storageErr) {
+          console.error("[deployVsMission] Error persisting campaign to storage:", storageErr);
+        }
+      }
+
+      setErrorMessage({ title: "Mission Deployed", body: `VS Mission against ${competitor.name} is now active. Tactical analysis starting...` });
+      setActiveTab('missions');
+
+      // Auto-generate tactics
+      try {
+        console.log("[deployVsMission] Launching auto-generation of tactics...");
+        const tactics = await generateMissionTactics(currentBusinessName, objective, missionName);
+        setLocalCampaigns(prev => prev.map(m => m.id === missionId ? { ...m, tacticalPlan: tactics } : m));
+        if (scanId) {
+          try {
+            await storageService.updateCampaign(scanId, missionId, { tacticalPlan: tactics });
+          } catch (updateErr) {
+            console.error("[deployVsMission] Failed to update campaign with tactics in storage:", updateErr);
+          }
+        }
+      } catch (e) {
+        console.error("[deployVsMission] Auto-tactic generation failed:", e);
+      }
+    } catch (err: any) {
+      console.error("[deployVsMission] Uncaught exception in deployVsMission:", err);
+      setErrorMessage({ title: "Mission Deployment Failed", body: `An error occurred while deploying the VS Mission: ${err.message || err}` });
     }
   }, [report.businessName]);
 

@@ -302,6 +302,10 @@ const CompetitorTracking: React.FC<CompetitorTrackingProps> = React.memo(({ repo
   const [expandedSummaries, setExpandedSummaries] = useState<Record<string, boolean>>({});
 
   const handleToggleSummary = async (comp: any) => {
+    if (!comp || !comp.name) {
+      console.warn("handleToggleSummary called with invalid competitor:", comp);
+      return;
+    }
     const isExpanded = expandedSummaries[comp.name];
     
     // Toggle expansion state
@@ -312,12 +316,12 @@ const CompetitorTracking: React.FC<CompetitorTrackingProps> = React.memo(({ repo
       setLoadingSummaries(prev => ({ ...prev, [comp.name]: true }));
       try {
         const summary = await generateCompetitorSummary(
-          report.businessName,
-          report.overallScore,
+          report?.businessName || "Your Business",
+          report?.overallScore || 0,
           comp.name,
-          comp.score,
-          comp.strengths,
-          comp.weaknesses
+          comp.score || 0,
+          comp.strengths || [],
+          comp.weaknesses || []
         );
         setSummaries(prev => ({ ...prev, [comp.name]: summary }));
       } catch (error) {

@@ -84,7 +84,7 @@ export const storageService = {
     if (!id) {
       try {
         const guestScans = JSON.parse(localStorage.getItem('ocula_guest_scans') || '[]');
-        return guestScans;
+        return Array.isArray(guestScans) ? guestScans.filter((s: any) => s && typeof s === 'object' && s.businessName) : [];
       } catch (e) {
         console.warn('Failed to load guest scans from local storage:', e);
         return [];
@@ -95,7 +95,7 @@ export const storageService = {
     if (isConfigPlaceholder) {
       try {
         const localScans = JSON.parse(localStorage.getItem(`ocula_scans_${id}`) || '[]');
-        return localScans;
+        return Array.isArray(localScans) ? localScans.filter((s: any) => s && typeof s === 'object' && s.businessName) : [];
       } catch (e) {
         return [];
       }
@@ -104,12 +104,13 @@ export const storageService = {
     const path = `users/${id}/scans`;
     try {
       const snap = await getDocs(collection(db, path));
-      const firestoreScans = snap.docs.map(d => d.data() as SavedScan);
+      const firestoreScans = snap.docs.map(d => d.data() as SavedScan).filter((s: any) => s && typeof s === 'object' && s.businessName);
       
       // Load local scans to merge for offline resilience
       let localScans: SavedScan[] = [];
       try {
-        localScans = JSON.parse(localStorage.getItem(`ocula_scans_${id}`) || '[]');
+        const parsed = JSON.parse(localStorage.getItem(`ocula_scans_${id}`) || '[]');
+        localScans = Array.isArray(parsed) ? parsed.filter((s: any) => s && typeof s === 'object' && s.businessName) : [];
       } catch (e) {
         // ignore
       }
@@ -128,7 +129,7 @@ export const storageService = {
       console.warn('Could not load scans from Firestore, falling back to local storage:', error);
       try {
         const localScans = JSON.parse(localStorage.getItem(`ocula_scans_${id}`) || '[]');
-        return localScans;
+        return Array.isArray(localScans) ? localScans.filter((s: any) => s && typeof s === 'object' && s.businessName) : [];
       } catch (e) {
         return [];
       }
