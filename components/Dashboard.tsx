@@ -605,14 +605,70 @@ const Dashboard: React.FC<DashboardProps> = ({ report, onReset, onRescan, initia
     setWidgets(prev => prev.map(w => w.id === id ? { ...w, visible: !w.visible } : w));
   };
 
+  // Local helper to initialize/derive campaigns if none exist in the report
+  const getInitialCampaigns = useCallback((rep: any) => {
+    if (rep.campaigns && rep.campaigns.length > 0) {
+      return rep.campaigns;
+    }
+    if (rep.recommendations && rep.recommendations.length > 0) {
+      return rep.recommendations.map((rec: any, i: number) => ({
+        id: `camp_derived_${i}`,
+        name: rec.category || 'Local Growth Mission',
+        status: 'active' as const,
+        progress: Math.min(30, Math.max(10, (i + 1) * 10)),
+        objective: rec.task,
+        kpi: rec.impact || 'Visibility Uplift',
+        priority: rec.priority || 'medium',
+        isVsMission: false,
+        tacticalPlan: [
+          `Audit current metrics for ${rec.category || 'this category'}`,
+          `Draft implementation steps for task: "${rec.task}"`,
+          `Deploy updates and verify impact: "${rec.impact || 'growth'}"`
+        ]
+      }));
+    }
+    return [
+      {
+        id: 'camp_fallback_1',
+        name: 'Local SEO Audit',
+        status: 'active' as const,
+        progress: 25,
+        objective: 'Optimize Google My Business primary categories and citation consistency across major local directories.',
+        kpi: 'Local Search Volume (+15%)',
+        priority: 'high' as const,
+        isVsMission: false,
+        tacticalPlan: [
+          'Audit name, address, phone number (NAP) consistency',
+          'Analyze competitor category selection in primary service locations',
+          'Verify schema structured data on primary local landing pages'
+        ]
+      },
+      {
+        id: 'camp_fallback_2',
+        name: 'Review Acceleration',
+        status: 'active' as const,
+        progress: 10,
+        objective: 'Implement systematic customer review request loop to elevate rating score and local trust.',
+        kpi: 'Customer Reviews (4.8+ Stars)',
+        priority: 'medium' as const,
+        isVsMission: false,
+        tacticalPlan: [
+          'Establish email review follow-up template',
+          'Create localized QR code for instore review prompt',
+          'Draft response templates for incoming feedback loops'
+        ]
+      }
+    ];
+  }, []);
+
   // Local reactive state for campaigns (missions)
-  const [localCampaigns, setLocalCampaigns] = useState<Campaign[]>(report.campaigns || []);
+  const [localCampaigns, setLocalCampaigns] = useState<Campaign[]>(getInitialCampaigns(report));
   const [localSwot, setLocalSwot] = useState(report.swotAnalysis);
   const [isGeneratingSwot, setIsGeneratingSwot] = useState(false);
 
   // Sync state when report changes
   useEffect(() => {
-    setLocalCampaigns(report.campaigns || []);
+    setLocalCampaigns(getInitialCampaigns(report));
     setLocalSwot(report.swotAnalysis);
     setLocalSocialPresence(report.socialPresence || []);
     

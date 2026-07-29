@@ -26,7 +26,7 @@ export async function fetchRealSeoData(domain: string): Promise<any> {
     const contentType = response.headers.get("content-type");
     if (!contentType || contentType.indexOf("application/json") === -1) {
       const text = await response.text();
-      console.error(`Expected JSON from SEO Proxy but received ${contentType}. Payload sample: ${text.substring(0, 100)}`);
+      console.warn(`Expected JSON from SEO Proxy but received ${contentType}. Payload sample: ${text.substring(0, 100)}`);
       return null;
     }
 
@@ -43,7 +43,7 @@ export async function fetchRealSeoData(domain: string): Promise<any> {
     
     return null;
   } catch (error) {
-    console.error('Failed to fetch real SEO data:', error);
+    console.warn('Failed to fetch real SEO data:', error);
     return null;
   }
 }
