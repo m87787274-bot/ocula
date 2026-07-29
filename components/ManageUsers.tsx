@@ -200,17 +200,17 @@ export const ManageUsers: React.FC<ManageUsersProps> = ({ isDarkMode, onBack }) 
                       </td>
                       <td className="px-6 py-4">
                         <span className={`text-sm font-medium ${
-                          user.account.tier === 'premium' ? 'text-purple-500' : 
-                          user.account.tier === 'growth' ? 'text-indigo-500' : 
+                          user?.account?.tier === 'premium' ? 'text-purple-500' : 
+                          user?.account?.tier === 'growth' ? 'text-indigo-500' : 
                           'text-gray-500'
                         }`}>
-                          {user.account.tier.toUpperCase()}
+                          {(user?.account?.tier || 'free').toUpperCase()}
                         </span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2 text-sm text-gray-500">
                           <Calendar className="w-3.5 h-3.5" />
-                          {new Date(user.account.renewalDate).toLocaleDateString()}
+                          {user?.account?.renewalDate ? new Date(user.account.renewalDate).toLocaleDateString() : 'N/A'}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-right">

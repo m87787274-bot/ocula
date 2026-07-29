@@ -463,7 +463,7 @@ const Dashboard: React.FC<DashboardProps> = ({ report, onReset, onRescan, initia
     // Filter Competitors
     if (filters.selectedCompetitors.length > 0) {
       r.competitorComparison = (report.competitorComparison || []).filter(c => 
-        filters.selectedCompetitors.includes(c.name)
+        c && c.name && filters.selectedCompetitors.includes(c.name)
       );
     }
 
@@ -675,12 +675,12 @@ const Dashboard: React.FC<DashboardProps> = ({ report, onReset, onRescan, initia
   const dossierRef = useRef<HTMLDivElement>(null);
 
   const competitorNames = useMemo(() => 
-    (report.competitorComparison || []).map(c => c.name), 
+    (report.competitorComparison || []).filter(c => c && c.name).map(c => c.name), 
   [report.competitorComparison]);
 
   const safeRadarData = useMemo(() => {
     if (filteredReport.radarMetrics && filteredReport.radarMetrics.length > 0) {
-      return filteredReport.radarMetrics.map(m => ({
+      return filteredReport.radarMetrics.filter(m => m).map(m => ({
         subject: m.subject || 'Metric',
         A: Number(m.A) || 0,
         benchmark: 65,
@@ -688,7 +688,7 @@ const Dashboard: React.FC<DashboardProps> = ({ report, onReset, onRescan, initia
       }));
     }
     if (filteredReport.categories && filteredReport.categories.length > 0) {
-      return filteredReport.categories.map(c => ({
+      return filteredReport.categories.filter(c => c).map(c => ({
         subject: c.name ? c.name.split(' ')[0] : 'Metric',
         A: Number(c.score) || 0,
         benchmark: 65,
@@ -776,7 +776,7 @@ const Dashboard: React.FC<DashboardProps> = ({ report, onReset, onRescan, initia
   }, [filteredReport.keywordAnalysis?.suggestedKeywords]);
 
   const treemapData = useMemo(() => {
-    return (filteredReport.categories || []).map(c => ({
+    return (filteredReport.categories || []).filter(c => c && c.name).map(c => ({
       name: c.name,
       size: c.score,
       status: c.status
@@ -3464,7 +3464,7 @@ const Dashboard: React.FC<DashboardProps> = ({ report, onReset, onRescan, initia
                     renewalDate: new Date().toISOString()
                   };
                   
-                  const tierConfig = TIER_CONFIGS[account.tier];
+                  const tierConfig = TIER_CONFIGS[account.tier] || TIER_CONFIGS['free'];
                   const usagePercentage = account.unitsTotal > 0 
                     ? Math.min(100, (account.unitsUsed / account.unitsTotal) * 100)
                     : 0;
@@ -3630,7 +3630,7 @@ const Dashboard: React.FC<DashboardProps> = ({ report, onReset, onRescan, initia
           <CompetitorTracking 
             report={filteredReport} 
             isDarkMode={isDarkMode} 
-            maxCompetitors={TIER_CONFIGS[currentTier].limits.competitors} 
+            maxCompetitors={(TIER_CONFIGS[currentTier] || TIER_CONFIGS.free).limits.competitors} 
             onDeployVsMission={deployVsMission}
             isDominanceTier={currentTier === 'premium'}
           />

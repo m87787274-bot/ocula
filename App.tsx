@@ -1925,7 +1925,8 @@ const AppContent: React.FC = () => {
                     growth: 1,
                     premium: 2,
                   };
-                  const userTierLevel = user ? tierLevels[user.account.tier] : 0;
+                  const userTier = user?.account?.tier || "free";
+                  const userTierLevel = tierLevels[userTier] || 0;
                   const requiredTierLevel = tierLevels[tmpl.requiredTier || "free"];
                   const isLocked = userTierLevel < requiredTierLevel;
 
