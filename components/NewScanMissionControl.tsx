@@ -4,7 +4,8 @@ import {
   Building2, MapPin, Globe, Activity, Users, Plus, X, 
   Sparkles, Shield, Cpu, Zap, CheckCircle2, AlertCircle, 
   Clock, Search, HelpCircle, Layers, ShieldAlert,
-  ArrowRight, Apple, Facebook, Linkedin, Instagram, Video, Link
+  ArrowRight, Apple, Facebook, Linkedin, Instagram, Video, Link,
+  ChevronDown, ChevronUp
 } from 'lucide-react';
 import { EntityInput, ScryTemplate, User, SubscriptionTier } from '../types';
 import { INDUSTRIES, COMPANY_SIZES } from '../src/constants/industries';
@@ -225,6 +226,7 @@ export const NewScanMissionControl: React.FC<NewScanMissionControlProps> = ({
   const [competitorList, setCompetitorList] = useState<string[]>([]);
   const [industrySearch, setIndustrySearch] = useState("");
   const [showIndustryDropdown, setShowIndustryDropdown] = useState(false);
+  const [showAllSources, setShowAllSources] = useState(false);
   
   // Suggestions filter
   const filteredSuggestions = CURATED_COMPANIES.filter(c => 
@@ -645,8 +647,8 @@ export const NewScanMissionControl: React.FC<NewScanMissionControlProps> = ({
                   <h4 id="connected-sources-title" className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
                     Connected Sources
                   </h4>
-                  <p className="text-xs text-slate-400 dark:text-slate-500">
-                    52 channels indexed
+                  <p className="text-xs text-slate-400 dark:text-slate-500 font-medium">
+                    {showAllSources ? "17 of 52 channels loaded" : "8 of 52 channels loaded"}
                   </p>
                 </div>
               </div>
@@ -692,11 +694,11 @@ export const NewScanMissionControl: React.FC<NewScanMissionControlProps> = ({
                   )
                 },
                 { 
-                  name: "Apple", 
-                  desc: "Apple Maps", 
+                  name: "YouTube", 
+                  desc: "Video Platform Reputation", 
                   icon: (
-                    <svg viewBox="0 0 170 170" className="w-8 h-8" fill="currentColor">
-                      <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.34.13-9.13-1.93-14.37-6.23-3.41-2.87-7.23-7.58-11.47-14.12-7.85-12.12-14.07-25.75-18.66-40.93-4.59-15.17-6.88-29.35-6.88-42.53 0-14.83 3.65-26.6 10.95-35.31 7.3-8.71 16.32-13.11 27.06-13.22 5.56 0 11.45 1.54 17.67 4.64 6.22 3.1 10.45 4.65 12.69 4.65 1.78 0 6.07-1.54 12.87-4.65 6.8-3.1 12.44-4.54 16.92-4.3 11.8.47 21.05 4.79 27.76 12.95 6.7 8.16 10 18.27 9.87 30.34-1.41 10.51-6.13 19.38-14.17 26.6-8.04 7.23-17.21 11.22-27.53 11.96 1.48 5.64 4.02 11.48 7.6 17.51 3.58 6.03 7.02 10.74 10.33 14.12zM119.22 32.22c0-7.3 2.61-13.88 7.82-19.74 5.21-5.86 11.45-9.13 18.72-9.8 1.4 7.74-1.12 14.8-7.56 21.17-6.44 6.37-13.06 9.61-18.98 9.72-.11-1.35-.11-2.45-.11-3.6z" className="text-slate-900 dark:text-white" />
+                    <svg viewBox="0 0 24 24" className="w-8 h-8">
+                      <path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.108C19.53 3.5 12 3.5 12 3.5s-7.53 0-9.388.555A3.003 3.003 0 0 0 .502 6.163C0 8.018 0 12 0 12s0 3.982.502 5.837a3.003 3.003 0 0 0 2.11 2.108C4.47 20.5 12 20.5 12 20.5s7.53 0 9.388-.555a3.003 3.003 0 0 0 2.11-2.108C24 15.982 24 12 24 12s0-3.982-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" fill="#FF0000" />
                     </svg>
                   )
                 },
@@ -764,6 +766,123 @@ export const NewScanMissionControl: React.FC<NewScanMissionControlProps> = ({
               ))}
             </div>
 
+            {/* Expandable Section with 12 More Premium Channels */}
+            <AnimatePresence>
+              {showAllSources && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  className="overflow-hidden mt-4"
+                >
+                  <div className="grid grid-cols-4 gap-4 pt-4 border-t border-slate-50 dark:border-slate-900/40">
+                    {[
+                      {
+                        name: "Reddit",
+                        desc: "Community Sentiment Signals",
+                        icon: (
+                          <svg viewBox="0 0 24 24" className="w-8 h-8">
+                            <circle cx="12" cy="12" r="10" fill="#FF4500" />
+                            <path d="M17.16 11.23c0-.62-.51-1.12-1.14-1.12c-.31 0-.6.13-.8.34c-.95-.66-2.25-1.08-3.69-1.13l.79-2.48l2.58.55c0 .48.39.87.87.87a.88.88 0 0 0 .88-.87c0-.48-.39-.87-.88-.87c-.38 0-.7.25-.82.6l-2.76-.59a.213.213 0 0 0-.25.13l-.87 2.74c-1.46.04-2.78.47-3.74 1.13c-.2-.21-.49-.34-.8-.34c-.63 0-1.14.5-1.14 1.12c0 .44.25.82.62 1.01a3.864 3.864 0 0 0-.05.58c0 2.17 2.45 3.93 5.46 3.93c3.01 0 5.46-1.76 5.46-3.93c0-.2-.02-.39-.05-.58c.37-.19.62-.57.62-1.01zm-7.64.91c0-.46.37-.84.84-.84c.46 0 .84.38.84.84s-.37.84-.84.84a.837.837 0 0 1-.84-.84zm4.98 2.21c-.56.56-1.63.61-2 .61c-.38 0-1.45-.05-2-.61a.208.208 0 0 1 0-.29a.208.208 0 0 1 .29 0c.43.43 1.25.48 1.71.48c.46 0 1.28-.05 1.71-.48a.208.208 0 0 1 .29 0c.08.08.08.21 0 .29zm-.64-1.37c-.46 0-.84-.38-.84-.84s.37-.84.84-.84c.46 0 .84.38.84.84s-.38.84-.84.84z" fill="#FFF" />
+                          </svg>
+                        )
+                      },
+                      {
+                        name: "Pinterest",
+                        desc: "Visual Discovery & Trends",
+                        icon: (
+                          <svg viewBox="0 0 24 24" className="w-8 h-8">
+                            <path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174c-.105-.949-.2-2.405.042-3.441c.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914c1.023 0 1.518.769 1.518 1.69c0 1.029-.655 2.568-.993 3.995c-.283 1.194.599 2.169 1.777 2.169c2.133 0 3.772-2.249 3.772-5.495c0-2.873-2.064-4.882-5.012-4.882c-3.414 0-5.418 2.561-5.418 5.207c0 1.031.397 2.138.893 2.738c.098.119.112.224.083.345l-.333 1.36c-.053.22-.174.267-.402.161C4.488 16.141 3.5 14.102 3.5 11.758c0-3.824 2.778-7.333 8.01-7.333c4.205 0 7.471 2.997 7.471 7.002c0 4.178-2.634 7.542-6.289 7.542c-1.228 0-2.385-.638-2.779-1.393l-.758 2.886c-.274 1.045-1.014 2.355-1.511 3.165C8.834 23.834 10.378 24 12 24c6.627 0 12-5.373 12-12C24 5.373 18.627 0 12 0z" fill="#BD081C" />
+                          </svg>
+                        )
+                      },
+                      {
+                        name: "Yelp",
+                        desc: "Local Directory Sentiment",
+                        icon: (
+                          <svg viewBox="0 0 24 24" className="w-8 h-8">
+                            <path d="M12.23 15.11c-.34-.02-.68.12-.87.41l-2.02 3.1c-.2.31-.13.72.16.95l1.96 1.5c.29.22.7.18.94-.1l2.02-3.1c.2-.31.13-.72-.16-.95l-1.63-1.25a1 1 0 0 0-.4-.56zm-.46-6.22c.31-.15.48-.49.44-.83l-.43-3.68c-.04-.37-.37-.64-.74-.6l-2.45.28c-.37.04-.64.37-.6.74l.43 3.68c.04.37.37.64.74.6l1.86-.21a1.002 1.002 0 0 0 .75-.66zm5.8 4.29l3.14-.99c.35-.11.53-.49.41-.83l-.98-2.27c-.15-.34-.54-.5-.88-.36l-3.14.99c-.35.11-.53.49-.41.83l1.1 2.53a1.01 1.01 0 0 0 .76.1zm-8.8 1.94l-3.21.36c-.36.04-.63.37-.59.74l.26 2.45c.04.36.37.63.74.59l3.21-.36c.36-.04.63-.37.59-.74l-.45-2.54a1 1 0 0 0-.55-.5zm9.58-.27l-2.61-2.05c-.29-.23-.7-.18-.94.1l-2.02 3.1c-.2.31-.13.72.16.95l2.61 2.05c.29.23.7.18.94-.1l2.02-3.1c.2-.31.13-.72-.16-.95z" fill="#D32323" />
+                          </svg>
+                        )
+                      },
+                      {
+                        name: "Trustpilot",
+                        desc: "Brand Integrity Audits",
+                        icon: (
+                          <svg viewBox="0 0 24 24" className="w-8 h-8">
+                            <path d="M22.7 8.9h-7.1L13.4 2c-.3-.8-1.5-.8-1.8 0L9.4 8.9H2.3c-.9 0-1.2 1.1-.5 1.6l5.7 4.2L5.3 21.5c-.3.8.6 1.5 1.3 1l5.7-4.2l5.7 4.2c.7.5 1.6-.2 1.3-1l-2.2-6.8l5.7-4.2c.7-.5.4-1.6-.5-1.6zM12 16.7l-4.5 3.3l1.7-5.3l-4.5-3.3h5.6l1.7-5.3l1.7 5.3h5.6l-4.5 3.3l1.7 5.3L12 16.7z" fill="#00B67A" />
+                          </svg>
+                        )
+                      },
+                      {
+                        name: "X",
+                        desc: "Real-time Footprint",
+                        icon: (
+                          <svg viewBox="0 0 24 24" className="w-8 h-8 text-slate-900 dark:text-white" fill="currentColor">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                          </svg>
+                        )
+                      },
+                      {
+                        name: "Threads",
+                        desc: "Meta Text Conversational Flow",
+                        icon: (
+                          <svg viewBox="0 0 24 24" className="w-8 h-8 text-slate-900 dark:text-white" fill="currentColor">
+                            <path d="M15.142 12.316c-.114.027-.225.048-.335.064a3.86 3.86 0 0 1-2.31-.225c-.702-.316-1.185-.85-1.442-1.583a3.54 3.54 0 0 1-.035-1.921c.214-.737.662-1.288 1.341-1.637c.563-.29 1.173-.38 1.802-.275a3.17 3.17 0 0 1 2.221 1.761c.218.498.271 1.018.17 1.547a4.13 4.13 0 0 1-.72 1.633c-.34.463-.765.833-1.267 1.077c-.114.055-.23.104-.347.15c.342.348.744.577 1.202.668c.843.167 1.63-.008 2.338-.48a7.89 7.89 0 0 0 1.956-2.036c.642-.99 1.026-2.063 1.116-3.238c.117-1.523-.195-2.966-.96-4.275a9.3 9.3 0 0 0-3.32-3.41c-1.533-.91-3.208-1.32-4.991-1.218A9.74 9.74 0 0 0 4.19 5.562C3.12 7.026 2.5 8.683 2.35 10.493c-.15 1.83.195 3.585.992 5.195a9.49 9.49 0 0 0 3.333 3.52c1.543.922 3.234 1.34 5.031 1.25a9.7 9.7 0 0 0 6.643-3.62c.31-.383.61-.781.823-1.23a.62.62 0 0 0-.171-.787a.64.64 0 0 0-.825.07c-.43.435-.875.856-1.385 1.21a8.38 8.38 0 0 1-5.18 1.79c-1.517.025-2.96-.346-4.24-1.183a8.1 8.1 0 0 1-2.985-3.155c-.71-1.424-.972-2.946-.774-4.54a8.31 8.31 0 0 1 1.51-3.955c.917-1.295 2.128-2.222 3.633-2.737c1.558-.533 3.142-.516 4.707.031a8.13 8.13 0 0 1 4.1 3.197c.541.831.812 1.745.815 2.74c.005 1.458-.423 2.748-1.285 3.86a6.83 6.83 0 0 1-2.825 2.19c-.31.127-.63.228-.96.297zm-1.144-4.323c.31-.055.6-.18.843-.377a1.86 1.86 0 0 0 .543-.801c.142-.423.11-.84-.1-1.234a1.8 1.8 0 0 0-.8-.857c-.422-.228-.868-.28-1.328-.157a1.82 1.82 0 0 0-1.17 1.057c-.173.4-.15.8-.027 1.2c.162.53.513.896.994 1.107c.333.146.68.143 1.045.062z" />
+                          </svg>
+                        )
+                      },
+                      {
+                        name: "Quora",
+                        desc: "Q&A Authority Profile",
+                        icon: (
+                          <svg viewBox="0 0 24 24" className="w-8 h-8">
+                            <path d="M12.5 1A10.5 10.5 0 0 0 2 11.5c0 5.4 4.1 9.9 9.5 10.4c.5 0 .9.3.9.8l.2.8c.1.5.6.8 1.1.5l1.6-1.1c.3-.2.7-.2 1-.1c4.5.9 8.7-2.1 9.5-6.6c.9-4.7-2.1-9.2-6.8-10C17.3 1.2 14.9 1 12.5 1zm-.5 17c-3.6 0-6.5-2.9-6.5-6.5S8.4 5 12 5s6.5 2.9 6.5 6.5s-2.9 6.5-6.5 6.5zm5.5-2.1c.3.3.3.8 0 1.1c-.3.3-.8.3-1.1 0l-1.9-1.9c-.3-.3-.3-.8 0-1.1c.3-.3.8-.3 1.1 0l1.9 1.9z" fill="#AA2200" />
+                          </svg>
+                        )
+                      },
+                      {
+                        name: "GitHub",
+                        desc: "Tech Presence & Audits",
+                        icon: (
+                          <svg viewBox="0 0 24 24" className="w-8 h-8 text-slate-900 dark:text-white" fill="currentColor">
+                            <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+                          </svg>
+                        )
+                      },
+                      {
+                        name: "Play Store",
+                        desc: "App Store Reputation Data",
+                        icon: (
+                          <svg viewBox="0 0 24 24" className="w-8 h-8">
+                            <path d="M3 5.277c0-.2.052-.382.146-.537l9.043 9.042l-9.043 9.043c-.094-.155-.146-.337-.146-.537V5.277z" fill="#EA4335" />
+                            <path d="M17.062 10.742L3.896 3.14a1.076 1.076 0 0 0-.75-.11l9.043 9.043l4.873-4.873l.001.002-.001-.46z" fill="#FBBC05" />
+                            <path d="M3.146 21.26a1.077 1.077 0 0 0 .75-.11l13.167-7.602l.001-.462l-4.875-4.875l-9.043 9.043v.006z" fill="#34A853" />
+                            <path d="M17.062 13.258l4.475-2.583c.613-.354.613-.934 0-1.288l-4.475-2.584L12.189 12l4.873 4.873v-3.615z" fill="#4285F4" />
+                          </svg>
+                        )
+                      }
+                    ].map((src, idx) => (
+                      <div 
+                        id={`source-item-expanded-${src.name.toLowerCase().replace(' ', '-')}`}
+                        key={`expanded-${idx}`}
+                        className="bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-850 border border-slate-100 dark:border-slate-800/60 hover:border-slate-200 dark:hover:border-slate-700 rounded-2xl p-4 text-center transition-all cursor-pointer group flex flex-col items-center justify-center gap-3 shadow-sm hover:shadow-md"
+                        title={`${src.name} - ${src.desc}`}
+                      >
+                        <div id={`source-logo-expanded-${src.name}`} className="flex items-center justify-center w-10 h-10 group-hover:scale-105 transition-transform duration-200">
+                          {src.icon}
+                        </div>
+                        <div id={`source-symbol-expanded-${src.name}`} className="text-slate-700 dark:text-slate-300 font-semibold text-xs tracking-tight whitespace-nowrap">
+                          {src.name}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/60 flex justify-between items-center">
               <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-semibold">
                 <div className="w-5 h-5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shadow-sm">
@@ -773,10 +892,15 @@ export const NewScanMissionControl: React.FC<NewScanMissionControlProps> = ({
               </div>
               <button 
                 type="button" 
-                className="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:hover:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 rounded-full text-[11px] font-bold flex items-center gap-1 transition-all"
+                onClick={() => setShowAllSources(!showAllSources)}
+                className="px-4 py-1.5 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:hover:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm active:scale-95"
               >
-                <span>+12 more</span>
-                <ArrowRight className="w-3 h-3" />
+                <span>{showAllSources ? "Show less" : "+9 more"}</span>
+                {showAllSources ? (
+                  <ChevronUp className="w-3.5 h-3.5" />
+                ) : (
+                  <ChevronDown className="w-3.5 h-3.5" />
+                )}
               </button>
             </div>
           </div>
