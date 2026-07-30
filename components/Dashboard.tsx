@@ -3038,7 +3038,8 @@ const Dashboard: React.FC<DashboardProps> = ({ report, onReset, onRescan, initia
 
                 if (widget.id === 'rivalSnapshot') {
                   const topRivals = [...(report.competitorComparison || [])]
-                    .sort((a, b) => b.score - a.score);
+                    .filter(c => c && typeof c === 'object')
+                    .sort((a, b) => (Number(b.score) || 0) - (Number(a.score) || 0));
                   
                   return (
                     <div key="competitorAnalysis" id="widget-competitorAnalysis" className="surface p-6 rounded-xl hover-lift scroll-mt-32">
