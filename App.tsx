@@ -19,6 +19,7 @@ import {
   TemplateDefinition,
   EntityInput,
   ScanStatus,
+  SavedScan,
 } from "./types";
 import { Permission, hasPermission } from "./src/constants/permissions";
 import { INDUSTRIES, COMPANY_SIZES } from "./src/constants/industries";
@@ -176,6 +177,7 @@ type ScanAction =
       type: "SET_COMPLETE";
       report: VisibilityReport;
       reports: VisibilityReport[];
+      scanId?: string;
     }
   | { type: "SET_REPORT"; report: VisibilityReport; scanId?: string }
   | { type: "RESET" };
@@ -226,6 +228,7 @@ const scanReducer = (state: SearchState, action: ScanAction): SearchState => {
         message: action.reports.length > 1 ? "Comparison Complete" : "Complete",
         report: action.report,
         reports: action.reports,
+        scanId: action.scanId ?? state.scanId,
         error: null,
       };
     case "RESET":
@@ -472,8 +475,26 @@ const AppContent: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Sync with AI Studio is no longer needed in the frontend
-    // as we use server-side API keys.
+    const params = new URLSearchParams(window.location.search);
+    const permalinkScanId = params.get("scan") || params.get("scanId");
+    if (permalinkScanId) {
+      const loadPermalinkScan = async () => {
+        try {
+          const scan = await storageService.getScanById(permalinkScanId);
+          if (scan && scan.report) {
+            dispatch({
+              type: "SET_REPORT",
+              report: scan.report,
+              scanId: scan.id,
+            });
+            setView("home");
+          }
+        } catch (err) {
+          console.warn("Failed to load permalink scan:", err);
+        }
+      };
+      loadPermalinkScan();
+    }
   }, []);
 
   const handleLogout = async () => {
@@ -798,17 +819,20 @@ const AppContent: React.FC = () => {
           localStorage.setItem("ocula_has_scanned", "true");
         }
 
+        const savedScans: SavedScan[] = [];
         for (const report of reports) {
           report.focusMode = scanTemplate;
-          await storageService.saveScan(
+          const saved = await storageService.saveScan(
             report.businessName,
             report.overallScore,
             report,
           );
+          if (saved) savedScans.push(saved);
         }
 
         setInitialTab("overview");
-        dispatch({ type: "SET_COMPLETE", report: reports[0], reports });
+        const primaryScanId = savedScans.length > 0 ? savedScans[0].id : undefined;
+        dispatch({ type: "SET_COMPLETE", report: reports[0], reports, scanId: primaryScanId });
         if (reports.length > 1) {
           setView("compare");
         }

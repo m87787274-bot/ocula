@@ -47,9 +47,9 @@ const KeyInsightsDashboard: React.FC<KeyInsightsDashboardProps> = React.memo(({ 
         {/* Visibility Index Card */}
         <div className="lg:col-span-2 surface p-4 rounded-xl sm:rounded-xl shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 relative overflow-hidden group hover-lift transition-all">
           <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/5 rounded-full blur-[100px] -mr-48 -mt-48 transition-all group-hover:bg-indigo-500/10"></div>
-          <div className="relative z-10 flex flex-col md:flex-row items-center gap-4">
-            <div className="flex flex-col items-center text-center">
-              <div className="relative w-52 h-52 md:w-56 md:h-56 flex items-center justify-center">
+          <div className="relative z-10 flex flex-col xl:flex-row items-center xl:items-start gap-6">
+            <div className="flex flex-col items-center text-center shrink-0">
+              <div className="relative w-44 h-44 sm:w-48 sm:h-48 flex items-center justify-center">
                 <svg className="w-full h-full -rotate-90" viewBox="0 0 200 200">
                   <circle
                     cx="100"
@@ -79,51 +79,51 @@ const KeyInsightsDashboard: React.FC<KeyInsightsDashboardProps> = React.memo(({ 
                   </defs>
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-5xl md:text-6xl font-black text-slate-900 dark:text-white tracking-tight">{report.overallScore}</span>
-                  <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Index Score</span>
+                  <span className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">{report.overallScore}</span>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Index Score</span>
                 </div>
               </div>
-              <div className="mt-4 flex flex-col gap-2">
+              <div className="mt-3 flex flex-col gap-2">
                 <div className="px-4 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 rounded-full border border-indigo-100 dark:border-indigo-800">
-                  <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">{(report.profileBadge?.visibilityLevel || 'Emerging')} Presence</span>
+                  <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest whitespace-nowrap">{(report.profileBadge?.visibilityLevel || 'Emerging')} Presence</span>
                 </div>
                 {report.overallScore >= 85 && (
                   <div className="px-4 py-1.5 bg-amber-50 dark:bg-amber-900/30 rounded-full border border-amber-100 dark:border-amber-800 flex items-center gap-1.5 justify-center animate-bounce">
                     <Zap className="w-3 h-3 text-amber-500 fill-amber-500" />
-                    <span className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest text-center">Top Performer</span>
+                    <span className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest text-center whitespace-nowrap">Top Performer</span>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-4">
-                <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Intelligence Score</h3>
-                <p className="text-slate-500 dark:text-slate-400 font-bold leading-tight line-clamp-2">
+            <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-4 items-start min-w-0">
+              <div className="space-y-3 min-w-0">
+                <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight uppercase leading-tight">Intelligence Score</h3>
+                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-bold leading-relaxed line-clamp-2">
                   {report.visibilityIndex?.summary || 'No summary available.'}
                 </p>
-                <div className="flex flex-col gap-2">
-                  <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-between">
-                    <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase">Strength</span>
-                    <span className="text-xs font-bold text-slate-900 dark:text-white truncate max-w-[120px]">{report.visibilityIndex?.biggestStrength || 'Not Available'}</span>
+                <div className="flex flex-col gap-2 pt-1">
+                  <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-between gap-2 overflow-hidden">
+                    <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase shrink-0 whitespace-nowrap">Strength</span>
+                    <span className="text-xs font-bold text-slate-900 dark:text-white truncate text-right">{report.visibilityIndex?.biggestStrength || 'Not Available'}</span>
                   </div>
-                  <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center justify-between">
-                    <span className="text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase">Gap</span>
-                    <span className="text-xs font-bold text-slate-900 dark:text-white truncate max-w-[120px]">{report.visibilityIndex?.primaryGap || 'Not Available'}</span>
+                  <div className="p-2.5 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center justify-between gap-2 overflow-hidden">
+                    <span className="text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase shrink-0 whitespace-nowrap">Gap</span>
+                    <span className="text-xs font-bold text-slate-900 dark:text-white truncate text-right">{report.visibilityIndex?.primaryGap || 'Not Available'}</span>
                   </div>
                 </div>
               </div>
-              <div className="h-[200px] w-full">
+              <div className="h-[180px] sm:h-[200px] w-full min-w-0 flex items-center justify-center">
                 <ResponsiveContainer width="100%" height="100%">
-                  <RadarChart cx="50%" cy="50%" outerRadius="60%" data={radarData}>
+                  <RadarChart cx="50%" cy="50%" outerRadius="48%" data={radarData}>
                     <PolarGrid stroke={isDarkMode ? "#1e293b" : "#f1f5f9"} />
-                    <PolarAngleAxis dataKey="subject" tick={{ fill: isDarkMode ? '#94a3b8' : '#64748b', fontSize: 10, fontWeight: 900 }} />
+                    <PolarAngleAxis dataKey="subject" tick={{ fill: isDarkMode ? '#94a3b8' : '#64748b', fontSize: 9, fontWeight: 800 }} />
                     <Radar
                       name="Intelligence"
                       dataKey="A"
                       stroke="#6366f1"
                       fill="#6366f1"
-                      fillOpacity={0.2}
+                      fillOpacity={0.25}
                       strokeWidth={2}
                     />
                   </RadarChart>

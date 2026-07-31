@@ -1,5 +1,6 @@
 import { 
   collection, 
+  collectionGroup,
   doc, 
   getDoc, 
   getDocs, 
@@ -134,6 +135,63 @@ export const storageService = {
         return [];
       }
     }
+  },
+
+  getScanById: async (scanId: string): Promise<SavedScan | null> => {
+    if (!scanId) return null;
+    
+    // 1. Check local storage across guest and user keys
+    try {
+      const guestScans = JSON.parse(localStorage.getItem('ocula_guest_scans') || '[]');
+      const foundGuest = guestScans.find((s: any) => s && s.id === scanId);
+      if (foundGuest) return foundGuest;
+
+      const user = auth.currentUser;
+      if (user) {
+        const userScans = JSON.parse(localStorage.getItem(`ocula_scans_${user.uid}`) || '[]');
+        const foundUserLocal = userScans.find((s: any) => s && s.id === scanId);
+        if (foundUserLocal) return foundUserLocal;
+      }
+
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('ocula_scans_')) {
+          try {
+            const items = JSON.parse(localStorage.getItem(key) || '[]');
+            const match = items.find((s: any) => s && s.id === scanId);
+            if (match) return match;
+          } catch (e) {
+            // ignore
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Error reading local storage for scan by ID:', e);
+    }
+
+    // 2. Query via getScans()
+    try {
+      const scans = await storageService.getScans();
+      const match = scans.find(s => s && s.id === scanId);
+      if (match) return match;
+    } catch (e) {
+      console.warn('Error finding scan via getScans:', e);
+    }
+
+    // 3. Fallback: Query collectionGroup('scans') where 'id' == scanId
+    if (!isConfigPlaceholder) {
+      try {
+        const q = query(collectionGroup(db, 'scans'), where('id', '==', scanId), limit(1));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          return snap.docs[0].data() as SavedScan;
+        }
+      } catch (e) {
+        console.warn('Collection group scan query error:', e);
+      }
+    }
+
+    return null;
   },
 
   saveScan: async (businessName: string, score: number, report: VisibilityReport) => {
