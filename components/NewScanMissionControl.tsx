@@ -648,7 +648,7 @@ export const NewScanMissionControl: React.FC<NewScanMissionControlProps> = ({
                     Connected Sources
                   </h4>
                   <p className="text-xs text-slate-400 dark:text-slate-500 font-medium">
-                    {showAllSources ? "17 of 52 channels loaded" : "8 of 52 channels loaded"}
+                    {showAllSources ? "20 of 52 channels loaded" : "8 of 52 channels loaded"}
                   </p>
                 </div>
               </div>
@@ -862,6 +862,38 @@ export const NewScanMissionControl: React.FC<NewScanMissionControlProps> = ({
                             <path d="M17.062 13.258l4.475-2.583c.613-.354.613-.934 0-1.288l-4.475-2.584L12.189 12l4.873 4.873v-3.615z" fill="#4285F4" />
                           </svg>
                         )
+                      },
+                      {
+                        name: "Tripadvisor",
+                        desc: "Local Travel & Dining Footprint",
+                        icon: (
+                          <svg viewBox="0 0 24 24" className="w-8 h-8">
+                            <circle cx="7.5" cy="13.5" r="3.5" fill="none" stroke="#00AF87" strokeWidth="2" />
+                            <circle cx="7.5" cy="13.5" r="1.5" fill="#00AF87" />
+                            <circle cx="16.5" cy="13.5" r="3.5" fill="none" stroke="#00AF87" strokeWidth="2" />
+                            <circle cx="16.5" cy="13.5" r="1.5" fill="#00AF87" />
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.1 0 2 .9 2 2s-.9 2-2 2s-2-.9-2-2s.9-2 2-2z" fill="#00AF87" fillOpacity="0.15" />
+                            <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z" fill="#00AF87" />
+                          </svg>
+                        )
+                      },
+                      {
+                        name: "Nextdoor",
+                        desc: "Hyperlocal Neighborhood Network",
+                        icon: (
+                          <svg viewBox="0 0 24 24" className="w-8 h-8">
+                            <path d="M19 9.3V4h-3v2.3L12 3 2 12h3v9h5v-6h4v6h5v-9h3L19 9.3zM12 5.5l6 5.4V19h-2v-6H10v6H8v-8.1l6-5.4z" fill="#00B55A" />
+                          </svg>
+                        )
+                      },
+                      {
+                        name: "Foursquare",
+                        desc: "Location & Citation Signals",
+                        icon: (
+                          <svg viewBox="0 0 24 24" className="w-8 h-8">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-4H8V9h3V7H9V5h4v6h2v2h-2v3z" fill="#F35787" />
+                          </svg>
+                        )
                       }
                     ].map((src, idx) => (
                       <div 
@@ -895,7 +927,7 @@ export const NewScanMissionControl: React.FC<NewScanMissionControlProps> = ({
                 onClick={() => setShowAllSources(!showAllSources)}
                 className="px-4 py-1.5 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/40 dark:hover:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm active:scale-95"
               >
-                <span>{showAllSources ? "Show less" : "+9 more"}</span>
+                <span>{showAllSources ? "Show less" : "+12 more"}</span>
                 {showAllSources ? (
                   <ChevronUp className="w-3.5 h-3.5" />
                 ) : (
