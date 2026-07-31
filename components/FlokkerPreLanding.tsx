@@ -126,16 +126,164 @@ export const FlokkerPreLanding: React.FC<FlokkerPreLandingProps> = ({
   };
 
   return (
-    <div className="dark bg-[#070B1A] text-[#F8FAFC] min-h-screen font-sans selection:bg-[#6C63FF]/30 overflow-x-hidden relative">
+    <div className="flokker-white-theme bg-white text-slate-800 min-h-screen font-sans selection:bg-[#6C63FF]/30 overflow-x-hidden relative">
+      <style>{`
+        .flokker-white-theme {
+          background-color: #ffffff !important;
+          color: #1e293b !important;
+        }
+        
+        /* Heading elements and white text */
+        .flokker-white-theme h1,
+        .flokker-white-theme h2,
+        .flokker-white-theme h3,
+        .flokker-white-theme h4,
+        .flokker-white-theme h5,
+        .flokker-white-theme h6 {
+          color: #0f172a !important;
+        }
+
+        /* Generic white text to slate text, except for buttons, active pills, or gradients */
+        .flokker-white-theme .text-white:not(button):not(button *):not(.bg-\[\#6C63FF\] *):not(.bg-indigo-600 *):not(.bg-gradient-to-tr *):not(.bg-gradient-to-r *):not(.bg-slate-900\/60 *) {
+          color: #0f172a !important;
+        }
+
+        .flokker-white-theme .text-\[\#F8FAFC\],
+        .flokker-white-theme .text-\[\#f8fafc\] {
+          color: #1e293b !important;
+        }
+
+        /* Slate-gray text */
+        .flokker-white-theme .text-\[\#94A3B8\],
+        .flokker-white-theme .text-\[\#94a3b8\] {
+          color: #475569 !important;
+        }
+
+        /* Background overrides */
+        .flokker-white-theme .bg-\[\#070B1A\] {
+          background-color: #ffffff !important;
+        }
+        .flokker-white-theme .bg-\[\#070B1A\]\/80 {
+          background-color: rgba(255, 255, 255, 0.85) !important;
+          border-color: rgba(15, 23, 42, 0.08) !important;
+        }
+        .flokker-white-theme .bg-\[\#070B1A\]\/70 {
+          background-color: rgba(255, 255, 255, 0.75) !important;
+          border-color: rgba(15, 23, 42, 0.08) !important;
+        }
+        .flokker-white-theme header {
+          background-color: rgba(255, 255, 255, 0.8) !important;
+          border-color: rgba(15, 23, 42, 0.06) !important;
+        }
+
+        /* Cards and sections */
+        .flokker-white-theme .bg-\[\#101828\]\/40,
+        .flokker-white-theme .bg-\[\#101828\]\/35,
+        .flokker-white-theme .bg-\[\#101828\]\/30,
+        .flokker-white-theme .bg-\[\#101828\]\/25,
+        .flokker-white-theme .bg-\[\#101828\] {
+          background-color: #f8fafc !important;
+          border-color: #e2e8f0 !important;
+          box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02) !important;
+        }
+
+        /* Hover states for cards */
+        .flokker-white-theme .hover\:bg-\[\#101828\]\/65:hover {
+          background-color: #f1f5f9 !important;
+        }
+
+        /* Inner background elements */
+        .flokker-white-theme .bg-\[\#111827\]\/80,
+        .flokker-white-theme .bg-\[\#111827\]\/60,
+        .flokker-white-theme .bg-\[\#111827\]\/40,
+        .flokker-white-theme .bg-\[\#111827\]\/30,
+        .flokker-white-theme .bg-\[\#111827\] {
+          background-color: #ffffff !important;
+          border-color: #e2e8f0 !important;
+        }
+
+        /* SVG Globe sphere update */
+        .flokker-white-theme circle[fill="url(#globeSphere)"] {
+          fill: #ffffff !important;
+          stroke: #6C63FF !important;
+          stroke-opacity: 0.15 !important;
+        }
+
+        /* Border line adjustments */
+        .flokker-white-theme .border-white\/5,
+        .flokker-white-theme .border-white\/10 {
+          border-color: #e2e8f0 !important;
+        }
+
+        /* Division borders */
+        .flokker-white-theme .divide-white\/5 > * {
+          border-color: #e2e8f0 !important;
+        }
+
+        /* Nav links and other texts hover */
+        .flokker-white-theme nav a {
+          color: #475569 !important;
+        }
+        .flokker-white-theme nav a:hover {
+          color: #1e293b !important;
+        }
+
+        /* Background elements white/5 and white/10 */
+        .flokker-white-theme .bg-white\/5 {
+          background-color: #f1f5f9 !important;
+        }
+        .flokker-white-theme .bg-white\/10 {
+          background-color: #e2e8f0 !important;
+        }
+        .flokker-white-theme .hover\:bg-white\/10:hover {
+          background-color: #e2e8f0 !important;
+        }
+
+        /* Brand logos and badges opacity on white */
+        .flokker-white-theme .opacity-30 {
+          opacity: 0.75 !important;
+        }
+        .flokker-white-theme .opacity-30 span {
+          color: #475569 !important;
+        }
+
+        /* FAQ block */
+        .flokker-white-theme .bg-slate-900\/60 {
+          background-color: rgba(15, 23, 42, 0.03) !important;
+        }
+
+        /* Modal styling */
+        .flokker-white-theme .bg-\[\#101828\] {
+          background-color: #ffffff !important;
+          border-color: #e2e8f0 !important;
+        }
+
+        /* Footer styling */
+        .flokker-white-theme footer {
+          background-color: #f8fafc !important;
+          border-top-color: #e2e8f0 !important;
+        }
+        .flokker-white-theme footer * {
+          color: #475569 !important;
+        }
+        .flokker-white-theme footer h4 {
+          color: #0f172a !important;
+        }
+        
+        /* Floating cards connectivity to globe */
+        .flokker-white-theme .lg\:col-span-6 .absolute .font-mono {
+          color: #0f172a !important;
+        }
+      `}</style>
       
       {/* BACKGROUND DECORATIVE GRID & ORBITS */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         {/* Subtle geometric layout grid */}
         <div 
-          className="absolute inset-0 opacity-[0.025]"
+          className="absolute inset-0 opacity-[0.4]"
           style={{
-            backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px), 
-                              linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px)`,
+            backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.05) 1px, transparent 1px), 
+                              linear-gradient(90deg, rgba(15, 23, 42, 0.05) 1px, transparent 1px)`,
             backgroundSize: '54px 54px',
           }}
         />

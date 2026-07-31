@@ -4,6 +4,7 @@ import { VisibilityReport, KPI } from '../types';
 import { TrendingUp, TrendingDown, Target, Zap, Shield, AlertCircle, ArrowRight, BarChart3, PieChart, Activity } from 'lucide-react';
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, Radar, Tooltip } from 'recharts';
 import SWOTAnalysis from './SWOTAnalysis';
+import { SolarSystemOrbit } from './SolarSystemOrbit';
 
 interface KeyInsightsDashboardProps {
   report: VisibilityReport;
@@ -15,22 +16,6 @@ interface KeyInsightsDashboardProps {
 
 const KeyInsightsDashboard: React.FC<KeyInsightsDashboardProps> = React.memo(({ report, kpis, isDarkMode, swotFallback, onDefineKPIs }) => {
   const swotData = report.swotAnalysis || swotFallback;
-  const radarData = useMemo(() => {
-    const breakdown = report?.visibilityBreakdown || {
-      googleMyBusiness: 0,
-      socialPresence: 0,
-      brandAuthority: 0,
-      contentStrength: 0,
-      marketPosition: 0
-    };
-    return [
-      { subject: 'GMB', A: breakdown.googleMyBusiness || 0, fullMark: 100 },
-      { subject: 'Social', A: breakdown.socialPresence || 0, fullMark: 100 },
-      { subject: 'Brand', A: breakdown.brandAuthority || 0, fullMark: 100 },
-      { subject: 'Content', A: breakdown.contentStrength || 0, fullMark: 100 },
-      { subject: 'Market', A: breakdown.marketPosition || 0, fullMark: 100 },
-    ];
-  }, [report]);
 
   const kpiSummary = useMemo(() => {
     if (kpis.length === 0) return null;
@@ -44,93 +29,9 @@ const KeyInsightsDashboard: React.FC<KeyInsightsDashboardProps> = React.memo(({ 
     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Top Insights Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Visibility Index Card */}
-        <div className="lg:col-span-2 surface p-4 rounded-xl sm:rounded-xl shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 relative overflow-hidden group hover-lift transition-all">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/5 rounded-full blur-[100px] -mr-48 -mt-48 transition-all group-hover:bg-indigo-500/10"></div>
-          <div className="relative z-10 flex flex-col xl:flex-row items-center xl:items-start gap-6">
-            <div className="flex flex-col items-center text-center shrink-0">
-              <div className="relative w-44 h-44 sm:w-48 sm:h-48 flex items-center justify-center">
-                <svg className="w-full h-full -rotate-90" viewBox="0 0 200 200">
-                  <circle
-                    cx="100"
-                    cy="100"
-                    r="90"
-                    fill="transparent"
-                    stroke={isDarkMode ? "#1e293b" : "#f1f5f9"}
-                    strokeWidth="11"
-                  />
-                  <circle
-                    cx="100"
-                    cy="100"
-                    r="90"
-                    fill="transparent"
-                    stroke="url(#indigoGradient)"
-                    strokeWidth="11"
-                    strokeDasharray={565}
-                    strokeDashoffset={565 - (565 * (Number(report?.overallScore) || 0)) / 100}
-                    strokeLinecap="round"
-                    className="transition-all duration-1000 ease-out"
-                  />
-                  <defs>
-                    <linearGradient id="indigoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#8b8eff" />
-                      <stop offset="100%" stopColor="#5b5fff" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">{report.overallScore}</span>
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Index Score</span>
-                </div>
-              </div>
-              <div className="mt-3 flex flex-col gap-2">
-                <div className="px-4 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 rounded-full border border-indigo-100 dark:border-indigo-800">
-                  <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest whitespace-nowrap">{(report.profileBadge?.visibilityLevel || 'Emerging')} Presence</span>
-                </div>
-                {report.overallScore >= 85 && (
-                  <div className="px-4 py-1.5 bg-amber-50 dark:bg-amber-900/30 rounded-full border border-amber-100 dark:border-amber-800 flex items-center gap-1.5 justify-center animate-bounce">
-                    <Zap className="w-3 h-3 text-amber-500 fill-amber-500" />
-                    <span className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest text-center whitespace-nowrap">Top Performer</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-4 items-start min-w-0">
-              <div className="space-y-3 min-w-0">
-                <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight uppercase leading-tight">Intelligence Score</h3>
-                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-bold leading-relaxed line-clamp-2">
-                  {report.visibilityIndex?.summary || 'No summary available.'}
-                </p>
-                <div className="flex flex-col gap-2 pt-1">
-                  <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-between gap-2 overflow-hidden">
-                    <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase shrink-0 whitespace-nowrap">Strength</span>
-                    <span className="text-xs font-bold text-slate-900 dark:text-white truncate text-right">{report.visibilityIndex?.biggestStrength || 'Not Available'}</span>
-                  </div>
-                  <div className="p-2.5 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center justify-between gap-2 overflow-hidden">
-                    <span className="text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase shrink-0 whitespace-nowrap">Gap</span>
-                    <span className="text-xs font-bold text-slate-900 dark:text-white truncate text-right">{report.visibilityIndex?.primaryGap || 'Not Available'}</span>
-                  </div>
-                </div>
-              </div>
-              <div className="h-[180px] sm:h-[200px] w-full min-w-0 flex items-center justify-center">
-                <ResponsiveContainer width="100%" height="100%">
-                  <RadarChart cx="50%" cy="50%" outerRadius="48%" data={radarData}>
-                    <PolarGrid stroke={isDarkMode ? "#1e293b" : "#f1f5f9"} />
-                    <PolarAngleAxis dataKey="subject" tick={{ fill: isDarkMode ? '#94a3b8' : '#64748b', fontSize: 9, fontWeight: 800 }} />
-                    <Radar
-                      name="Intelligence"
-                      dataKey="A"
-                      stroke="#6366f1"
-                      fill="#6366f1"
-                      fillOpacity={0.25}
-                      strokeWidth={2}
-                    />
-                  </RadarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
+        {/* Visibility Index Solar System Card */}
+        <div className="lg:col-span-2">
+          <SolarSystemOrbit report={report} isDarkMode={isDarkMode} />
         </div>
 
         {/* Recommended Next Move Card */}
