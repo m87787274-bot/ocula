@@ -133,7 +133,7 @@ export const FlokkerPreLanding: React.FC<FlokkerPreLandingProps> = ({
           color: #1e293b !important;
         }
         
-        /* Heading elements and white text */
+        /* Heading elements - deep rich dark slate */
         .flokker-white-theme h1,
         .flokker-white-theme h2,
         .flokker-white-theme h3,
@@ -143,20 +143,109 @@ export const FlokkerPreLanding: React.FC<FlokkerPreLandingProps> = ({
           color: #0f172a !important;
         }
 
-        /* Generic white text to slate text, except for buttons, active pills, or gradients */
-        .flokker-white-theme .text-white:not(button):not(button *):not(.bg-\[\#6C63FF\] *):not(.bg-indigo-600 *):not(.bg-gradient-to-tr *):not(.bg-gradient-to-r *):not(.bg-slate-900\/60 *) {
-          color: #0f172a !important;
-        }
-
+        /* Generic white/light texts mapped to slate-800 for high readability on white */
+        .flokker-white-theme .text-white,
+        .flokker-white-theme [class*="text-white/"],
+        .flokker-white-theme .text-slate-100,
+        .flokker-white-theme .text-slate-200,
+        .flokker-white-theme .text-slate-300,
+        .flokker-white-theme .text-slate-400,
+        .flokker-white-theme .text-gray-100,
+        .flokker-white-theme .text-gray-200,
+        .flokker-white-theme .text-gray-300,
+        .flokker-white-theme .text-gray-400,
+        .flokker-white-theme .text-neutral-100,
+        .flokker-white-theme .text-neutral-200,
+        .flokker-white-theme .text-neutral-300,
+        .flokker-white-theme .text-neutral-400,
+        .flokker-white-theme .text-indigo-100,
+        .flokker-white-theme .text-indigo-200,
+        .flokker-white-theme .text-indigo-300,
+        .flokker-white-theme .text-indigo-400,
+        .flokker-white-theme .text-indigo-50,
         .flokker-white-theme .text-\[\#F8FAFC\],
         .flokker-white-theme .text-\[\#f8fafc\] {
           color: #1e293b !important;
         }
 
-        /* Slate-gray text */
+        /* Gray/slate muted text mapped to slate-600 to ensure perfect WCAG contrast pass */
+        .flokker-white-theme .text-slate-500,
+        .flokker-white-theme .text-slate-600,
+        .flokker-white-theme .text-gray-500,
+        .flokker-white-theme .text-gray-600,
+        .flokker-white-theme .text-neutral-500,
+        .flokker-white-theme .text-neutral-600,
         .flokker-white-theme .text-\[\#94A3B8\],
         .flokker-white-theme .text-\[\#94a3b8\] {
           color: #475569 !important;
+        }
+
+        /* Specific brand highlights and badge colors tuned to higher contrast versions for light bg */
+        .flokker-white-theme .text-\[\#6C63FF\],
+        .flokker-white-theme .text-\[\#6c63ff\] {
+          color: #4f46e5 !important; /* Premium Indigo-600 */
+        }
+        .flokker-white-theme .text-\[\#8B5CF6\],
+        .flokker-white-theme .text-\[\#8b5cf6\] {
+          color: #6d28d9 !important; /* Premium Violet-700 */
+        }
+        .flokker-white-theme .text-\[\#4F8BFF\],
+        .flokker-white-theme .text-\[\#4f8bff\] {
+          color: #1d4ed8 !important; /* Royal Blue-700 */
+        }
+        .flokker-white-theme .text-\[\#FDBA2D\],
+        .flokker-white-theme .text-\[\#fdba2d\] {
+          color: #b45309 !important; /* Warm Amber-700 */
+        }
+        .flokker-white-theme .text-emerald-400 {
+          color: #047857 !important; /* Emerald-700 */
+        }
+        .flokker-white-theme .text-rose-400 {
+          color: #be123c !important; /* Rose-700 */
+        }
+
+        /* Base element rules for body paragraph elements to ensure readable reading line lengths and weights */
+        .flokker-white-theme p {
+          color: #334155 !important;
+        }
+
+        /* Re-assert pristine white text ONLY on elements with solid bright background fills and buttons */
+        .flokker-white-theme .bg-\[\#6C63FF\],
+        .flokker-white-theme .bg-\[\#6C63FF\] *,
+        .flokker-white-theme .bg-\[\#8B5CF6\],
+        .flokker-white-theme .bg-\[\#8B5CF6\] *,
+        .flokker-white-theme .bg-\[\#4F8BFF\],
+        .flokker-white-theme .bg-\[\#4F8BFF\] *,
+        .flokker-white-theme .bg-\[\#5a52e0\],
+        .flokker-white-theme .bg-\[\#5a52e0\] *,
+        .flokker-white-theme .bg-indigo-600,
+        .flokker-white-theme .bg-indigo-600 *,
+        .flokker-white-theme .bg-emerald-500,
+        .flokker-white-theme .bg-emerald-500 *,
+        /* Target buttons with solid colored classes specifically so their texts remain white */
+        .flokker-white-theme button.bg-\[\#6C63FF\],
+        .flokker-white-theme button.bg-\[\#6C63FF\] *,
+        .flokker-white-theme button.bg-\[\#8B5CF6\],
+        .flokker-white-theme button.bg-\[\#8B5CF6\] * {
+          color: #ffffff !important;
+        }
+
+        /* Forms, inputs, and textareas inside light theme styled with professional off-white/light gray contrast */
+        .flokker-white-theme input,
+        .flokker-white-theme textarea,
+        .flokker-white-theme select {
+          background-color: #f1f5f9 !important;
+          border-color: #cbd5e1 !important;
+          color: #1e293b !important;
+        }
+        .flokker-white-theme input::placeholder,
+        .flokker-white-theme textarea::placeholder {
+          color: #94a3b8 !important;
+        }
+
+        /* Gradient text elements should keep their gradient fill */
+        .flokker-white-theme .bg-clip-text {
+          -webkit-text-fill-color: transparent !important;
         }
 
         /* Background overrides */
