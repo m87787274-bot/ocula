@@ -170,8 +170,8 @@ export const FlokkerPreLanding: React.FC<FlokkerPreLandingProps> = ({
         .flokker-white-theme .text-indigo-300,
         .flokker-white-theme .text-indigo-400,
         .flokker-white-theme .text-indigo-50,
-        .flokker-white-theme .text-\[\#F8FAFC\],
-        .flokker-white-theme .text-\[\#f8fafc\] {
+        .flokker-white-theme .text-\\[\\#F8FAFC\\],
+        .flokker-white-theme .text-\\[\\#f8fafc\\] {
           color: #1e293b !important;
         }
 
@@ -182,26 +182,26 @@ export const FlokkerPreLanding: React.FC<FlokkerPreLandingProps> = ({
         .flokker-white-theme .text-gray-600,
         .flokker-white-theme .text-neutral-500,
         .flokker-white-theme .text-neutral-600,
-        .flokker-white-theme .text-\[\#94A3B8\],
-        .flokker-white-theme .text-\[\#94a3b8\] {
+        .flokker-white-theme .text-\\[\\#94A3B8\\],
+        .flokker-white-theme .text-\\[\\#94a3b8\\] {
           color: #1e293b !important; /* Ensure these are now deep slate-800 instead of washed-out grey */
         }
 
         /* Specific brand highlights and badge colors tuned to higher contrast versions for light bg */
-        .flokker-white-theme .text-\[\#6C63FF\],
-        .flokker-white-theme .text-\[\#6c63ff\] {
+        .flokker-white-theme .text-\\[\\#6C63FF\\],
+        .flokker-white-theme .text-\\[\\#6c63ff\\] {
           color: #4f46e5 !important; /* Premium Indigo-600 */
         }
-        .flokker-white-theme .text-\[\#8B5CF6\],
-        .flokker-white-theme .text-\[\#8b5cf6\] {
+        .flokker-white-theme .text-\\[\\#8B5CF6\\],
+        .flokker-white-theme .text-\\[\\#8b5cf6\\] {
           color: #6d28d9 !important; /* Premium Violet-700 */
         }
-        .flokker-white-theme .text-\[\#4F8BFF\],
-        .flokker-white-theme .text-\[\#4f8bff\] {
+        .flokker-white-theme .text-\\[\\#4F8BFF\\],
+        .flokker-white-theme .text-\\[\\#4f8bff\\] {
           color: #1d4ed8 !important; /* Royal Blue-700 */
         }
-        .flokker-white-theme .text-\[\#FDBA2D\],
-        .flokker-white-theme .text-\[\#fdba2d\] {
+        .flokker-white-theme .text-\\[\\#FDBA2D\\],
+        .flokker-white-theme .text-\\[\\#fdba2d\\] {
           color: #b45309 !important; /* Warm Amber-700 */
         }
         .flokker-white-theme .text-emerald-400 {
@@ -212,35 +212,41 @@ export const FlokkerPreLanding: React.FC<FlokkerPreLandingProps> = ({
         }
 
         /* Re-assert pristine white text ONLY on elements with solid bright background fills and buttons */
-        .flokker-white-theme .bg-\[\#6C63FF\],
-        .flokker-white-theme .bg-\[\#6C63FF\] *,
-        .flokker-white-theme .bg-\[\#8B5CF6\],
-        .flokker-white-theme .bg-\[\#8B5CF6\] *,
-        .flokker-white-theme .bg-\[\#4F8BFF\],
-        .flokker-white-theme .bg-\[\#4F8BFF\] *,
-        .flokker-white-theme .bg-\[\#5a52e0\],
-        .flokker-white-theme .bg-\[\#5a52e0\] *,
+        .flokker-white-theme .bg-\\[\\#6C63FF\\],
+        .flokker-white-theme .bg-\\[\\#6C63FF\\] *,
+        .flokker-white-theme .bg-\\[\\#8B5CF6\\],
+        .flokker-white-theme .bg-\\[\\#8B5CF6\\] *,
+        .flokker-white-theme .bg-\\[\\#4F8BFF\\],
+        .flokker-white-theme .bg-\\[\\#4F8BFF\\] *,
+        .flokker-white-theme .bg-\\[\\#5a52e0\\],
+        .flokker-white-theme .bg-\\[\\#5a52e0\\] *,
         .flokker-white-theme .bg-indigo-600,
         .flokker-white-theme .bg-indigo-600 *,
         .flokker-white-theme .bg-emerald-500,
         .flokker-white-theme .bg-emerald-500 *,
         
-        /* Active button state selections inside package builder */
-        .flokker-white-theme .border-\[\#6C63FF\].bg-\[\#6C63FF\]\/10,
-        .flokker-white-theme .border-\[\#6C63FF\].bg-\[\#6C63FF\]\/10 *,
-        .flokker-white-theme .border-\[\#8B5CF6\].bg-\[\#8B5CF6\]\/10,
-        .flokker-white-theme .border-\[\#8B5CF6\].bg-\[\#8B5CF6\]\/10 *,
-        .flokker-white-theme .border-\[\#4F8BFF\].bg-\[\#4F8BFF\]\/10,
-        .flokker-white-theme .border-\[\#4F8BFF\].bg-\[\#4F8BFF\]\/10 *,
-        
-        /* General buttons and active states */
-        .flokker-white-theme button.bg-\[\#6C63FF\],
-        .flokker-white-theme button.bg-\[\#6C63FF\] *,
-        .flokker-white-theme button.bg-\[\#8B5CF6\],
-        .flokker-white-theme button.bg-\[\#8B5CF6\] *,
-        .flokker-white-theme button.bg-slate-900/80.text-white,
-        .flokker-white-theme button.bg-slate-900/80.text-white * {
+        /* General buttons and solid active states */
+        .flokker-white-theme button.bg-\\[\\#6C63FF\\],
+        .flokker-white-theme button.bg-\\[\\#6C63FF\\] *,
+        .flokker-white-theme button.bg-\\[\\#8B5CF6\\],
+        .flokker-white-theme button.bg-\\[\\#8B5CF6\\] *,
+        .flokker-white-theme button.bg-slate-900\\/80.text-white,
+        .flokker-white-theme button.bg-slate-900\\/80.text-white * {
           color: #ffffff !important;
+        }
+
+        /* Active button state selections inside package builder with light tint bg */
+        .flokker-white-theme .border-\\[\\#6C63FF\\].bg-\\[\\#6C63FF\\]\\/10,
+        .flokker-white-theme .border-\\[\\#6C63FF\\].bg-\\[\\#6C63FF\\]\\/10 * {
+          color: #4f46e5 !important;
+        }
+        .flokker-white-theme .border-\\[\\#8B5CF6\\].bg-\\[\\#8B5CF6\\]\\/10,
+        .flokker-white-theme .border-\\[\\#8B5CF6\\].bg-\\[\\#8B5CF6\\]\\/10 * {
+          color: #6d28d9 !important;
+        }
+        .flokker-white-theme .border-\\[\\#4F8BFF\\].bg-\\[\\#4F8BFF\\]\\/10,
+        .flokker-white-theme .border-\\[\\#4F8BFF\\].bg-\\[\\#4F8BFF\\]\\/10 * {
+          color: #1d4ed8 !important;
         }
 
         /* Active selected tabs inside Ocula BI Dashboard must have high visibility white text */
@@ -267,16 +273,16 @@ export const FlokkerPreLanding: React.FC<FlokkerPreLandingProps> = ({
         }
 
         /* Background overrides */
-        .flokker-white-theme .bg-\[\#070B1A\] {
+        .flokker-white-theme .bg-\\[\\#070B1A\\] {
           background-color: #ffffff !important;
         }
-        .flokker-white-theme .bg-\[\#070B1A\]\/80 {
-          background-color: rgba(255, 255, 255, 0.85) !important;
-          border-color: rgba(15, 23, 42, 0.08) !important;
+        .flokker-white-theme .bg-\\[\\#070B1A\\]\\/80 {
+          background-color: rgba(255, 255, 255, 0.95) !important;
+          border-color: rgba(15, 23, 42, 0.1) !important;
         }
-        .flokker-white-theme .bg-\[\#070B1A\]\/70 {
-          background-color: rgba(255, 255, 255, 0.75) !important;
-          border-color: rgba(15, 23, 42, 0.08) !important;
+        .flokker-white-theme .bg-\\[\\#070B1A\\]\\/70 {
+          background-color: rgba(255, 255, 255, 0.85) !important;
+          border-color: rgba(15, 23, 42, 0.1) !important;
         }
         .flokker-white-theme header {
           background-color: rgba(255, 255, 255, 0.8) !important;
@@ -284,47 +290,47 @@ export const FlokkerPreLanding: React.FC<FlokkerPreLandingProps> = ({
         }
 
         /* Cards and sections mapped to soft light gray/white container designs */
-        .flokker-white-theme .bg-\[\#101828\]\/40,
-        .flokker-white-theme .bg-\[\#101828\]\/35,
-        .flokker-white-theme .bg-\[\#101828\]\/30,
-        .flokker-white-theme .bg-\[\#101828\]\/25,
-        .flokker-white-theme .bg-\[\#101828\]/70,
-        .flokker-white-theme .bg-\[\#101828\] {
+        .flokker-white-theme .bg-\\[\\#101828\\]\\/40,
+        .flokker-white-theme .bg-\\[\\#101828\\]\\/35,
+        .flokker-white-theme .bg-\\[\\#101828\\]\\/30,
+        .flokker-white-theme .bg-\\[\\#101828\\]\\/25,
+        .flokker-white-theme .bg-\\[\\#101828\\]\\/70,
+        .flokker-white-theme .bg-\\[\\#101828\\] {
           background-color: #f8fafc !important;
           border-color: #e2e8f0 !important;
           box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02) !important;
         }
 
         /* Target all subtexts inside these cards to guarantee perfect legibility */
-        .flokker-white-theme .bg-\[\#101828\]\/40 *,
-        .flokker-white-theme .bg-\[\#101828\]\/35 *,
-        .flokker-white-theme .bg-\[\#101828\]\/30 *,
-        .flokker-white-theme .bg-\[\#101828\]\/25 *,
-        .flokker-white-theme .bg-\[\#101828\]/70 *,
-        .flokker-white-theme .bg-\[\#101828\] * {
+        .flokker-white-theme .bg-\\[\\#101828\\]\\/40 *,
+        .flokker-white-theme .bg-\\[\\#101828\\]\\/35 *,
+        .flokker-white-theme .bg-\\[\\#101828\\]\\/30 *,
+        .flokker-white-theme .bg-\\[\\#101828\\]\\/25 *,
+        .flokker-white-theme .bg-\\[\\#101828\\]\\/70 *,
+        .flokker-white-theme .bg-\\[\\#101828\\] * {
           color: #1e293b;
         }
 
         /* Hover states for cards */
-        .flokker-white-theme .hover\:bg-\[\#101828\]\/65:hover {
+        .flokker-white-theme .hover\\:bg-\\[\\#101828\\]\\/65:hover {
           background-color: #f1f5f9 !important;
         }
 
         /* Inner background elements */
-        .flokker-white-theme .bg-\[\#111827\]\/80,
-        .flokker-white-theme .bg-\[\#111827\]\/60,
-        .flokker-white-theme .bg-\[\#111827\]\/40,
-        .flokker-white-theme .bg-\[\#111827\]\/30,
-        .flokker-white-theme .bg-\[\#111827\] {
+        .flokker-white-theme .bg-\\[\\#111827\\]\\/80,
+        .flokker-white-theme .bg-\\[\\#111827\\]\\/60,
+        .flokker-white-theme .bg-\\[\\#111827\\]\\/40,
+        .flokker-white-theme .bg-\\[\\#111827\\]\\/30,
+        .flokker-white-theme .bg-\\[\\#111827\\] {
           background-color: #ffffff !important;
           border-color: #e2e8f0 !important;
         }
         
-        .flokker-white-theme .bg-\[\#111827\]\/80 *,
-        .flokker-white-theme .bg-\[\#111827\]\/60 *,
-        .flokker-white-theme .bg-\[\#111827\]\/40 *,
-        .flokker-white-theme .bg-\[\#111827\]\/30 *,
-        .flokker-white-theme .bg-\[\#111827\] * {
+        .flokker-white-theme .bg-\\[\\#111827\\]\\/80 *,
+        .flokker-white-theme .bg-\\[\\#111827\\]\\/60 *,
+        .flokker-white-theme .bg-\\[\\#111827\\]\\/40 *,
+        .flokker-white-theme .bg-\\[\\#111827\\]\\/30 *,
+        .flokker-white-theme .bg-\\[\\#111827\\] * {
           color: #1e293b;
         }
 
@@ -336,13 +342,13 @@ export const FlokkerPreLanding: React.FC<FlokkerPreLandingProps> = ({
         }
 
         /* Border line adjustments */
-        .flokker-white-theme .border-white\/5,
-        .flokker-white-theme .border-white\/10 {
+        .flokker-white-theme .border-white\\/5,
+        .flokker-white-theme .border-white\\/10 {
           border-color: #e2e8f0 !important;
         }
 
         /* Division borders */
-        .flokker-white-theme .divide-white\/5 > * {
+        .flokker-white-theme .divide-white\\/5 > * {
           border-color: #e2e8f0 !important;
         }
 
@@ -355,18 +361,18 @@ export const FlokkerPreLanding: React.FC<FlokkerPreLandingProps> = ({
         }
 
         /* Background elements white/5, white/10 and slate-900 to adapt to light theme */
-        .flokker-white-theme .bg-white\/5,
-        .flokker-white-theme .bg-slate-900\/60,
-        .flokker-white-theme .bg-slate-900\/80,
+        .flokker-white-theme .bg-white\\/5,
+        .flokker-white-theme .bg-slate-900\\/60,
+        .flokker-white-theme .bg-slate-900\\/80,
         .flokker-white-theme .bg-slate-900 {
           background-color: #f1f5f9 !important;
           border-color: #cbd5e1 !important;
         }
-        .flokker-white-theme .bg-white\/10 {
+        .flokker-white-theme .bg-white\\/10 {
           background-color: #e2e8f0 !important;
           border-color: #cbd5e1 !important;
         }
-        .flokker-white-theme .hover\:bg-white\/10:hover {
+        .flokker-white-theme .hover\\:bg-white\\/10:hover {
           background-color: #e2e8f0 !important;
         }
 
@@ -379,12 +385,12 @@ export const FlokkerPreLanding: React.FC<FlokkerPreLandingProps> = ({
         }
 
         /* FAQ block */
-        .flokker-white-theme .bg-slate-900\/60 {
+        .flokker-white-theme .bg-slate-900\\/60 {
           background-color: rgba(15, 23, 42, 0.03) !important;
         }
 
         /* Modal styling */
-        .flokker-white-theme .bg-\[\#101828\] {
+        .flokker-white-theme .bg-\\[\\#101828\\] {
           background-color: #ffffff !important;
           border-color: #e2e8f0 !important;
         }
@@ -402,7 +408,7 @@ export const FlokkerPreLanding: React.FC<FlokkerPreLandingProps> = ({
         }
         
         /* Floating cards connectivity to globe */
-        .flokker-white-theme .lg\:col-span-6 .absolute .font-mono {
+        .flokker-white-theme .lg\\:col-span-6 .absolute .font-mono {
           color: #0f172a !important;
         }
       `}</style>

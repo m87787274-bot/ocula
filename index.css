@@ -399,3 +399,12 @@ body.print-view-active .relative.z-10.min-h-screen.flex-1 {
     box-shadow: none !important;
   }
 }
+
+/* Global high-contrast overrides for text-slate-500 across both light and dark modes */
+.text-slate-500 {
+  color: #334155 !important; /* Slate-700 (High-contrast for light theme) */
+}
+.dark .text-slate-500,
+:where(.dark, .dark *) .text-slate-500 {
+  color: #cbd5e1 !important; /* Slate-300 (High-contrast for dark theme) */
+}
